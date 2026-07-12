@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BoboMart — Quick Grocery Delivery</title>
+
+  <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#3DA829',
+              greenlight: '#EAF6E6',
+              orange: '#F5A11A',
+              orangelight: '#FEF3E0',
+            },
+          },
+          fontFamily: {
+            en: ['Nunito', 'sans-serif'],
+            ar: ['Cairo', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Fonts: Nunito (EN) + Cairo (AR) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/custom.css" />
+</head>
+
+<body class="bb-page font-en bg-white text-gray-800 pb-20 md:pb-0">
+
+  <!-- ============================================================
+       OFFER STRIP (fixed message, sitewide)
+       .NET: bind threshold (100 KD) from settings/config
+  ============================================================ -->
+  <div class="bb-offer-strip bg-brand-green text-white text-center text-xs sm:text-sm font-bold py-2 px-4">
+    <span data-en="🚚 Free delivery on orders above 100 KD"
+          data-ar="🚚 توصيل مجاني للطلبات فوق ١٠٠ د.ك">🚚 Free delivery on orders above 100 KD</span>
+  </div>
+
+  <!-- ============================================================
+       HEADER — desktop: full nav bar / mobile: logo + actions
+       .NET: profile picture + name bound to logged-in user
+  ============================================================ -->
+  <header class="bb-header sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3 md:gap-6">
+
+      <!-- Logo -->
+      <a href="index.html" class="bb-logo shrink-0">
+        <img src="images/logo.jpeg" alt="BoboMart" class="h-9 md:h-11 w-auto rounded" />
+      </a>
+
+      <!-- Search (grows to fill) -->
+      <div class="bb-search flex-1 max-w-xl">
+        <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="bb-search-input bg-transparent outline-none text-sm w-full placeholder-gray-400"
+                 data-placeholder-en="Search groceries..." data-placeholder-ar="ابحث عن البقالة..."
+                 placeholder="Search groceries..." />
+        </div>
+      </div>
+
+      <!-- Desktop nav links -->
+      <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600">
+        <a href="#" class="text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
+        <a href="#" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
+        <a href="#" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
+      </nav>
+
+      <!-- Actions: language, cart, profile picture -->
+      <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0">
+        <button id="langToggle" class="bb-lang-toggle text-xs font-bold border border-gray-200 rounded-full px-3 py-1.5 hover:border-brand-green hover:text-brand-green transition"
+                data-en="عربي" data-ar="EN">عربي</button>
+
+        <button class="bb-cart-btn relative p-2 rounded-full hover:bg-gray-100 transition" aria-label="Cart">
+          <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span id="cartBadge" class="bb-cart-badge absolute -top-0.5 -right-0.5 bg-brand-orange text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
+        </button>
+
+        <!-- Profile picture (top, as required) -->
+        <button class="bb-profile shrink-0" aria-label="Profile">
+          <!-- .NET: src bound to @Model.User.AvatarUrl -->
+          <img src="images/profile.jpg" alt="Profile"
+               class="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover border-2 border-brand-green" />
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4">
+
+    <!-- ============================================================
+         HERO BANNER (static image/illustration for now)
+    ============================================================ -->
+    <section class="bb-hero mt-4 rounded-3xl bg-brand-greenlight overflow-hidden">
+      <div class="flex items-center justify-between gap-4 px-6 py-8 md:px-12 md:py-12">
+        <div class="bb-hero-text max-w-md">
+          <p class="text-brand-orange font-extrabold text-xs md:text-sm uppercase tracking-wide mb-1"
+             data-en="Quick delivery in Kuwait" data-ar="توصيل سريع في الكويت">Quick delivery in Kuwait</p>
+          <h1 class="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight"
+              data-en="Fresh groceries, delivered in minutes" data-ar="بقالة طازجة تصلك في دقائق">Fresh groceries, delivered in minutes</h1>
+          <button class="bb-hero-cta mt-4 bg-brand-green text-white font-bold text-sm rounded-full px-6 py-2.5 hover:opacity-90 transition"
+                  data-en="Shop now" data-ar="تسوق الآن">Shop now</button>
+        </div>
+        <img src="images/hero.jpg" alt="Fresh groceries"
+             class="bb-hero-img hidden sm:block w-48 md:w-72 h-32 md:h-44 object-cover rounded-2xl shadow-md shrink-0" />
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CATEGORIES (horizontal scroll chips)
+         REPEATABLE: .bb-category-chip — Razor loop over categories
+    ============================================================ -->
+    <section class="bb-categories mt-8">
+      <h2 class="bb-section-title text-lg md:text-xl font-extrabold mb-3"
+          data-en="Shop by category" data-ar="تسوق حسب الفئة">Shop by category</h2>
+      <div class="bb-category-list flex gap-3 overflow-x-auto no-scrollbar pb-1">
+        <!-- REPEATABLE: category chip -->
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/categories/fruitsveg.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Fruits & Veg" data-ar="فواكه وخضار">Fruits &amp; Veg</span>
+        </a>
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/products/milk.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Dairy & Eggs" data-ar="ألبان وبيض">Dairy &amp; Eggs</span>
+        </a>
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/products/bread.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Bakery" data-ar="مخبوزات">Bakery</span>
+        </a>
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/categories/beverages.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Beverages" data-ar="مشروبات">Beverages</span>
+        </a>
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/categories/snacks.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Snacks" data-ar="وجبات خفيفة">Snacks</span>
+        </a>
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/products/rice.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Rice & Grains" data-ar="أرز وحبوب">Rice &amp; Grains</span>
+        </a>
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/categories/frozen.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Frozen" data-ar="مجمدات">Frozen</span>
+        </a>
+        <a href="#" class="bb-category-chip shrink-0 flex flex-col items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 hover:border-brand-green transition">
+          <img src="images/categories/household.jpg" alt="" class="w-11 h-11 rounded-full object-cover" /><span class="text-xs font-bold" data-en="Household" data-ar="منزلية">Household</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         DEAL OF THE DAY — countdown ends at midnight today
+         .NET: deal products + end time from DB
+         REPEATABLE: .bb-deal-card
+    ============================================================ -->
+    <section class="bb-deals mt-10 rounded-3xl bg-brand-orangelight px-4 py-6 md:px-8 md:py-8">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <div>
+          <h2 class="bb-section-title text-lg md:text-xl font-extrabold"
+              data-en="🔥 Deal of the Day" data-ar="🔥 عرض اليوم">🔥 Deal of the Day</h2>
+          <p class="text-xs text-gray-500 font-semibold" data-en="Today only — hurry up!" data-ar="اليوم فقط — سارع بالشراء!">Today only — hurry up!</p>
+        </div>
+        <!-- Countdown -->
+        <div class="bb-countdown flex items-center gap-2" id="countdown">
+          <span class="text-xs font-bold text-gray-600" data-en="Ends in" data-ar="ينتهي خلال">Ends in</span>
+          <span class="bb-countdown-box bg-brand-orange text-white font-extrabold text-sm rounded-lg px-2.5 py-1.5 min-w-[40px] text-center" id="cdHours">00</span>
+          <span class="font-extrabold text-brand-orange">:</span>
+          <span class="bb-countdown-box bg-brand-orange text-white font-extrabold text-sm rounded-lg px-2.5 py-1.5 min-w-[40px] text-center" id="cdMins">00</span>
+          <span class="font-extrabold text-brand-orange">:</span>
+          <span class="bb-countdown-box bg-brand-orange text-white font-extrabold text-sm rounded-lg px-2.5 py-1.5 min-w-[40px] text-center" id="cdSecs">00</span>
+        </div>
+      </div>
+
+      <div class="bb-deal-grid grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <!-- REPEATABLE: deal card -->
+        <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
+          <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-30%</span>
+          <img src="images/products/chips.jpg" alt="Potato Chips" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-1" data-en="Potato Chips" data-ar="رقائق بطاطس">Potato Chips</p>
+          <span class="bb-pack-size text-[11px] font-bold text-gray-400">150g</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="bb-price text-brand-green font-extrabold text-sm">0.350 <small data-en="KD" data-ar="د.ك">KD</small></span>
+            <span class="bb-price-old text-gray-400 text-xs line-through">0.500</span>
+          </div>
+          <div class="bb-cart-control mt-2" data-product="deal-chips"></div>
+        </div>
+
+        <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
+          <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-25%</span>
+          <img src="images/products/apples.jpg" alt="Red Apples" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-1" data-en="Red Apples" data-ar="تفاح أحمر">Red Apples</p>
+          <span class="bb-pack-size text-[11px] font-bold text-gray-400">1kg</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="bb-price text-brand-green font-extrabold text-sm">0.600 <small data-en="KD" data-ar="د.ك">KD</small></span>
+            <span class="bb-price-old text-gray-400 text-xs line-through">0.800</span>
+          </div>
+          <div class="bb-cart-control mt-2" data-product="deal-apples"></div>
+        </div>
+
+        <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
+          <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-20%</span>
+          <img src="images/products/cheese.jpg" alt="Cheese Slices" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-1" data-en="Cheese Slices" data-ar="شرائح جبن">Cheese Slices</p>
+          <span class="bb-pack-size text-[11px] font-bold text-gray-400">200g</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="bb-price text-brand-green font-extrabold text-sm">0.800 <small data-en="KD" data-ar="د.ك">KD</small></span>
+            <span class="bb-price-old text-gray-400 text-xs line-through">1.000</span>
+          </div>
+          <div class="bb-cart-control mt-2" data-product="deal-cheese"></div>
+        </div>
+
+        <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
+          <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-40%</span>
+          <img src="images/products/cornflakes.jpg" alt="Corn Flakes" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-1" data-en="Corn Flakes" data-ar="رقائق الذرة">Corn Flakes</p>
+          <span class="bb-pack-size text-[11px] font-bold text-gray-400">500g</span>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="bb-price text-brand-green font-extrabold text-sm">0.900 <small data-en="KD" data-ar="د.ك">KD</small></span>
+            <span class="bb-price-old text-gray-400 text-xs line-through">1.500</span>
+          </div>
+          <div class="bb-cart-control mt-2" data-product="deal-flakes"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GROCERY PACKETS — fixed-quantity packs (500g, 1kg, 1L ...)
+         REPEATABLE: .bb-product-card — Razor loop over products
+    ============================================================ -->
+    <section class="bb-packets mt-10">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="bb-section-title text-lg md:text-xl font-extrabold"
+            data-en="Grocery packets" data-ar="عبوات البقالة">Grocery packets</h2>
+        <a href="#" class="text-brand-green text-xs font-extrabold" data-en="View all →" data-ar="← عرض الكل">View all →</a>
+      </div>
+
+      <div class="bb-product-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+        <!-- REPEATABLE: product card -->
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/rice.jpg" alt="Basmati Rice" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Basmati Rice" data-ar="أرز بسمتي">Basmati Rice</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">5kg</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">4.750 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="rice"></div>
+          </div>
+        </div>
+
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/milk.jpg" alt="Fresh Milk" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Fresh Milk" data-ar="حليب طازج">Fresh Milk</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">1L</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">0.650 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="milk"></div>
+          </div>
+        </div>
+
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/bananas.jpg" alt="Bananas" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Bananas" data-ar="موز">Bananas</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">1kg</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">0.450 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="bananas"></div>
+          </div>
+        </div>
+
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/eggs.jpg" alt="Farm Eggs" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Farm Eggs" data-ar="بيض بلدي">Farm Eggs</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">30 pcs</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">1.200 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="eggs"></div>
+          </div>
+        </div>
+
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/tomatoes.jpg" alt="Tomatoes" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Tomatoes" data-ar="طماطم">Tomatoes</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">500g</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">0.350 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="tomatoes"></div>
+          </div>
+        </div>
+
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/bread.jpg" alt="Arabic Bread" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Arabic Bread" data-ar="خبز عربي">Arabic Bread</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">6 pcs</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">0.250 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="bread"></div>
+          </div>
+        </div>
+
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/oliveoil.jpg" alt="Olive Oil" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Olive Oil" data-ar="زيت زيتون">Olive Oil</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">750ml</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">2.900 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="oliveoil"></div>
+          </div>
+        </div>
+
+        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <img src="images/products/chicken.jpg" alt="Chicken Breast" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <p class="bb-product-name text-sm font-bold mt-2" data-en="Chicken Breast" data-ar="صدر دجاج">Chicken Breast</p>
+          <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">1kg</span>
+          <div class="mt-auto pt-2 flex items-center justify-between gap-2">
+            <span class="bb-price text-gray-900 font-extrabold text-sm">1.950 <small class="text-gray-400 font-bold" data-en="KD" data-ar="د.ك">KD</small></span>
+            <div class="bb-cart-control" data-product="chicken"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER (desktop only)
+    ============================================================ -->
+    <footer class="bb-footer hidden md:block mt-14 border-t border-gray-100 py-8 text-center text-xs text-gray-400 font-semibold">
+      <p data-en="© 2026 BoboMart — Fresh groceries delivered across Kuwait 🇰🇼"
+         data-ar="© ٢٠٢٦ بوبومارت — بقالة طازجة تصلك في جميع أنحاء الكويت 🇰🇼">© 2026 BoboMart — Fresh groceries delivered across Kuwait 🇰🇼</p>
+    </footer>
+  </main>
+
+  <!-- ============================================================
+       BOTTOM TAB BAR — mobile only (app-like navigation)
+       .NET: active tab set per Razor view
+  ============================================================ -->
+  <nav class="bb-tabbar md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-100 flex justify-around items-center py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
+    </a>
+    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
+    </a>
+    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400 relative">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
+      <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
+    </a>
+    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
+    </a>
+    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
+    </a>
+  </nav>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

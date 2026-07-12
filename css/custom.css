@@ -1,0 +1,53 @@
+/* BoboMart — small overrides on top of Tailwind */
+
+/* Hide horizontal scrollbars on category strips */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Arabic (RTL) mode: switch font */
+html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
+
+/* Discount badge sticks to the reading-start corner in RTL */
+html[dir="rtl"] .bb-discount-badge { left: auto; right: 0.75rem; }
+
+/* Add-to-cart button + stepper (shared component) */
+.bb-add-btn {
+  background: #3DA829;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  transition: opacity .15s;
+}
+.bb-add-btn:hover { opacity: .9; }
+
+.bb-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #EAF6E6;
+  border-radius: 9999px;
+  padding: 3px 6px;
+}
+.bb-stepper button {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #3DA829;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bb-stepper button:disabled { opacity: .4; cursor: not-allowed; }
+.bb-stepper .bb-qty {
+  min-width: 16px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 12px;
+  color: #1F2937;
+}
