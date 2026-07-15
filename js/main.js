@@ -79,7 +79,8 @@ function renderControl(container) {
   if (qty === 0) {
     const btn = document.createElement('button');
     btn.className = 'bb-add-btn';
-    btn.textContent = document.documentElement.lang === 'ar' ? '+ أضف' : '+ Add';
+    btn.textContent = '+';
+    btn.setAttribute('aria-label', document.documentElement.lang === 'ar' ? 'أضف إلى السلة' : 'Add to cart');
     btn.addEventListener('click', () => {
       cart[id] = 1;
       renderControl(container);

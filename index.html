@@ -55,7 +55,7 @@
 
       <!-- Logo -->
       <a href="index.html" class="bb-logo shrink-0">
-        <img src="images/logo.jpeg" alt="BoboMart" class="h-9 md:h-11 w-auto rounded" />
+        <img src="images/logo.jpeg" alt="BoboMart" class="h-12 md:h-16 w-auto rounded" />
       </a>
 
       <!-- Search (grows to fill) -->
@@ -75,22 +75,16 @@
         <a href="#" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
       </nav>
 
-      <!-- Actions: language, cart, profile picture -->
+      <!-- Actions: cart, then language toggle (moved to the far right, where profile used to be) -->
       <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0">
-        <button id="langToggle" class="bb-lang-toggle text-xs font-bold border border-gray-200 rounded-full px-3 py-1.5 hover:border-brand-green hover:text-brand-green transition"
-                data-en="عربي" data-ar="EN">عربي</button>
-
         <button class="bb-cart-btn relative p-2 rounded-full hover:bg-gray-100 transition" aria-label="Cart">
           <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           <span id="cartBadge" class="bb-cart-badge absolute -top-0.5 -right-0.5 bg-brand-orange text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
         </button>
 
-        <!-- Profile picture (top, as required) -->
-        <button class="bb-profile shrink-0" aria-label="Profile">
-          <!-- .NET: src bound to @Model.User.AvatarUrl -->
-          <img src="images/profile.jpg" alt="Profile"
-               class="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover border-2 border-brand-green" />
-        </button>
+        <!-- Language toggle (shifted to profile's old position) -->
+        <button id="langToggle" class="bb-lang-toggle text-xs font-bold border border-gray-200 rounded-full px-3 py-1.5 hover:border-brand-green hover:text-brand-green transition"
+                data-en="عربي" data-ar="EN">عربي</button>
       </div>
     </div>
   </header>
@@ -178,50 +172,50 @@
         <!-- REPEATABLE: deal card -->
         <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
           <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-30%</span>
-          <img src="images/products/chips.jpg" alt="Potato Chips" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/chips.jpg" alt="Potato Chips" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-1" data-en="Potato Chips" data-ar="رقائق بطاطس">Potato Chips</p>
           <span class="bb-pack-size text-[11px] font-bold text-gray-400">150g</span>
           <div class="mt-1 flex items-center gap-2">
             <span class="bb-price text-brand-green font-extrabold text-sm">0.350 <small data-en="KD" data-ar="د.ك">KD</small></span>
             <span class="bb-price-old text-gray-400 text-xs line-through">0.500</span>
           </div>
-          <div class="bb-cart-control mt-2" data-product="deal-chips"></div>
+          <div class="bb-cart-control mt-2 flex justify-end" data-product="deal-chips"></div>
         </div>
 
         <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
           <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-25%</span>
-          <img src="images/products/apples.jpg" alt="Red Apples" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/apples.jpg" alt="Red Apples" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-1" data-en="Red Apples" data-ar="تفاح أحمر">Red Apples</p>
           <span class="bb-pack-size text-[11px] font-bold text-gray-400">1kg</span>
           <div class="mt-1 flex items-center gap-2">
             <span class="bb-price text-brand-green font-extrabold text-sm">0.600 <small data-en="KD" data-ar="د.ك">KD</small></span>
             <span class="bb-price-old text-gray-400 text-xs line-through">0.800</span>
           </div>
-          <div class="bb-cart-control mt-2" data-product="deal-apples"></div>
+          <div class="bb-cart-control mt-2 flex justify-end" data-product="deal-apples"></div>
         </div>
 
         <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
           <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-20%</span>
-          <img src="images/products/cheese.jpg" alt="Cheese Slices" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/cheese.jpg" alt="Cheese Slices" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-1" data-en="Cheese Slices" data-ar="شرائح جبن">Cheese Slices</p>
           <span class="bb-pack-size text-[11px] font-bold text-gray-400">200g</span>
           <div class="mt-1 flex items-center gap-2">
             <span class="bb-price text-brand-green font-extrabold text-sm">0.800 <small data-en="KD" data-ar="د.ك">KD</small></span>
             <span class="bb-price-old text-gray-400 text-xs line-through">1.000</span>
           </div>
-          <div class="bb-cart-control mt-2" data-product="deal-cheese"></div>
+          <div class="bb-cart-control mt-2 flex justify-end" data-product="deal-cheese"></div>
         </div>
 
         <div class="bb-deal-card bb-product-card bg-white rounded-2xl p-3 md:p-4 relative flex flex-col">
           <span class="bb-discount-badge absolute top-3 left-3 bg-brand-orange text-white text-[10px] font-extrabold rounded-full px-2 py-0.5">-40%</span>
-          <img src="images/products/cornflakes.jpg" alt="Corn Flakes" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/cornflakes.jpg" alt="Corn Flakes" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-1" data-en="Corn Flakes" data-ar="رقائق الذرة">Corn Flakes</p>
           <span class="bb-pack-size text-[11px] font-bold text-gray-400">500g</span>
           <div class="mt-1 flex items-center gap-2">
             <span class="bb-price text-brand-green font-extrabold text-sm">0.900 <small data-en="KD" data-ar="د.ك">KD</small></span>
             <span class="bb-price-old text-gray-400 text-xs line-through">1.500</span>
           </div>
-          <div class="bb-cart-control mt-2" data-product="deal-flakes"></div>
+          <div class="bb-cart-control mt-2 flex justify-end" data-product="deal-flakes"></div>
         </div>
       </div>
     </section>
@@ -239,8 +233,9 @@
 
       <div class="bb-product-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
         <!-- REPEATABLE: product card -->
-        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/rice.jpg" alt="Basmati Rice" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+        <div class="bb-product-card relative bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <span class="bb-bestseller-badge absolute top-3 left-3 z-10 bg-brand-green text-white text-[10px] font-extrabold rounded-full px-2 py-0.5" data-en="Best Seller" data-ar="الأكثر مبيعاً">Best Seller</span>
+          <img src="images/products/rice.jpg" alt="Basmati Rice" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Basmati Rice" data-ar="أرز بسمتي">Basmati Rice</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">5kg</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -250,7 +245,7 @@
         </div>
 
         <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/milk.jpg" alt="Fresh Milk" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/milk.jpg" alt="Fresh Milk" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Fresh Milk" data-ar="حليب طازج">Fresh Milk</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">1L</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -259,8 +254,9 @@
           </div>
         </div>
 
-        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/bananas.jpg" alt="Bananas" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+        <div class="bb-product-card relative bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <span class="bb-bestseller-badge absolute top-3 left-3 z-10 bg-brand-green text-white text-[10px] font-extrabold rounded-full px-2 py-0.5" data-en="Best Seller" data-ar="الأكثر مبيعاً">Best Seller</span>
+          <img src="images/products/bananas.jpg" alt="Bananas" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Bananas" data-ar="موز">Bananas</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">1kg</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -270,7 +266,7 @@
         </div>
 
         <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/eggs.jpg" alt="Farm Eggs" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/eggs.jpg" alt="Farm Eggs" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Farm Eggs" data-ar="بيض بلدي">Farm Eggs</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">30 pcs</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -280,7 +276,7 @@
         </div>
 
         <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/tomatoes.jpg" alt="Tomatoes" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/tomatoes.jpg" alt="Tomatoes" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Tomatoes" data-ar="طماطم">Tomatoes</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">500g</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -290,7 +286,7 @@
         </div>
 
         <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/bread.jpg" alt="Arabic Bread" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/bread.jpg" alt="Arabic Bread" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Arabic Bread" data-ar="خبز عربي">Arabic Bread</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">6 pcs</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -300,7 +296,7 @@
         </div>
 
         <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/oliveoil.jpg" alt="Olive Oil" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+          <img src="images/products/oliveoil.jpg" alt="Olive Oil" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Olive Oil" data-ar="زيت زيتون">Olive Oil</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">750ml</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -309,8 +305,9 @@
           </div>
         </div>
 
-        <div class="bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
-          <img src="images/products/chicken.jpg" alt="Chicken Breast" class="bb-product-img h-24 md:h-28 w-full object-cover rounded-xl" />
+        <div class="bb-product-card relative bg-white border border-gray-100 rounded-2xl p-3 md:p-4 flex flex-col hover:shadow-md transition">
+          <span class="bb-bestseller-badge absolute top-3 left-3 z-10 bg-brand-green text-white text-[10px] font-extrabold rounded-full px-2 py-0.5" data-en="Best Seller" data-ar="الأكثر مبيعاً">Best Seller</span>
+          <img src="images/products/chicken.jpg" alt="Chicken Breast" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
           <p class="bb-product-name text-sm font-bold mt-2" data-en="Chicken Breast" data-ar="صدر دجاج">Chicken Breast</p>
           <span class="bb-pack-size inline-block w-fit text-[11px] font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2 py-0.5 mt-1">1kg</span>
           <div class="mt-auto pt-2 flex items-center justify-between gap-2">

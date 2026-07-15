@@ -10,17 +10,28 @@ html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
 /* Discount badge sticks to the reading-start corner in RTL */
 html[dir="rtl"] .bb-discount-badge { left: auto; right: 0.75rem; }
 
+/* Best Seller badge sticks to the reading-start corner in RTL */
+html[dir="rtl"] .bb-bestseller-badge { left: auto; right: 0.75rem; }
+
 /* Add-to-cart button + stepper (shared component) */
+/* Round orange "+" button, sized large enough to tap comfortably */
 .bb-add-btn {
-  background: #3DA829;
-  color: #fff;
-  font-weight: 800;
-  font-size: 12px;
+  width: 38px;
+  height: 38px;
   border-radius: 9999px;
-  padding: 6px 14px;
-  transition: opacity .15s;
+  background: #F5A11A;      /* brand orange */
+  color: #fff;              /* white "+" */
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(245, 161, 26, .35);
+  transition: opacity .15s, transform .1s;
 }
-.bb-add-btn:hover { opacity: .9; }
+.bb-add-btn:hover { opacity: .92; }
+.bb-add-btn:active { transform: scale(.94); }
 
 .bb-stepper {
   display: flex;
