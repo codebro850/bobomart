@@ -70,17 +70,17 @@
 
       <!-- Desktop nav links -->
       <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600">
-        <a href="#" class="text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
-        <a href="#" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
-        <a href="#" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
+        <a href="index.html" class="text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
+        <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
+        <a href="orders.html" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
       </nav>
 
       <!-- Actions: cart, then language toggle (moved to the far right, where profile used to be) -->
       <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0">
-        <button class="bb-cart-btn relative p-2 rounded-full hover:bg-gray-100 transition" aria-label="Cart">
+        <a href="cart.html" class="bb-cart-btn relative p-2 rounded-full hover:bg-gray-100 transition" aria-label="Cart">
           <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           <span id="cartBadge" class="bb-cart-badge absolute -top-0.5 -right-0.5 bg-brand-orange text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
-        </button>
+        </a>
 
         <!-- Language toggle (shifted to profile's old position) -->
         <button id="langToggle" class="bb-lang-toggle text-xs font-bold border border-gray-200 rounded-full px-3 py-1.5 hover:border-brand-green hover:text-brand-green transition"
@@ -332,24 +332,24 @@
        .NET: active tab set per Razor view
   ============================================================ -->
   <nav class="bb-tabbar md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-100 flex justify-around items-center py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+    <a href="index.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
     </a>
-    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
     </a>
-    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400 relative">
+    <a href="cart.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400 relative">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
       <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
     </a>
-    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
     </a>
-    <a href="#" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
     </a>

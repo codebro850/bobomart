@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BoboMart — My Cart</title>
+
+  <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#3DA829',
+              greenlight: '#EAF6E6',
+              orange: '#F5A11A',
+              orangelight: '#FEF3E0',
+            },
+          },
+          fontFamily: {
+            en: ['Nunito', 'sans-serif'],
+            ar: ['Cairo', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Fonts: Nunito (EN) + Cairo (AR) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/custom.css" />
+</head>
+
+<body class="bb-page font-en bg-white text-gray-800 pb-20 md:pb-0">
+
+  <!-- OFFER STRIP -->
+  <div class="bb-offer-strip bg-brand-green text-white text-center text-xs sm:text-sm font-bold py-2 px-4">
+    <span data-en="🚚 Free delivery on orders above 100 KD"
+          data-ar="🚚 توصيل مجاني للطلبات فوق ١٠٠ د.ك">🚚 Free delivery on orders above 100 KD</span>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bb-header sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3 md:gap-6">
+
+      <!-- Logo -->
+      <a href="index.html" class="bb-logo shrink-0">
+        <img src="images/logo.jpeg" alt="BoboMart" class="h-12 md:h-16 w-auto rounded" />
+      </a>
+
+      <!-- Search (grows to fill) -->
+      <div class="bb-search flex-1 max-w-xl">
+        <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="bb-search-input bg-transparent outline-none text-sm w-full placeholder-gray-400"
+                 data-placeholder-en="Search groceries..." data-placeholder-ar="ابحث عن البقالة..."
+                 placeholder="Search groceries..." />
+        </div>
+      </div>
+
+      <!-- Desktop nav links -->
+      <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600">
+        <a href="index.html" class="hover:text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
+        <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
+        <a href="orders.html" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
+      </nav>
+
+      <!-- Actions: cart, then language toggle -->
+      <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0">
+        <a href="cart.html" class="bb-cart-btn relative p-2 rounded-full bg-brand-greenlight transition" aria-label="Cart">
+          <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="bb-cart-badge absolute -top-0.5 -right-0.5 bg-brand-orange text-white text-[10px] font-bold rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
+        </a>
+
+        <button id="langToggle" class="bb-lang-toggle text-xs font-bold border border-gray-200 rounded-full px-3 py-1.5 hover:border-brand-green hover:text-brand-green transition"
+                data-en="عربي" data-ar="EN">عربي</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4">
+
+    <!-- ============================================================
+         CART — items rendered by js/main.js from localStorage
+         .NET later: server-rendered cart lines + cart API
+    ============================================================ -->
+    <section class="bb-cart mt-6">
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-5"
+          data-en="My cart" data-ar="سلتي">My cart</h1>
+
+      <!-- Empty state -->
+      <div id="cartEmpty" class="hidden text-center py-16">
+        <div class="text-5xl mb-3">🛒</div>
+        <p class="font-extrabold text-gray-700" data-en="Your cart is empty" data-ar="سلتك فارغة">Your cart is empty</p>
+        <p class="text-sm text-gray-400 font-semibold mt-1" data-en="Add some fresh groceries to get started" data-ar="أضف بعض البقالة الطازجة للبدء">Add some fresh groceries to get started</p>
+        <a href="index.html" class="inline-block mt-5 bg-brand-green text-white font-bold text-sm rounded-full px-6 py-2.5 hover:opacity-90 transition"
+           data-en="Start shopping" data-ar="ابدأ التسوق">Start shopping</a>
+      </div>
+
+      <!-- Cart items (filled by main.js) -->
+      <div id="cartItems" class="space-y-3"></div>
+
+      <!-- Order summary -->
+      <div id="cartSummary" class="hidden mt-6 bg-gray-50 border border-gray-100 rounded-2xl p-4 md:p-5">
+        <h2 class="font-extrabold text-sm mb-3" data-en="Order summary" data-ar="ملخص الطلب">Order summary</h2>
+        <div class="space-y-2 text-sm font-semibold text-gray-600">
+          <div class="flex items-center justify-between">
+            <span data-en="Subtotal" data-ar="المجموع الفرعي">Subtotal</span>
+            <span id="cartSubtotal" class="font-extrabold text-gray-900">0.000 KD</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span data-en="Delivery" data-ar="التوصيل">Delivery</span>
+            <span id="cartDelivery" class="font-extrabold text-gray-900">0.500 KD</span>
+          </div>
+          <div class="border-t border-gray-200 pt-2 flex items-center justify-between text-base">
+            <span class="font-extrabold text-gray-900" data-en="Total" data-ar="الإجمالي">Total</span>
+            <span id="cartTotal" class="font-extrabold text-brand-green">0.000 KD</span>
+          </div>
+        </div>
+
+        <!-- .NET: checkout posts to order controller -->
+        <button class="bb-checkout-btn w-full mt-4 bg-brand-orange text-white font-extrabold text-sm rounded-full py-3 hover:opacity-90 transition"
+                data-en="Proceed to checkout" data-ar="إتمام الطلب">Proceed to checkout</button>
+        <p class="text-[11px] text-gray-400 font-semibold text-center mt-2"
+           data-en="Free delivery on orders above 100 KD" data-ar="توصيل مجاني للطلبات فوق ١٠٠ د.ك">Free delivery on orders above 100 KD</p>
+      </div>
+    </section>
+
+    <!-- FOOTER (desktop only) -->
+    <footer class="bb-footer hidden md:block mt-14 border-t border-gray-100 py-8 text-center text-xs text-gray-400 font-semibold">
+      <p data-en="© 2026 BoboMart — Fresh groceries delivered across Kuwait 🇰🇼"
+         data-ar="© ٢٠٢٦ بوبومارت — بقالة طازجة تصلك في جميع أنحاء الكويت 🇰🇼">© 2026 BoboMart — Fresh groceries delivered across Kuwait 🇰🇼</p>
+    </footer>
+  </main>
+
+  <!-- BOTTOM TAB BAR — mobile only -->
+  <nav class="bb-tabbar md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-100 flex justify-around items-center py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <a href="index.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
+    </a>
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
+    </a>
+    <a href="cart.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green relative">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
+      <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
+    </a>
+    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
+    </a>
+    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
+    </a>
+  </nav>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

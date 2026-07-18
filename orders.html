@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BoboMart — My Orders</title>
+
+  <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#3DA829',
+              greenlight: '#EAF6E6',
+              orange: '#F5A11A',
+              orangelight: '#FEF3E0',
+            },
+          },
+          fontFamily: {
+            en: ['Nunito', 'sans-serif'],
+            ar: ['Cairo', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Fonts: Nunito (EN) + Cairo (AR) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/custom.css" />
+</head>
+
+<body class="bb-page font-en bg-white text-gray-800 pb-20 md:pb-0">
+
+  <!-- OFFER STRIP -->
+  <div class="bb-offer-strip bg-brand-green text-white text-center text-xs sm:text-sm font-bold py-2 px-4">
+    <span data-en="🚚 Free delivery on orders above 100 KD"
+          data-ar="🚚 توصيل مجاني للطلبات فوق ١٠٠ د.ك">🚚 Free delivery on orders above 100 KD</span>
+  </div>
+
+  <!-- HEADER -->
+  <header class="bb-header sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3 md:gap-6">
+
+      <!-- Logo -->
+      <a href="index.html" class="bb-logo shrink-0">
+        <img src="images/logo.jpeg" alt="BoboMart" class="h-12 md:h-16 w-auto rounded" />
+      </a>
+
+      <!-- Search (grows to fill) -->
+      <div class="bb-search flex-1 max-w-xl">
+        <div class="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
+          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" class="bb-search-input bg-transparent outline-none text-sm w-full placeholder-gray-400"
+                 data-placeholder-en="Search groceries..." data-placeholder-ar="ابحث عن البقالة..."
+                 placeholder="Search groceries..." />
+        </div>
+      </div>
+
+      <!-- Desktop nav links -->
+      <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600">
+        <a href="index.html" class="hover:text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
+        <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
+        <a href="orders.html" class="text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
+      </nav>
+
+      <!-- Actions: cart, then language toggle -->
+      <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0">
+        <a href="cart.html" class="bb-cart-btn relative p-2 rounded-full hover:bg-gray-100 transition" aria-label="Cart">
+          <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="bb-cart-badge absolute -top-0.5 -right-0.5 bg-brand-orange text-white text-[10px] font-bold rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
+        </a>
+
+        <button id="langToggle" class="bb-lang-toggle text-xs font-bold border border-gray-200 rounded-full px-3 py-1.5 hover:border-brand-green hover:text-brand-green transition"
+                data-en="عربي" data-ar="EN">عربي</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4">
+
+    <!-- ============================================================
+         MY ORDERS — order history list
+         REPEATABLE: .bb-order-card — Razor loop over user's orders
+         .NET: status, items, totals bound from orders table
+    ============================================================ -->
+    <section class="bb-orders mt-6">
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-5"
+          data-en="My orders" data-ar="طلباتي">My orders</h1>
+
+      <div class="space-y-4">
+
+        <!-- REPEATABLE: order card — ACTIVE (on the way) -->
+        <div class="bb-order-card border border-brand-green/30 bg-brand-greenlight/40 rounded-2xl p-4 md:p-5">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p class="font-extrabold text-sm">#BM-2481</p>
+              <p class="text-[11px] text-gray-400 font-bold" data-en="Today, 2:45 PM" data-ar="اليوم، ٢:٤٥ م">Today, 2:45 PM</p>
+            </div>
+            <span class="bb-order-status shrink-0 bg-brand-green text-white text-[10px] font-extrabold rounded-full px-3 py-1"
+                  data-en="🛵 On the way" data-ar="🛵 في الطريق">🛵 On the way</span>
+          </div>
+
+          <!-- item thumbnails -->
+          <div class="flex items-center gap-2 mb-3">
+            <img src="images/products/milk.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-white" />
+            <img src="images/products/bread.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-white" />
+            <img src="images/products/eggs.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-white" />
+            <span class="text-[11px] font-extrabold text-gray-500" data-en="+2 more" data-ar="+٢ أخرى">+2 more</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-extrabold text-gray-900">4.350 <small class="text-gray-400" data-en="KD" data-ar="د.ك">KD</small>
+              <span class="text-[11px] text-gray-400 font-bold" data-en="· 5 items" data-ar="· ٥ منتجات">· 5 items</span></p>
+            <!-- .NET: link to live tracking view -->
+            <a href="#" class="text-brand-green text-xs font-extrabold" data-en="Track order →" data-ar="← تتبع الطلب">Track order →</a>
+          </div>
+
+          <!-- delivery progress -->
+          <div class="mt-3">
+            <div class="h-1.5 bg-white rounded-full overflow-hidden">
+              <div class="h-full w-2/3 bg-brand-green rounded-full"></div>
+            </div>
+            <p class="text-[11px] text-gray-500 font-bold mt-1.5" data-en="Arriving in ~15 min" data-ar="يصل خلال ~١٥ دقيقة">Arriving in ~15 min</p>
+          </div>
+        </div>
+
+        <!-- REPEATABLE: order card — DELIVERED -->
+        <div class="bb-order-card border border-gray-100 rounded-2xl p-4 md:p-5">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p class="font-extrabold text-sm">#BM-2437</p>
+              <p class="text-[11px] text-gray-400 font-bold" data-en="Jul 15, 6:20 PM" data-ar="١٥ يوليو، ٦:٢٠ م">Jul 15, 6:20 PM</p>
+            </div>
+            <span class="bb-order-status shrink-0 bg-brand-greenlight text-brand-green text-[10px] font-extrabold rounded-full px-3 py-1"
+                  data-en="✓ Delivered" data-ar="✓ تم التوصيل">✓ Delivered</span>
+          </div>
+
+          <div class="flex items-center gap-2 mb-3">
+            <img src="images/products/rice.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+            <img src="images/products/chicken.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+            <img src="images/products/oliveoil.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-extrabold text-gray-900">9.600 <small class="text-gray-400" data-en="KD" data-ar="د.ك">KD</small>
+              <span class="text-[11px] text-gray-400 font-bold" data-en="· 3 items" data-ar="· ٣ منتجات">· 3 items</span></p>
+            <!-- .NET: re-adds order lines to cart -->
+            <button class="bg-brand-green text-white text-xs font-extrabold rounded-full px-4 py-1.5 hover:opacity-90 transition"
+                    data-en="Reorder" data-ar="إعادة الطلب">Reorder</button>
+          </div>
+        </div>
+
+        <!-- REPEATABLE: order card — DELIVERED -->
+        <div class="bb-order-card border border-gray-100 rounded-2xl p-4 md:p-5">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p class="font-extrabold text-sm">#BM-2395</p>
+              <p class="text-[11px] text-gray-400 font-bold" data-en="Jul 12, 11:05 AM" data-ar="١٢ يوليو، ١١:٠٥ ص">Jul 12, 11:05 AM</p>
+            </div>
+            <span class="bb-order-status shrink-0 bg-brand-greenlight text-brand-green text-[10px] font-extrabold rounded-full px-3 py-1"
+                  data-en="✓ Delivered" data-ar="✓ تم التوصيل">✓ Delivered</span>
+          </div>
+
+          <div class="flex items-center gap-2 mb-3">
+            <img src="images/products/apples.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+            <img src="images/products/bananas.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+            <img src="images/products/tomatoes.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+            <img src="images/products/cheese.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+            <span class="text-[11px] font-extrabold text-gray-500" data-en="+3 more" data-ar="+٣ أخرى">+3 more</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-extrabold text-gray-900">6.750 <small class="text-gray-400" data-en="KD" data-ar="د.ك">KD</small>
+              <span class="text-[11px] text-gray-400 font-bold" data-en="· 7 items" data-ar="· ٧ منتجات">· 7 items</span></p>
+            <button class="bg-brand-green text-white text-xs font-extrabold rounded-full px-4 py-1.5 hover:opacity-90 transition"
+                    data-en="Reorder" data-ar="إعادة الطلب">Reorder</button>
+          </div>
+        </div>
+
+        <!-- REPEATABLE: order card — CANCELLED -->
+        <div class="bb-order-card border border-gray-100 rounded-2xl p-4 md:p-5 opacity-80">
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p class="font-extrabold text-sm">#BM-2350</p>
+              <p class="text-[11px] text-gray-400 font-bold" data-en="Jul 8, 9:30 PM" data-ar="٨ يوليو، ٩:٣٠ م">Jul 8, 9:30 PM</p>
+            </div>
+            <span class="bb-order-status shrink-0 bg-red-50 text-red-500 text-[10px] font-extrabold rounded-full px-3 py-1"
+                  data-en="✕ Cancelled" data-ar="✕ ملغي">✕ Cancelled</span>
+          </div>
+
+          <div class="flex items-center gap-2 mb-3">
+            <img src="images/products/chips.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+            <img src="images/products/cornflakes.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+          </div>
+
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-extrabold text-gray-900">1.250 <small class="text-gray-400" data-en="KD" data-ar="د.ك">KD</small>
+              <span class="text-[11px] text-gray-400 font-bold" data-en="· 2 items" data-ar="· منتجان">· 2 items</span></p>
+            <button class="bg-brand-green text-white text-xs font-extrabold rounded-full px-4 py-1.5 hover:opacity-90 transition"
+                    data-en="Reorder" data-ar="إعادة الطلب">Reorder</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER (desktop only) -->
+    <footer class="bb-footer hidden md:block mt-14 border-t border-gray-100 py-8 text-center text-xs text-gray-400 font-semibold">
+      <p data-en="© 2026 BoboMart — Fresh groceries delivered across Kuwait 🇰🇼"
+         data-ar="© ٢٠٢٦ بوبومارت — بقالة طازجة تصلك في جميع أنحاء الكويت 🇰🇼">© 2026 BoboMart — Fresh groceries delivered across Kuwait 🇰🇼</p>
+    </footer>
+  </main>
+
+  <!-- BOTTOM TAB BAR — mobile only -->
+  <nav class="bb-tabbar md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-100 flex justify-around items-center py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <a href="index.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
+    </a>
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
+    </a>
+    <a href="cart.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400 relative">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
+      <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
+    </a>
+    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
+    </a>
+    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
+    </a>
+  </nav>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

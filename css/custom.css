@@ -13,6 +13,9 @@ html[dir="rtl"] .bb-discount-badge { left: auto; right: 0.75rem; }
 /* Best Seller badge sticks to the reading-start corner in RTL */
 html[dir="rtl"] .bb-bestseller-badge { left: auto; right: 0.75rem; }
 
+/* Menu chevrons point the reading direction in RTL */
+html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
+
 /* Add-to-cart button + stepper (shared component) */
 /* Round orange "+" button, sized large enough to tap comfortably */
 .bb-add-btn {
