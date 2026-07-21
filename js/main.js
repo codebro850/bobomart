@@ -94,6 +94,94 @@ const PRODUCTS = {
   bread:    { en: 'Arabic Bread',   ar: 'خبز عربي',   pack: '6 pcs',  price: 0.250, img: 'images/products/bread.jpg' },
   oliveoil: { en: 'Olive Oil',      ar: 'زيت زيتون',  pack: '750ml',  price: 2.900, img: 'images/products/oliveoil.jpg' },
   chicken:  { en: 'Chicken Breast', ar: 'صدر دجاج',   pack: '1kg',    price: 1.950, img: 'images/products/chicken.jpg' },
+  // Pack-size variants so category pages have fuller grids.
+  // .NET later: every row below is just another product record.
+  'bananas-500':  { en: 'Bananas',        ar: 'موز',         pack: '500g',   price: 0.250, img: 'images/products/bananas.jpg' },
+  'apples-500':   { en: 'Red Apples',     ar: 'تفاح أحمر',   pack: '500g',   price: 0.350, img: 'images/products/apples.jpg' },
+  'tomatoes-1kg': { en: 'Tomatoes',       ar: 'طماطم',       pack: '1kg',    price: 0.650, img: 'images/products/tomatoes.jpg' },
+  'milk-500':     { en: 'Fresh Milk',     ar: 'حليب طازج',   pack: '500ml',  price: 0.350, img: 'images/products/milk.jpg' },
+  'eggs-15':      { en: 'Farm Eggs',      ar: 'بيض بلدي',    pack: '15 pcs', price: 0.650, img: 'images/products/eggs.jpg' },
+  'cheese-400':   { en: 'Cheese Slices',  ar: 'شرائح جبن',   pack: '400g',   price: 1.500, img: 'images/products/cheese.jpg' },
+  'bread-10':     { en: 'Arabic Bread',   ar: 'خبز عربي',    pack: '10 pcs', price: 0.400, img: 'images/products/bread.jpg' },
+  'rice-1kg':     { en: 'Basmati Rice',   ar: 'أرز بسمتي',   pack: '1kg',    price: 1.100, img: 'images/products/rice.jpg' },
+  'flakes-1kg':   { en: 'Corn Flakes',    ar: 'رقائق الذرة', pack: '1kg',    price: 1.600, img: 'images/products/cornflakes.jpg' },
+  'chips-75':     { en: 'Potato Chips',   ar: 'رقائق بطاطس', pack: '75g',    price: 0.200, img: 'images/products/chips.jpg' },
+  'oil-1500':     { en: 'Olive Oil',      ar: 'زيت زيتون',   pack: '1.5L',   price: 5.500, img: 'images/products/oliveoil.jpg' },
+  'chicken-500':  { en: 'Chicken Breast', ar: 'صدر دجاج',    pack: '500g',   price: 1.050, img: 'images/products/chicken.jpg' },
+};
+
+// Category → subcategories → product ids (Zepto/Instamart-style browse).
+// .NET later: categories + subcategories tables, products joined by FK.
+const CATEGORIES = {
+  fruitsveg: {
+    en: 'Fruits & Veg', ar: 'فواكه وخضار', img: 'images/categories/fruitsveg.jpg',
+    subs: [
+      { id: 'fruits',     en: 'Fresh Fruits',     ar: 'فواكه طازجة',  img: 'images/products/apples.jpg',   products: ['deal-apples', 'apples-500', 'bananas', 'bananas-500'] },
+      { id: 'vegetables', en: 'Fresh Vegetables', ar: 'خضار طازجة',   img: 'images/products/tomatoes.jpg', products: ['tomatoes', 'tomatoes-1kg'] },
+      { id: 'seasonal',   en: 'Seasonal Picks',   ar: 'مختارات الموسم', img: 'images/categories/fruitsveg.jpg', products: ['bananas', 'deal-apples', 'tomatoes'] },
+    ],
+  },
+  dairy: {
+    en: 'Dairy & Eggs', ar: 'ألبان وبيض', img: 'images/products/milk.jpg',
+    subs: [
+      { id: 'milk',   en: 'Milk',            ar: 'حليب',       img: 'images/products/milk.jpg',   products: ['milk', 'milk-500'] },
+      { id: 'eggs',   en: 'Eggs',            ar: 'بيض',        img: 'images/products/eggs.jpg',   products: ['eggs', 'eggs-15'] },
+      { id: 'cheese', en: 'Cheese & Butter', ar: 'جبن وزبدة',  img: 'images/products/cheese.jpg', products: ['deal-cheese', 'cheese-400'] },
+    ],
+  },
+  bakery: {
+    en: 'Bakery', ar: 'مخبوزات', img: 'images/products/bread.jpg',
+    subs: [
+      { id: 'breads',    en: 'Breads',    ar: 'خبز',         img: 'images/products/bread.jpg',      products: ['bread', 'bread-10'] },
+      { id: 'breakfast', en: 'Breakfast', ar: 'فطور',        img: 'images/products/cornflakes.jpg', products: ['deal-flakes', 'flakes-1kg', 'eggs'] },
+    ],
+  },
+  beverages: {
+    en: 'Beverages', ar: 'مشروبات', img: 'images/categories/beverages.jpg',
+    subs: [
+      { id: 'dairy-drinks', en: 'Milk Drinks',   ar: 'مشروبات الحليب', img: 'images/products/milk.jpg',       products: ['milk', 'milk-500'] },
+      { id: 'chilled',      en: 'Chilled Picks', ar: 'مشروبات باردة',  img: 'images/categories/beverages.jpg', products: ['milk-500'] },
+    ],
+  },
+  snacks: {
+    en: 'Snacks', ar: 'وجبات خفيفة', img: 'images/categories/snacks.jpg',
+    subs: [
+      { id: 'chips',   en: 'Chips & Crisps', ar: 'رقائق وشيبس', img: 'images/products/chips.jpg',      products: ['deal-chips', 'chips-75'] },
+      { id: 'cereals', en: 'Cereal Snacks',  ar: 'حبوب خفيفة',  img: 'images/products/cornflakes.jpg', products: ['deal-flakes', 'flakes-1kg'] },
+    ],
+  },
+  rice: {
+    en: 'Rice & Grains', ar: 'أرز وحبوب', img: 'images/products/rice.jpg',
+    subs: [
+      { id: 'rice',    en: 'Rice',    ar: 'أرز',   img: 'images/products/rice.jpg',       products: ['rice', 'rice-1kg'] },
+      { id: 'cereals', en: 'Cereals', ar: 'حبوب',  img: 'images/products/cornflakes.jpg', products: ['deal-flakes', 'flakes-1kg'] },
+    ],
+  },
+  frozen: {
+    en: 'Frozen', ar: 'مجمدات', img: 'images/categories/frozen.jpg',
+    subs: [
+      { id: 'frozen-meat', en: 'Frozen Chicken', ar: 'دجاج مجمد', img: 'images/products/chicken.jpg', products: ['chicken', 'chicken-500'] },
+    ],
+  },
+  household: {
+    en: 'Household', ar: 'منزلية', img: 'images/categories/household.jpg',
+    subs: [
+      { id: 'kitchen', en: 'Kitchen Essentials', ar: 'أساسيات المطبخ', img: 'images/products/oliveoil.jpg', products: ['oliveoil', 'oil-1500'] },
+    ],
+  },
+  meat: {
+    en: 'Meat & Poultry', ar: 'لحوم ودواجن', img: 'images/products/chicken.jpg',
+    subs: [
+      { id: 'chicken', en: 'Chicken', ar: 'دجاج', img: 'images/products/chicken.jpg', products: ['chicken', 'chicken-500'] },
+      { id: 'eggs',    en: 'Eggs',    ar: 'بيض',  img: 'images/products/eggs.jpg',    products: ['eggs', 'eggs-15'] },
+    ],
+  },
+  oils: {
+    en: 'Oils & Condiments', ar: 'زيوت وتوابل', img: 'images/products/oliveoil.jpg',
+    subs: [
+      { id: 'oils', en: 'Cooking Oils', ar: 'زيوت الطبخ', img: 'images/products/oliveoil.jpg', products: ['oliveoil', 'oil-1500'] },
+    ],
+  },
 };
 
 function loadCart() {
@@ -243,3 +331,110 @@ if (document.getElementById('cartItems')) {
   });
   if (langToggleEl) langToggleEl.addEventListener('click', renderCartPage);
 }
+
+/* ============================================================
+   5. CATEGORY PAGE — Zepto/Instamart-style split view.
+   Left rail: subcategories in a single column. Right: product
+   grid of the active subcategory. Only runs when #subcatRail
+   exists (category.html). Category comes from ?cat=<id>.
+   .NET later: server renders the rail + grid; the active
+   subcategory becomes part of the route.
+============================================================ */
+function initCategoryPage() {
+  const rail = document.getElementById('subcatRail');
+  if (!rail) return;
+
+  const params = new URLSearchParams(location.search);
+  const catId = params.get('cat');
+  const category = CATEGORIES[catId] || CATEGORIES.fruitsveg;
+
+  // "All" pseudo-subcategory first (like Zepto), then real subs
+  const allProducts = [...new Set(category.subs.flatMap((s) => s.products))];
+  const subs = [
+    { id: 'all', en: 'All', ar: 'الكل', img: category.img, products: allProducts },
+    ...category.subs,
+  ];
+  let activeSubId = subs.find((s) => s.id === params.get('sub')) ? params.get('sub') : 'all';
+
+  const isAr = () => document.documentElement.lang === 'ar';
+
+  // Page + document title
+  const titleEl = document.getElementById('categoryTitle');
+  titleEl.dataset.en = category.en;
+  titleEl.dataset.ar = category.ar;
+  titleEl.textContent = isAr() ? category.ar : category.en;
+  document.title = `BoboMart — ${category.en}`;
+
+  function renderRail() {
+    rail.innerHTML = '';
+    subs.forEach((sub) => {
+      const active = sub.id === activeSubId;
+      const btn = document.createElement('button');
+      btn.className = `bb-subcat-item w-full flex flex-col md:flex-row items-center gap-1 md:gap-3 px-1.5 md:px-3 py-2.5 text-center md:text-left transition ${
+        active ? 'is-active' : 'hover:bg-gray-100'
+      }`;
+      btn.innerHTML = `
+        <img src="${sub.img}" alt="" class="w-11 h-11 md:w-12 md:h-12 rounded-full object-cover shrink-0 ${active ? 'ring-2 ring-brand-green' : ''}" />
+        <span class="text-[10px] md:text-xs font-extrabold leading-tight ${active ? 'text-brand-green' : 'text-gray-600'}"
+              data-en="${sub.en}" data-ar="${sub.ar}">${isAr() ? sub.ar : sub.en}</span>
+      `;
+      btn.addEventListener('click', () => {
+        activeSubId = sub.id;
+        // keep the URL shareable without reloading
+        const url = new URL(location);
+        url.searchParams.set('cat', catId || 'fruitsveg');
+        url.searchParams.set('sub', sub.id);
+        history.replaceState(null, '', url);
+        renderRail();
+        renderGrid();
+      });
+      rail.appendChild(btn);
+    });
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('subcatProducts');
+    const emptyEl = document.getElementById('subcatEmpty');
+    const sub = subs.find((s) => s.id === activeSubId);
+    const ids = sub.products.filter((id) => PRODUCTS[id]);
+
+    const subTitleEl = document.getElementById('subcatTitle');
+    subTitleEl.dataset.en = sub.en;
+    subTitleEl.dataset.ar = sub.ar;
+    subTitleEl.textContent = isAr() ? sub.ar : sub.en;
+
+    const countEl = document.getElementById('subcatCount');
+    countEl.dataset.en = `${ids.length} items`;
+    countEl.dataset.ar = `${ids.length} منتج`;
+    countEl.textContent = isAr() ? countEl.dataset.ar : countEl.dataset.en;
+
+    grid.innerHTML = '';
+    emptyEl.classList.toggle('hidden', ids.length > 0);
+
+    ids.forEach((id) => {
+      const p = PRODUCTS[id];
+      const card = document.createElement('div');
+      card.className = 'bb-product-card bg-white border border-gray-100 rounded-2xl p-2.5 md:p-4 relative flex flex-col hover:shadow-md transition';
+      const oldPrice = p.oldPrice
+        ? `<span class="bb-price-old text-gray-400 text-xs line-through">${fmtKD(p.oldPrice)}</span>`
+        : '';
+      card.innerHTML = `
+        <img src="${p.img}" alt="${p.en}" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
+        <p class="bb-product-name text-sm font-bold mt-1" data-en="${p.en}" data-ar="${p.ar}">${isAr() ? p.ar : p.en}</p>
+        <span class="bb-pack-size text-[11px] font-bold text-gray-400">${p.pack}</span>
+        <div class="mt-1 flex items-center gap-2">
+          <span class="bb-price text-brand-green font-extrabold text-sm">${fmtKD(p.price)} <small data-en="KD" data-ar="د.ك">${isAr() ? 'د.ك' : 'KD'}</small></span>
+          ${oldPrice}
+        </div>
+        <div class="bb-cart-control mt-2 flex justify-end" data-product="${id}"></div>
+      `;
+      grid.appendChild(card);
+      renderControl(card.querySelector('.bb-cart-control'));
+    });
+  }
+
+  renderRail();
+  renderGrid();
+}
+
+initCategoryPage();

@@ -65,3 +65,44 @@ html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
   font-size: 12px;
   color: #1F2937;
 }
+
+/* Category page — subcategory rail (Zepto/Instamart style) */
+/* Sticks below the sticky header and scrolls on its own */
+.bb-subcat-rail {
+  top: 73px;                          /* header height (mobile) */
+  max-height: calc(100vh - 73px);
+}
+@media (min-width: 768px) {
+  .bb-subcat-rail {
+    top: 89px;                        /* header height (desktop) */
+    max-height: calc(100vh - 89px);
+  }
+}
+
+/* Active subcategory: green edge bar on the reading-start side */
+.bb-subcat-item { position: relative; }
+.bb-subcat-item.is-active { background: #EAF6E6; }
+.bb-subcat-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: #3DA829;
+}
+html[dir="rtl"] .bb-subcat-item.is-active::before {
+  left: auto;
+  right: 0;
+  border-radius: 4px 0 0 4px;
+}
+
+/* RTL: rail divider + label alignment flip sides */
+html[dir="rtl"] .bb-subcat-rail {
+  border-right: 0;
+  border-left: 1px solid #f3f4f6;   /* gray-100 */
+}
+@media (min-width: 768px) {
+  html[dir="rtl"] .bb-subcat-item span { text-align: right; }
+}

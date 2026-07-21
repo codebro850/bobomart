@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — Categories</title>
+  <title>BoboMart — Category</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -82,82 +82,50 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4">
+  <!-- ============================================================
+       CATEGORY BROWSE — Zepto/Instamart style split view
+       Left: single-column subcategory rail (.bb-subcat-rail)
+       Right: product grid of the active subcategory (.bb-subcat-products)
+       Rendered by js/main.js from ?cat=<id> in the URL.
+       .NET later: subcategories + products come from DB;
+       the rail and grid are Razor loops, active sub via route.
+  ============================================================ -->
+  <main class="max-w-7xl mx-auto">
 
-    <!-- ============================================================
-         ALL CATEGORIES — grid of category cards
-         REPEATABLE: .bb-category-card — Razor loop over categories
-         .NET: item counts come from products table
-    ============================================================ -->
-    <section class="bb-all-categories mt-6">
-      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-1"
-          data-en="All categories" data-ar="جميع الفئات">All categories</h1>
-      <p class="text-xs md:text-sm text-gray-500 font-semibold mb-5"
-         data-en="Browse everything we deliver" data-ar="تصفح كل ما نوصله لك">Browse everything we deliver</p>
+    <!-- Category title bar -->
+    <div class="px-4 pt-4 pb-2 flex items-center gap-2 border-b border-gray-100">
+      <a href="categories.html" class="bb-back-btn p-1.5 rounded-full hover:bg-gray-100 transition" aria-label="Back to categories">
+        <svg class="bb-chevron w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <h1 id="categoryTitle" class="text-lg md:text-xl font-extrabold">Category</h1>
+    </div>
 
-      <div class="bb-category-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-        <!-- REPEATABLE: category card -->
-        <a href="category.html?cat=fruitsveg" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/fruitsveg.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Fruits & Veg" data-ar="فواكه وخضار">Fruits &amp; Veg</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="48 items" data-ar="٤٨ منتج">48 items</span>
-        </a>
+    <div class="flex items-stretch">
 
-        <a href="category.html?cat=dairy" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/milk.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Dairy & Eggs" data-ar="ألبان وبيض">Dairy &amp; Eggs</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="32 items" data-ar="٣٢ منتج">32 items</span>
-        </a>
+      <!-- LEFT: subcategory rail (single column) -->
+      <aside id="subcatRail"
+             class="bb-subcat-rail shrink-0 w-[84px] md:w-56 border-r border-gray-100 bg-gray-50/60
+                    sticky self-start overflow-y-auto no-scrollbar py-2">
+        <!-- REPEATABLE: .bb-subcat-item — filled by JS / Razor loop -->
+      </aside>
 
-        <a href="category.html?cat=bakery" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/bread.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Bakery" data-ar="مخبوزات">Bakery</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="21 items" data-ar="٢١ منتج">21 items</span>
-        </a>
+      <!-- RIGHT: products of the active subcategory -->
+      <section class="flex-1 min-w-0 px-3 md:px-5 py-3">
+        <div class="flex items-baseline justify-between mb-3">
+          <h2 id="subcatTitle" class="text-sm md:text-base font-extrabold"></h2>
+          <span id="subcatCount" class="text-[11px] md:text-xs font-bold text-gray-400"></span>
+        </div>
 
-        <a href="category.html?cat=beverages" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/beverages.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Beverages" data-ar="مشروبات">Beverages</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="40 items" data-ar="٤٠ منتج">40 items</span>
-        </a>
+        <div id="subcatProducts"
+             class="bb-subcat-products grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2.5 md:gap-4">
+          <!-- REPEATABLE: .bb-product-card — filled by JS / Razor loop -->
+        </div>
 
-        <a href="category.html?cat=snacks" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/snacks.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Snacks" data-ar="وجبات خفيفة">Snacks</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="55 items" data-ar="٥٥ منتج">55 items</span>
-        </a>
-
-        <a href="category.html?cat=rice" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/rice.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Rice & Grains" data-ar="أرز وحبوب">Rice &amp; Grains</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="18 items" data-ar="١٨ منتج">18 items</span>
-        </a>
-
-        <a href="category.html?cat=frozen" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/frozen.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Frozen" data-ar="مجمدات">Frozen</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="26 items" data-ar="٢٦ منتج">26 items</span>
-        </a>
-
-        <a href="category.html?cat=household" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/household.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Household" data-ar="منزلية">Household</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="34 items" data-ar="٣٤ منتج">34 items</span>
-        </a>
-
-        <a href="category.html?cat=meat" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/chicken.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Meat & Poultry" data-ar="لحوم ودواجن">Meat &amp; Poultry</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="22 items" data-ar="٢٢ منتج">22 items</span>
-        </a>
-
-        <a href="category.html?cat=oils" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/oliveoil.jpg" alt="" class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Oils & Condiments" data-ar="زيوت وتوابل">Oils &amp; Condiments</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="29 items" data-ar="٢٩ منتج">29 items</span>
-        </a>
-      </div>
-    </section>
+        <!-- Shown when a subcategory has no products -->
+        <p id="subcatEmpty" class="hidden text-center text-sm font-bold text-gray-400 py-16"
+           data-en="No items in this section yet" data-ar="لا توجد منتجات في هذا القسم بعد">No items in this section yet</p>
+      </section>
+    </div>
 
     <!-- FOOTER (desktop only) -->
     <footer class="bb-footer hidden md:block mt-14 border-t border-gray-100 py-8 text-center text-xs text-gray-400 font-semibold">
