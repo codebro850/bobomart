@@ -110,6 +110,24 @@ const PRODUCTS = {
   'chicken-500':  { en: 'Chicken Breast', ar: 'صدر دجاج',    pack: '500g',   price: 1.050, img: 'images/products/chicken.jpg' },
 };
 
+// Short product descriptions, keyed by English name so every pack-size
+// variant shares one blurb (quick-commerce style — one or two lines).
+// .NET later: a `description` column on the products table.
+const DESCRIPTIONS = {
+  'Potato Chips':  { en: 'Crispy, lightly salted potato chips — the perfect crunchy snack any time of day.', ar: 'رقائق بطاطس مقرمشة بقليل من الملح — الوجبة الخفيفة المثالية في أي وقت.' },
+  'Red Apples':    { en: 'Crisp red apples picked at peak ripeness. Sweet, juicy and great for snacking.', ar: 'تفاح أحمر مقرمش مقطوف في ذروة نضجه. حلو وعصيري ومثالي للتسالي.' },
+  'Cheese Slices': { en: 'Smooth, creamy cheese slices that melt perfectly. Ideal for sandwiches and burgers.', ar: 'شرائح جبن كريمية ناعمة تذوب بشكل مثالي. رائعة للسندويشات والبرغر.' },
+  'Corn Flakes':   { en: 'Golden, crunchy corn flakes. A wholesome breakfast — just add milk.', ar: 'رقائق ذرة ذهبية ومقرمشة. فطور صحي — فقط أضف الحليب.' },
+  'Basmati Rice':  { en: 'Long-grain basmati rice with a rich aroma. Fluffy and perfect for biryani and pilaf.', ar: 'أرز بسمتي طويل الحبة بنكهة غنية. هش ومثالي للبرياني والبيلاف.' },
+  'Fresh Milk':    { en: 'Farm-fresh full-cream milk, pasteurised and rich in calcium for the whole family.', ar: 'حليب طازج كامل الدسم مبستر وغني بالكالسيوم لكل العائلة.' },
+  'Bananas':       { en: 'Naturally sweet, energy-rich bananas. A healthy grab-and-go snack.', ar: 'موز حلو المذاق غني بالطاقة. وجبة خفيفة صحية وسريعة.' },
+  'Farm Eggs':     { en: 'Farm-fresh eggs rich in protein. Perfect for breakfast, baking and cooking.', ar: 'بيض بلدي طازج غني بالبروتين. مثالي للفطور والخبز والطبخ.' },
+  'Tomatoes':      { en: 'Plump, ripe red tomatoes. Juicy and full of flavour for salads and cooking.', ar: 'طماطم حمراء ناضجة وممتلئة. عصيرية ومليئة بالنكهة للسلطات والطبخ.' },
+  'Arabic Bread':  { en: 'Soft, freshly baked Arabic bread. Warm, fluffy and perfect with any meal.', ar: 'خبز عربي طري ومخبوز طازجاً. دافئ وهش ومثالي مع أي وجبة.' },
+  'Olive Oil':     { en: 'Cold-pressed extra-virgin olive oil. Rich flavour for cooking and dressings.', ar: 'زيت زيتون بكر ممتاز معصور على البارد. نكهة غنية للطبخ والتتبيلات.' },
+  'Chicken Breast':{ en: 'Fresh, tender boneless chicken breast. Lean protein for healthy meals.', ar: 'صدر دجاج طازج وطري بدون عظم. بروتين قليل الدهون لوجبات صحية.' },
+};
+
 // Category → subcategories → product ids (Zepto/Instamart-style browse).
 // .NET later: categories + subcategories tables, products joined by FK.
 const CATEGORIES = {
@@ -207,23 +225,35 @@ function updateBadges() {
 function renderControl(container) {
   const id = container.dataset.product;
   const qty = cart[id] || 0;
+  // Wide variant: full-width "Add to cart" button (used on the product page).
+  const wide = container.dataset.variant === 'wide';
+  const isAr = document.documentElement.lang === 'ar';
   container.innerHTML = '';
+
+  // Whenever a control changes, refresh every other control for the same
+  // product so duplicate steppers (e.g. card + product page) stay in sync.
+  const syncAll = () => {
+    document.querySelectorAll(`.bb-cart-control[data-product="${id}"]`).forEach((el) => {
+      if (el !== container) renderControl(el);
+    });
+    updateBadges();
+  };
 
   if (qty === 0) {
     const btn = document.createElement('button');
-    btn.className = 'bb-add-btn';
-    btn.textContent = '+';
-    btn.setAttribute('aria-label', document.documentElement.lang === 'ar' ? 'أضف إلى السلة' : 'Add to cart');
+    btn.className = wide ? 'bb-add-btn bb-add-btn--wide' : 'bb-add-btn';
+    btn.textContent = wide ? (isAr ? 'أضف إلى السلة' : 'Add to cart') : '+';
+    btn.setAttribute('aria-label', isAr ? 'أضف إلى السلة' : 'Add to cart');
     btn.addEventListener('click', () => {
       cart[id] = 1;
       saveCart();
       renderControl(container);
-      updateBadges();
+      syncAll();
     });
     container.appendChild(btn);
   } else {
     const stepper = document.createElement('div');
-    stepper.className = 'bb-stepper';
+    stepper.className = wide ? 'bb-stepper bb-stepper--wide' : 'bb-stepper';
 
     const minus = document.createElement('button');
     minus.textContent = '−';
@@ -232,7 +262,7 @@ function renderControl(container) {
       if (cart[id] === 0) delete cart[id];
       saveCart();
       renderControl(container);
-      updateBadges();
+      syncAll();
     });
 
     const count = document.createElement('span');
@@ -246,7 +276,7 @@ function renderControl(container) {
       cart[id] = Math.min(MAX_QTY, cart[id] + 1);
       saveCart();
       renderControl(container);
-      updateBadges();
+      syncAll();
     });
 
     stepper.append(minus, count, plus);
@@ -256,6 +286,30 @@ function renderControl(container) {
 
 document.querySelectorAll('.bb-cart-control').forEach(renderControl);
 updateBadges();
+
+/* ============================================================
+   3b. PRODUCT CARDS → DETAIL PAGE
+   Clicking a card (anywhere except its cart control) opens the
+   product description page. Works for both the static cards and
+   the ones JS renders on the category page.
+   .NET later: the card is an <a> to /product/{id}.
+============================================================ */
+function linkProductCards(scope = document) {
+  scope.querySelectorAll('.bb-product-card').forEach((card) => {
+    if (card.dataset.linked) return;
+    const control = card.querySelector('.bb-cart-control[data-product]');
+    if (!control) return;
+    const id = control.dataset.product;
+    card.dataset.linked = '1';
+    card.classList.add('cursor-pointer');
+    card.addEventListener('click', (e) => {
+      // Don't navigate while tapping the add/stepper control.
+      if (e.target.closest('.bb-cart-control')) return;
+      location.href = `product.html?id=${encodeURIComponent(id)}`;
+    });
+  });
+}
+linkProductCards();
 
 /* ============================================================
    4. CART PAGE — renders cart items from localStorage.
@@ -431,6 +485,7 @@ function initCategoryPage() {
       grid.appendChild(card);
       renderControl(card.querySelector('.bb-cart-control'));
     });
+    linkProductCards(grid);
   }
 
   renderRail();
@@ -438,3 +493,83 @@ function initCategoryPage() {
 }
 
 initCategoryPage();
+
+/* ============================================================
+   6. PRODUCT PAGE — single product description view.
+   Quick-commerce style: big image, name, pack, price and a
+   short description, with an "Add to cart" buy bar.
+   Only runs when #productDetail exists (product.html).
+   Product comes from ?id=<id> in the URL.
+   .NET later: server renders /product/{id} from the DB.
+============================================================ */
+function initProductPage() {
+  const root = document.getElementById('productDetail');
+  if (!root) return;
+
+  const isAr = () => document.documentElement.lang === 'ar';
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const p = PRODUCTS[id];
+
+  const notFound = document.getElementById('productNotFound');
+
+  if (!p) {
+    root.classList.add('hidden');
+    if (notFound) notFound.classList.remove('hidden');
+    return;
+  }
+
+  // Image
+  const img = document.getElementById('productImg');
+  img.src = p.img;
+  img.alt = p.en;
+
+  // Discount badge (only when there's an old price)
+  const badge = document.getElementById('productDiscount');
+  if (p.oldPrice && p.oldPrice > p.price) {
+    const pct = Math.round((1 - p.price / p.oldPrice) * 100);
+    badge.textContent = `-${pct}%`;
+    badge.classList.remove('hidden');
+  } else {
+    badge.classList.add('hidden');
+  }
+
+  // Name (translatable via applyLanguage on toggle)
+  const nameEl = document.getElementById('productName');
+  nameEl.dataset.en = p.en;
+  nameEl.dataset.ar = p.ar;
+  nameEl.textContent = isAr() ? p.ar : p.en;
+  document.title = `BoboMart — ${p.en}`;
+
+  // Pack size
+  document.getElementById('productPack').textContent = p.pack;
+
+  // Price + old price
+  document.getElementById('productPrice').textContent = fmtKD(p.price);
+  const oldEl = document.getElementById('productOldPrice');
+  if (p.oldPrice && p.oldPrice > p.price) {
+    oldEl.textContent = fmtKD(p.oldPrice);
+    oldEl.classList.remove('hidden');
+  } else {
+    oldEl.classList.add('hidden');
+  }
+
+  // Short description
+  const desc = DESCRIPTIONS[p.en];
+  const descEl = document.getElementById('productDesc');
+  if (desc) {
+    descEl.dataset.en = desc.en;
+    descEl.dataset.ar = desc.ar;
+    descEl.textContent = isAr() ? desc.ar : desc.en;
+  }
+
+  // Buy bar price + cart control
+  const barPrice = document.getElementById('productPriceBar');
+  if (barPrice) barPrice.innerHTML = `${fmtKD(p.price)} <small class="text-xs font-bold text-gray-400" data-en="KD" data-ar="د.ك">${isAr() ? 'د.ك' : 'KD'}</small>`;
+
+  const control = document.getElementById('productCartControl');
+  control.dataset.product = id;
+  renderControl(control);
+}
+
+initProductPage();

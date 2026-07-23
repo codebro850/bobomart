@@ -58,6 +58,29 @@ html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
   justify-content: center;
 }
 .bb-stepper button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Wide "Add to cart" variant — used on the product detail buy bar */
+.bb-add-btn--wide {
+  width: 100%;
+  height: 48px;
+  border-radius: 14px;
+  font-size: 15px;
+  gap: 6px;
+  letter-spacing: .01em;
+}
+.bb-stepper--wide {
+  width: 100%;
+  height: 48px;
+  justify-content: space-between;
+  border-radius: 14px;
+  padding: 0 14px;
+}
+.bb-stepper--wide button {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+}
+.bb-stepper--wide .bb-qty { font-size: 16px; min-width: 28px; }
 .bb-stepper .bb-qty {
   min-width: 16px;
   text-align: center;
