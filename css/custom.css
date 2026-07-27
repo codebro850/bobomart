@@ -7,16 +7,37 @@
 /* Arabic (RTL) mode: switch font */
 html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
 
-/* Discount badge sticks to the reading-start corner in RTL */
-html[dir="rtl"] .bb-discount-badge { left: auto; right: 0.75rem; }
+/* Offer % badge stays on the reading-start corner in RTL */
+html[dir="rtl"] .bb-discount-badge { left: auto; right: 0.625rem; }
 
-/* Best Seller badge sticks to the reading-start corner in RTL */
-html[dir="rtl"] .bb-bestseller-badge { left: auto; right: 0.75rem; }
+/* Best Seller badge lives on the opposite corner from the offer % badge,
+   so the two never overlap. It flips sides in RTL as well. */
+html[dir="rtl"] .bb-bestseller-badge { right: auto; left: 0.625rem; }
 
 /* Menu chevrons point the reading direction in RTL */
 html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
 
-/* Add-to-cart button + stepper (shared component) */
+/* ------------------------------------------------------------
+   PRODUCT CARD
+------------------------------------------------------------ */
+/* Product title always occupies two lines: keeps every card in a row
+   the same height and long names no longer push the price around. */
+.bb-product-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.3;
+  min-height: 2.6em;
+}
+
+/* Price never wraps mid-number, so the strike-through price cannot
+   collide with the quantity stepper next to it. */
+.bb-price, .bb-price-old { white-space: nowrap; }
+
+/* ------------------------------------------------------------
+   ADD TO CART BUTTON + STEPPER (shared component)
+------------------------------------------------------------ */
 /* Round orange "+" button, sized large enough to tap comfortably */
 .bb-add-btn {
   width: 38px;
@@ -36,28 +57,40 @@ html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
 .bb-add-btn:hover { opacity: .92; }
 .bb-add-btn:active { transform: scale(.94); }
 
+/* The stepper keeps the same 38px height as the "+" button it replaces,
+   and its − / + hit areas match that button's size. */
 .bb-stepper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  height: 38px;
   background: #EAF6E6;
   border-radius: 9999px;
-  padding: 3px 6px;
+  padding: 2px;
 }
 .bb-stepper button {
-  width: 22px;
-  height: 22px;
+  width: 34px;
+  height: 34px;
   border-radius: 9999px;
   background: #3DA829;
   color: #fff;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 20px;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity .15s, transform .1s;
 }
+.bb-stepper button:active { transform: scale(.94); }
 .bb-stepper button:disabled { opacity: .4; cursor: not-allowed; }
+.bb-stepper .bb-qty {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 14px;
+  color: #1F2937;
+}
 
 /* Wide "Add to cart" variant — used on the product detail buy bar */
 .bb-add-btn--wide {
@@ -73,59 +106,101 @@ html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
   height: 48px;
   justify-content: space-between;
   border-radius: 14px;
-  padding: 0 14px;
+  padding: 0 8px;
 }
 .bb-stepper--wide button {
-  width: 30px;
-  height: 30px;
-  font-size: 18px;
+  width: 38px;
+  height: 38px;
+  font-size: 22px;
 }
-.bb-stepper--wide .bb-qty { font-size: 16px; min-width: 28px; }
-.bb-stepper .bb-qty {
-  min-width: 16px;
-  text-align: center;
-  font-weight: 800;
-  font-size: 12px;
-  color: #1F2937;
-}
+.bb-stepper--wide .bb-qty { font-size: 17px; min-width: 30px; }
 
-/* Category page — subcategory rail (Zepto/Instamart style) */
-/* Sticks below the sticky header and scrolls on its own */
+/* ------------------------------------------------------------
+   CATEGORY PAGE — subcategory strip across the top of the screen
+   Items sit side by side (image above label) and wrap onto the next
+   line, so every subcategory is visible without scrolling.
+------------------------------------------------------------ */
 .bb-subcat-rail {
   top: 73px;                          /* header height (mobile) */
-  max-height: calc(100vh - 73px);
 }
 @media (min-width: 768px) {
-  .bb-subcat-rail {
-    top: 89px;                        /* header height (desktop) */
-    max-height: calc(100vh - 89px);
-  }
+  .bb-subcat-rail { top: 89px; }      /* header height (desktop) */
 }
 
-/* Active subcategory: green edge bar on the reading-start side */
+/* Active subcategory: tinted pill + green underline */
 .bb-subcat-item { position: relative; }
 .bb-subcat-item.is-active { background: #EAF6E6; }
-.bb-subcat-item.is-active::before {
+.bb-subcat-item.is-active::after {
   content: '';
   position: absolute;
-  left: 0;
-  top: 8px;
-  bottom: 8px;
-  width: 4px;
-  border-radius: 0 4px 4px 0;
+  left: 22%;
+  right: 22%;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
   background: #3DA829;
 }
-html[dir="rtl"] .bb-subcat-item.is-active::before {
-  left: auto;
-  right: 0;
-  border-radius: 4px 0 0 4px;
-}
 
-/* RTL: rail divider + label alignment flip sides */
-html[dir="rtl"] .bb-subcat-rail {
-  border-right: 0;
-  border-left: 1px solid #f3f4f6;   /* gray-100 */
+/* ------------------------------------------------------------
+   ORDER STATUS BAR — three separate sections
+   Order Accepted · Preparing · On the Way
+------------------------------------------------------------ */
+.bb-order-step { display: flex; flex-direction: column; gap: 6px; }
+.bb-order-step-bar {
+  display: block;
+  height: 6px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 1px solid #e5e7eb;          /* gray-200 */
+}
+.bb-order-step-label {
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #9ca3af;                     /* gray-400 */
 }
 @media (min-width: 768px) {
-  html[dir="rtl"] .bb-subcat-item span { text-align: right; }
+  .bb-order-step-label { font-size: 11px; }
 }
+/* Completed section */
+.bb-order-step.is-done .bb-order-step-bar { background: #3DA829; border-color: #3DA829; }
+.bb-order-step.is-done .bb-order-step-label { color: #3DA829; }
+/* Section in progress — half filled */
+.bb-order-step.is-current .bb-order-step-bar {
+  border-color: #3DA829;
+  background: linear-gradient(90deg, #3DA829 0 55%, #fff 55% 100%);
+}
+.bb-order-step.is-current .bb-order-step-label { color: #3DA829; }
+html[dir="rtl"] .bb-order-step.is-current .bb-order-step-bar {
+  background: linear-gradient(270deg, #3DA829 0 55%, #fff 55% 100%);
+}
+
+/* ------------------------------------------------------------
+   FOOTER — sitewide link columns (mobile + desktop)
+------------------------------------------------------------ */
+.bb-footer-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 10px;
+}
+.bb-footer-links { display: flex; flex-direction: column; gap: 8px; }
+.bb-footer-links a {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;                     /* gray-500 */
+  transition: color .15s;
+}
+.bb-footer-links a:hover { color: #3DA829; }
+.bb-footer-social {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #EAF6E6;
+  color: #3DA829;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+}
+.bb-footer-social:hover { background: #3DA829; color: #fff; }

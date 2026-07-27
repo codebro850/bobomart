@@ -323,6 +323,15 @@ function fmtKD(n) {
   return n.toFixed(3);
 }
 
+// Currency label always comes BEFORE the amount and carries the same
+// font styling as the amount itself (e.g. "KD 4.750").
+function kdLabel() {
+  return document.documentElement.lang === 'ar' ? 'د.ك' : 'KD';
+}
+function priceHtml(n) {
+  return `<span data-en="KD" data-ar="د.ك">${kdLabel()}</span> ${fmtKD(n)}`;
+}
+
 function renderCartPage() {
   const list = document.getElementById('cartItems');
   if (!list) return;
@@ -357,7 +366,7 @@ function renderCartPage() {
       <div class="flex-1 min-w-0">
         <p class="text-sm font-bold truncate">${isAr ? p.ar : p.en}</p>
         <span class="text-[11px] font-bold text-gray-400">${p.pack}</span>
-        <p class="text-brand-green font-extrabold text-sm mt-0.5">${fmtKD(lineTotal)} <small>${isAr ? 'د.ك' : 'KD'}</small></p>
+        <p class="bb-price text-brand-green font-extrabold text-sm mt-0.5">${priceHtml(lineTotal)}</p>
       </div>
       <div class="bb-cart-control shrink-0" data-product="${id}"></div>
     `;
@@ -370,9 +379,9 @@ function renderCartPage() {
   const subEl = document.getElementById('cartSubtotal');
   const delEl = document.getElementById('cartDelivery');
   const totEl = document.getElementById('cartTotal');
-  if (subEl) subEl.textContent = `${fmtKD(subtotal)} ${kd}`;
-  if (delEl) delEl.textContent = delivery === 0 ? (isAr ? 'مجاني' : 'Free') : `${fmtKD(delivery)} ${kd}`;
-  if (totEl) totEl.textContent = `${fmtKD(subtotal + delivery)} ${kd}`;
+  if (subEl) subEl.textContent = `${kd} ${fmtKD(subtotal)}`;
+  if (delEl) delEl.textContent = delivery === 0 ? (isAr ? 'مجاني' : 'Free') : `${kd} ${fmtKD(delivery)}`;
+  if (totEl) totEl.textContent = `${kd} ${fmtKD(subtotal + delivery)}`;
 }
 
 renderCartPage();
@@ -423,13 +432,15 @@ function initCategoryPage() {
     rail.innerHTML = '';
     subs.forEach((sub) => {
       const active = sub.id === activeSubId;
+      // Items sit side by side across the top; inside each one the image
+      // stacks above the label (vertical alignment).
       const btn = document.createElement('button');
-      btn.className = `bb-subcat-item w-full flex flex-col md:flex-row items-center gap-1 md:gap-3 px-1.5 md:px-3 py-2.5 text-center md:text-left transition ${
-        active ? 'is-active' : 'hover:bg-gray-100'
+      btn.className = `bb-subcat-item shrink-0 w-[76px] md:w-[104px] flex flex-col items-center justify-start gap-1.5 px-1 pt-2 pb-2.5 rounded-2xl text-center transition ${
+        active ? 'is-active' : 'hover:bg-gray-50'
       }`;
       btn.innerHTML = `
-        <img src="${sub.img}" alt="" class="w-11 h-11 md:w-12 md:h-12 rounded-full object-cover shrink-0 ${active ? 'ring-2 ring-brand-green' : ''}" />
-        <span class="text-[10px] md:text-xs font-extrabold leading-tight ${active ? 'text-brand-green' : 'text-gray-600'}"
+        <img src="${sub.img}" alt="" class="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover shrink-0 ${active ? 'ring-2 ring-brand-green' : ''}" />
+        <span class="bb-subcat-label text-[10px] md:text-xs font-extrabold leading-tight ${active ? 'text-brand-green' : 'text-gray-600'}"
               data-en="${sub.en}" data-ar="${sub.ar}">${isAr() ? sub.ar : sub.en}</span>
       `;
       btn.addEventListener('click', () => {
@@ -467,17 +478,24 @@ function initCategoryPage() {
 
     ids.forEach((id) => {
       const p = PRODUCTS[id];
+      // Same card anatomy as the home page: offer % badge on the
+      // top-start corner, Best Seller on the top-end corner, a two-line
+      // title, then the price row (KD first) and the stepper below it.
       const card = document.createElement('div');
-      card.className = 'bb-product-card bg-white border border-gray-100 rounded-2xl p-2.5 md:p-4 relative flex flex-col hover:shadow-md transition';
+      card.className = 'bb-product-card bg-white border border-gray-100 rounded-2xl p-3 md:p-4 relative flex flex-col hover:shadow-md transition';
+      const pct = p.oldPrice && p.oldPrice > p.price ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
+      const discountBadge = pct
+        ? `<span class="bb-discount-badge absolute top-2.5 left-2.5 z-10 bg-brand-orange text-white text-xs md:text-sm font-extrabold rounded-full px-2.5 py-1 leading-none">-${pct}%</span>`
+        : '';
       const oldPrice = p.oldPrice
-        ? `<span class="bb-price-old text-gray-400 text-xs line-through">${fmtKD(p.oldPrice)}</span>`
+        ? `<span class="bb-price-old text-gray-400 font-bold text-xs line-through">${fmtKD(p.oldPrice)}</span>`
         : '';
       card.innerHTML = `
+        ${discountBadge}
         <img src="${p.img}" alt="${p.en}" class="bb-product-img aspect-square w-full object-cover rounded-xl" />
-        <p class="bb-product-name text-sm font-bold mt-1" data-en="${p.en}" data-ar="${p.ar}">${isAr() ? p.ar : p.en}</p>
-        <span class="bb-pack-size text-[11px] font-bold text-gray-400">${p.pack}</span>
-        <div class="mt-1 flex items-center gap-2">
-          <span class="bb-price text-brand-green font-extrabold text-sm">${fmtKD(p.price)} <small data-en="KD" data-ar="د.ك">${isAr() ? 'د.ك' : 'KD'}</small></span>
+        <p class="bb-product-name text-sm font-bold mt-2" data-en="${p.en}" data-ar="${p.ar}">${isAr() ? p.ar : p.en}</p>
+        <div class="bb-price-row mt-auto pt-2 flex flex-wrap items-baseline gap-x-2">
+          <span class="bb-price ${pct ? 'text-brand-green' : 'text-gray-900'} font-extrabold text-[15px]">${priceHtml(p.price)}</span>
           ${oldPrice}
         </div>
         <div class="bb-cart-control mt-2 flex justify-end" data-product="${id}"></div>
@@ -565,7 +583,7 @@ function initProductPage() {
 
   // Buy bar price + cart control
   const barPrice = document.getElementById('productPriceBar');
-  if (barPrice) barPrice.innerHTML = `${fmtKD(p.price)} <small class="text-xs font-bold text-gray-400" data-en="KD" data-ar="د.ك">${isAr() ? 'د.ك' : 'KD'}</small>`;
+  if (barPrice) barPrice.innerHTML = priceHtml(p.price);
 
   const control = document.getElementById('productCartControl');
   control.dataset.product = id;
