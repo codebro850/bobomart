@@ -116,9 +116,10 @@ html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
 .bb-stepper--wide .bb-qty { font-size: 17px; min-width: 30px; }
 
 /* ------------------------------------------------------------
-   CATEGORY PAGE — subcategory strip across the top of the screen
-   Items sit side by side (image above label) and wrap onto the next
-   line, so every subcategory is visible without scrolling.
+   CATEGORY PAGE — horizontal subcategory chip bar
+   Chips sit side by side at the top of the screen with the icon and
+   the label on one line, and wrap onto the next line when they run
+   out of room — so every subcategory is visible without scrolling.
 ------------------------------------------------------------ */
 .bb-subcat-rail {
   top: 73px;                          /* header height (mobile) */
@@ -127,18 +128,42 @@ html[dir="rtl"] .bb-chevron { transform: scaleX(-1); }
   .bb-subcat-rail { top: 89px; }      /* header height (desktop) */
 }
 
-/* Active subcategory: tinted pill + green underline */
-.bb-subcat-item { position: relative; }
-.bb-subcat-item.is-active { background: #EAF6E6; }
-.bb-subcat-item.is-active::after {
-  content: '';
-  position: absolute;
-  left: 22%;
-  right: 22%;
-  bottom: 0;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: #3DA829;
+.bb-subcat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 7px;          /* tighter on the icon side */
+  border: 1px solid #d1d5db;          /* gray-300 */
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, .12), 0 1px 2px rgba(17, 24, 39, .06);
+  transition: border-color .15s, background .15s;
+}
+html[dir="rtl"] .bb-subcat-chip { padding: 6px 7px 6px 14px; }
+.bb-subcat-chip:hover { border-color: #3DA829; }
+.bb-subcat-chip img {
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  object-fit: cover;
+  flex: none;
+}
+.bb-subcat-chip span {
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #374151;                     /* gray-700 */
+  white-space: nowrap;
+}
+/* Selected chip */
+.bb-subcat-chip.is-active { border-color: #3DA829; background: #EAF6E6; }
+.bb-subcat-chip.is-active span { color: #3DA829; }
+
+@media (min-width: 768px) {
+  .bb-subcat-chip { padding: 7px 18px 7px 9px; border-radius: 16px; }
+  html[dir="rtl"] .bb-subcat-chip { padding: 7px 9px 7px 18px; }
+  .bb-subcat-chip img { width: 34px; height: 34px; }
+  .bb-subcat-chip span { font-size: 14px; }
 }
 
 /* ------------------------------------------------------------

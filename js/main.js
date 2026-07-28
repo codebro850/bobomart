@@ -396,11 +396,13 @@ if (document.getElementById('cartItems')) {
 }
 
 /* ============================================================
-   5. CATEGORY PAGE — Zepto/Instamart-style split view.
-   Left rail: subcategories in a single column. Right: product
-   grid of the active subcategory. Only runs when #subcatRail
-   exists (category.html). Category comes from ?cat=<id>.
-   .NET later: server renders the rail + grid; the active
+   5. CATEGORY PAGE — chip bar on top, products below.
+   A horizontal bar of subcategory chips (icon + label) sits at the
+   top of the screen and wraps onto more lines as needed; the product
+   grid of the active subcategory fills the width beneath it.
+   Only runs when #subcatRail exists (category.html).
+   Category comes from ?cat=<id>.
+   .NET later: server renders the chip bar + grid; the active
    subcategory becomes part of the route.
 ============================================================ */
 function initCategoryPage() {
@@ -432,16 +434,14 @@ function initCategoryPage() {
     rail.innerHTML = '';
     subs.forEach((sub) => {
       const active = sub.id === activeSubId;
-      // Items sit side by side across the top; inside each one the image
-      // stacks above the label (vertical alignment).
+      // Chip: icon + label on one line. Chips sit side by side and wrap
+      // onto the next line. All styling lives in .bb-subcat-chip.
       const btn = document.createElement('button');
-      btn.className = `bb-subcat-item shrink-0 w-[76px] md:w-[104px] flex flex-col items-center justify-start gap-1.5 px-1 pt-2 pb-2.5 rounded-2xl text-center transition ${
-        active ? 'is-active' : 'hover:bg-gray-50'
-      }`;
+      btn.className = `bb-subcat-chip${active ? ' is-active' : ''}`;
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
       btn.innerHTML = `
-        <img src="${sub.img}" alt="" class="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover shrink-0 ${active ? 'ring-2 ring-brand-green' : ''}" />
-        <span class="bb-subcat-label text-[10px] md:text-xs font-extrabold leading-tight ${active ? 'text-brand-green' : 'text-gray-600'}"
-              data-en="${sub.en}" data-ar="${sub.ar}">${isAr() ? sub.ar : sub.en}</span>
+        <img src="${sub.img}" alt="" />
+        <span class="bb-subcat-label" data-en="${sub.en}" data-ar="${sub.ar}">${isAr() ? sub.ar : sub.en}</span>
       `;
       btn.addEventListener('click', () => {
         activeSubId = sub.id;
