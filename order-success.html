@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — Category</title>
+  <title>BoboMart — Order confirmed</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -65,11 +65,11 @@
       <!-- Desktop nav links -->
       <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600">
         <a href="index.html" class="hover:text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
-        <a href="categories.html" class="text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
-        <a href="orders.html" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
+        <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
+        <a href="orders.html" class="text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
       </nav>
 
-      <!-- Actions: cart + profile avatar (desktop only — mobile reaches profile from the tab bar; the language switch lives inside the profile page) -->
+      <!-- Actions: cart + profile avatar -->
       <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0">
         <a href="cart.html" class="bb-cart-btn relative p-2 rounded-full hover:bg-gray-100 transition" aria-label="Cart">
           <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
@@ -86,60 +86,151 @@
   </header>
 
   <!-- ============================================================
-       CATEGORY BROWSE
-       Subcategory chips run across the TOP of the screen (icon and
-       label on one line) and wrap onto the next line, so all of them
-       are visible at once. The product grid sits below and uses the
-       full width.
-       Rendered by js/main.js from ?cat=<id> in the URL.
-       .NET later: subcategories + products come from DB;
-       the strip and grid are Razor loops, active sub via route.
+       ORDER CONFIRMED — third and final step of the checkout funnel.
+       Reads the order js/main.js just saved on "Place order".
+       .NET later: server renders /order/{id} straight from the DB.
   ============================================================ -->
-  <main class="max-w-7xl mx-auto">
+  <main class="max-w-3xl mx-auto px-4">
 
-    <!-- Category title bar -->
-    <div class="px-4 pt-4 pb-2 flex items-center gap-2">
-      <a href="categories.html" class="bb-back-btn p-1.5 rounded-full hover:bg-gray-100 transition" aria-label="Back to categories">
-        <svg class="bb-chevron w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-      </a>
-      <h1 id="categoryTitle" class="text-lg md:text-xl font-extrabold">Category</h1>
+    <!-- Funnel trail: all three steps complete -->
+    <div class="bb-steps mt-6 mb-7 max-w-md mx-auto">
+      <div class="bb-step is-done">
+        <span class="bb-step-num">1</span>
+        <span class="bb-step-label" data-en="Cart" data-ar="السلة">Cart</span>
+      </div>
+      <span class="bb-step-sep is-done"></span>
+      <div class="bb-step is-done">
+        <span class="bb-step-num">2</span>
+        <span class="bb-step-label" data-en="Checkout" data-ar="إتمام الطلب">Checkout</span>
+      </div>
+      <span class="bb-step-sep is-done"></span>
+      <div class="bb-step is-done">
+        <span class="bb-step-num">3</span>
+        <span class="bb-step-label" data-en="Done" data-ar="تم">Done</span>
+      </div>
     </div>
 
-    <!-- TOP: two stacked chip bars — subcategories, then the third
-         level (sub-subcategories) of whichever subcategory is active.
-         The third bar is hidden when the active subcategory has none. -->
-    <div class="bb-subcat-rail sticky z-30 bg-white/95 backdrop-blur border-b border-gray-100 px-4 pt-1 pb-3">
-      <!-- REPEATABLE: .bb-subcat-chip — filled by JS / Razor loop -->
-      <div id="subcatRail"
-           class="flex flex-wrap items-center justify-start gap-2 md:gap-2.5"></div>
-
-      <!-- REPEATABLE: .bb-subcat-chip.bb-subcat-chip--l3 — third level -->
-      <div id="subcatRail3"
-           class="hidden flex-wrap items-center justify-start gap-2 mt-2.5 pt-2.5 border-t border-gray-100"></div>
+    <!-- No order to show (page opened directly) -->
+    <div id="orderMissing" class="hidden text-center py-16">
+      <p class="text-base font-extrabold text-gray-500" data-en="No recent order found" data-ar="لا يوجد طلب حديث">No recent order found</p>
+      <a href="orders.html" class="inline-block mt-4 bg-brand-green text-white text-sm font-extrabold rounded-full px-6 py-2.5"
+         data-en="Go to my orders" data-ar="الذهاب إلى طلباتي">Go to my orders</a>
     </div>
 
-    <!-- BELOW: products of the active subcategory -->
-    <section class="px-4 md:px-5 py-4">
-      <div class="flex items-baseline justify-between mb-3">
-        <h2 id="subcatTitle" class="text-sm md:text-base font-extrabold"></h2>
-        <span id="subcatCount" class="text-[11px] md:text-xs font-bold text-gray-400"></span>
+    <section id="orderConfirmed">
+
+      <!-- Success header -->
+      <div class="text-center">
+        <div class="bb-success-tick">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <h1 class="text-xl md:text-2xl font-extrabold mt-4" data-en="Order confirmed!" data-ar="تم تأكيد الطلب!">Order confirmed!</h1>
+        <p class="text-sm text-gray-500 font-semibold mt-1.5"
+           data-en="Thanks — we're picking your groceries right now."
+           data-ar="شكراً لك — نقوم بتجهيز طلبك الآن.">Thanks — we're picking your groceries right now.</p>
+
+        <div class="inline-flex items-center gap-2 mt-4 bg-brand-greenlight border border-brand-green/20 rounded-full px-4 py-2">
+          <span class="text-xs font-extrabold text-brand-green" data-en="Order" data-ar="طلب">Order</span>
+          <span id="successOrderId" class="text-xs font-extrabold text-gray-900" dir="ltr">#BM-0000</span>
+        </div>
       </div>
 
-      <div id="subcatProducts"
-           class="bb-subcat-products grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-        <!-- REPEATABLE: .bb-product-card — filled by JS / Razor loop -->
+      <!-- Arrival + progress -->
+      <div class="bb-order-card border border-brand-green/30 bg-brand-greenlight/40 rounded-2xl p-4 md:p-5 mt-6">
+        <div class="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <p class="text-[11px] font-extrabold text-gray-500" data-en="Estimated arrival" data-ar="وقت الوصول المتوقع">Estimated arrival</p>
+            <p id="successEta" class="font-extrabold text-base text-brand-green mt-0.5"></p>
+          </div>
+          <span class="bb-order-status shrink-0 bg-brand-green text-white text-[10px] font-extrabold rounded-full px-3 py-1"
+                data-en="✓ Accepted" data-ar="✓ تم القبول">✓ Accepted</span>
+        </div>
+
+        <!-- Same three-section status bar as the orders page -->
+        <div class="bb-order-progress">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="bb-order-step is-current">
+              <span class="bb-order-step-bar"></span>
+              <span class="bb-order-step-label" data-en="Order Accepted" data-ar="تم قبول الطلب">Order Accepted</span>
+            </div>
+            <div class="bb-order-step">
+              <span class="bb-order-step-bar"></span>
+              <span class="bb-order-step-label" data-en="Preparing" data-ar="قيد التحضير">Preparing</span>
+            </div>
+            <div class="bb-order-step">
+              <span class="bb-order-step-bar"></span>
+              <span class="bb-order-step-label" data-en="On the Way" data-ar="في الطريق">On the Way</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Shown when a subcategory has no products -->
-      <p id="subcatEmpty" class="hidden text-center text-sm font-bold text-gray-400 py-16"
-         data-en="No items in this section yet" data-ar="لا توجد منتجات في هذا القسم بعد">No items in this section yet</p>
+      <!-- Delivery + payment recap -->
+      <div class="grid sm:grid-cols-2 gap-3 mt-4">
+        <div class="bb-checkout-card">
+          <h2 class="bb-checkout-card-title mb-2.5">
+            <svg class="w-4 h-4 text-brand-green shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span data-en="Delivering to" data-ar="التوصيل إلى">Delivering to</span>
+          </h2>
+          <p id="successAddrLabel" class="bb-opt-title"></p>
+          <p id="successAddrLine" class="bb-opt-sub"></p>
+        </div>
+
+        <div class="bb-checkout-card">
+          <h2 class="bb-checkout-card-title mb-2.5">
+            <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span data-en="Paying with" data-ar="الدفع عبر">Paying with</span>
+          </h2>
+          <p id="successPayment" class="bb-opt-title"></p>
+          <p id="successSlot" class="bb-opt-sub"></p>
+        </div>
+      </div>
+
+      <!-- Ordered items + totals -->
+      <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 md:p-5 mt-4">
+        <h2 class="font-extrabold text-sm mb-3" data-en="Order summary" data-ar="ملخص الطلب">Order summary</h2>
+
+        <!-- REPEATABLE: .bb-checkout-line — one per ordered line (filled by JS) -->
+        <div id="successItems" class="space-y-2.5 mb-4"></div>
+
+        <div class="border-t border-gray-200 pt-3.5 space-y-2 text-sm font-semibold text-gray-600">
+          <div class="flex items-center justify-between">
+            <span data-en="Subtotal" data-ar="المجموع الفرعي">Subtotal</span>
+            <span id="successSubtotal" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span data-en="Delivery" data-ar="التوصيل">Delivery</span>
+            <span id="successDelivery" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
+          </div>
+          <div id="successDiscountRow" class="hidden items-center justify-between">
+            <span data-en="Discount" data-ar="الخصم">Discount</span>
+            <span id="successDiscount" class="bb-price font-extrabold text-brand-green">− KD 0.000</span>
+          </div>
+          <div class="border-t border-gray-200 pt-2 flex items-center justify-between text-base">
+            <span class="font-extrabold text-gray-900" data-en="Total paid" data-ar="الإجمالي المدفوع">Total paid</span>
+            <span id="successTotal" class="bb-price font-extrabold text-brand-green">KD 0.000</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-2.5 mt-5">
+        <a href="orders.html" class="flex-1 text-center bg-brand-green text-white font-extrabold text-sm rounded-full py-3 hover:opacity-90 transition"
+           data-en="Track my order" data-ar="تتبع طلبي">Track my order</a>
+        <a href="index.html" class="flex-1 text-center border border-gray-200 text-gray-700 font-extrabold text-sm rounded-full py-3 hover:bg-gray-50 transition"
+           data-en="Continue shopping" data-ar="متابعة التسوق">Continue shopping</a>
+      </div>
+
+      <p class="text-[11px] text-gray-400 font-semibold text-center mt-4"
+         data-en="Need help with this order? Contact us on WhatsApp — we reply in minutes."
+         data-ar="تحتاج مساعدة بشأن هذا الطلب؟ تواصل معنا على واتساب — نرد في دقائق.">Need help with this order? Contact us on WhatsApp — we reply in minutes.</p>
     </section>
 
     <!-- ============================================================
          FOOTER — sitewide links (mobile + desktop)
          .NET: becomes a shared _Footer partial
     ============================================================ -->
-    <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8 px-4">
+    <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
         <!-- Brand -->
@@ -210,7 +301,7 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
     </a>
-    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
     </a>
@@ -219,7 +310,7 @@
       <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
       <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
     </a>
-    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
     </a>
