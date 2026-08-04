@@ -1,0 +1,7 @@
+<!-- Cash on delivery mark -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 30" role="img" aria-label="Cash on delivery">
+  <rect width="48" height="30" rx="4" fill="#ffffff" stroke="#e5e7eb"/>
+  <rect x="8" y="9" width="32" height="12" rx="2.5" fill="#EAF6E6" stroke="#3DA829"/>
+  <circle cx="24" cy="15" r="3.2" fill="#3DA829"/>
+  <path d="M11.6 12.6v4.8M36.4 12.6v4.8" stroke="#3DA829" stroke-width="1.3" stroke-linecap="round"/>
+</svg>

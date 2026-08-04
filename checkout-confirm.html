@@ -96,17 +96,17 @@
     <div class="bb-steps mt-6 mb-7 max-w-md mx-auto">
       <div class="bb-step is-done">
         <span class="bb-step-num">1</span>
-        <span class="bb-step-label" data-en="Cart" data-ar="السلة">Cart</span>
+        <span class="bb-step-label" data-en="Address" data-ar="العنوان">Address</span>
       </div>
       <span class="bb-step-sep is-done"></span>
       <div class="bb-step is-done">
         <span class="bb-step-num">2</span>
-        <span class="bb-step-label" data-en="Checkout" data-ar="إتمام الطلب">Checkout</span>
+        <span class="bb-step-label" data-en="Payment" data-ar="الدفع">Payment</span>
       </div>
       <span class="bb-step-sep is-done"></span>
       <div class="bb-step is-done">
         <span class="bb-step-num">3</span>
-        <span class="bb-step-label" data-en="Done" data-ar="تم">Done</span>
+        <span class="bb-step-label" data-en="Confirm" data-ar="التأكيد">Confirm</span>
       </div>
     </div>
 
@@ -181,8 +181,13 @@
             <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             <span data-en="Paying with" data-ar="الدفع عبر">Paying with</span>
           </h2>
-          <p id="successPayment" class="bb-opt-title"></p>
-          <p id="successSlot" class="bb-opt-sub"></p>
+          <div class="flex items-center gap-2.5">
+            <img id="successPayImg" src="" alt="" class="bb-pay-img shrink-0" />
+            <div class="min-w-0">
+              <p id="successPayment" class="bb-opt-title"></p>
+              <p id="successSlot" class="bb-opt-sub"></p>
+            </div>
+          </div>
         </div>
       </div>
 

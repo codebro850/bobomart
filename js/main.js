@@ -714,58 +714,91 @@ function initProductPage() {
 initProductPage();
 
 /* ============================================================
-   7. CHECKOUT — address, delivery slot, payment, promo, totals.
-   Only runs when #checkoutBody exists (checkout.html).
-   "Place order" saves the order, empties the cart and hands over to
-   order-success.html.
-   .NET later: addresses / slots / payment methods come from the DB and
-   "Place order" POSTs to an order controller that returns the order id.
+   7. CHECKOUT — three pages, one shared draft.
+        step 1  checkout-address.html  → delivery address
+        step 2  checkout-payment.html  → delivery type, voucher,
+                                         payment options, order items
+        step 3  checkout-confirm.html  → order confirmed
+   The draft lives in localStorage so each page picks up where the
+   previous one left off.
+   .NET later: the draft becomes TempData / a server-side checkout
+   session and each step is its own Checkout action.
 ============================================================ */
 const ADDRESS_KEY = 'bobomart-addresses';
+const CHECKOUT_KEY = 'bobomart-checkout';
 const ORDER_KEY = 'bobomart-last-order';
 
-// Saved addresses of the logged-in user.
+// Areas served, used for the Area dropdown on step 1.
+// .NET later: the areas table, filtered to those with active coverage.
+const AREAS = [
+  { en: 'Salmiya',        ar: 'السالمية' },
+  { en: 'Hawally',        ar: 'حولي' },
+  { en: 'Jabriya',        ar: 'الجابرية' },
+  { en: 'Kuwait City',    ar: 'مدينة الكويت' },
+  { en: 'Sharq',          ar: 'شرق' },
+  { en: 'Salwa',          ar: 'سلوى' },
+  { en: 'Mishref',        ar: 'مشرف' },
+  { en: 'Rumaithiya',     ar: 'الرميثية' },
+  { en: 'Bayan',          ar: 'بيان' },
+  { en: 'Sabah Al Salem', ar: 'صباح السالم' },
+  { en: 'Farwaniya',      ar: 'الفروانية' },
+  { en: 'Fahaheel',       ar: 'الفحيحيل' },
+  { en: 'Mangaf',         ar: 'المنقف' },
+  { en: 'Mahboula',       ar: 'المهبولة' },
+  { en: 'Fintas',         ar: 'الفنطاس' },
+  { en: 'Jahra',          ar: 'الجهراء' },
+];
+
+function areaLabel(en, isAr) {
+  const found = AREAS.find((a) => a.en === en);
+  return isAr && found ? found.ar : en;
+}
+
+// Saved addresses of the logged-in user, held as structured fields so
+// step 1 can fill its form and step 2 can show just the important ones.
 // .NET later: the user's addresses table.
 const DEFAULT_ADDRESSES = [
-  { id: 'home', en: 'Home', ar: 'المنزل',
-    lineEn: 'Block 4, Street 12, Building 8, Flat 3 — Salmiya',
-    lineAr: 'قطعة ٤، شارع ١٢، مبنى ٨، شقة ٣ — السالمية' },
-  { id: 'work', en: 'Work', ar: 'العمل',
-    lineEn: 'Al Hamra Tower, Floor 22, Office 4 — Kuwait City',
-    lineAr: 'برج الحمراء، الطابق ٢٢، مكتب ٤ — مدينة الكويت' },
+  { id: 'home', label: 'Home', labelAr: 'المنزل', type: 'apartment', area: 'Salmiya',
+    block: '4', street: '12', avenue: '', building: '8', floor: '2', flat: '3',
+    phone: '+965 9000 1234', directions: 'Near the pharmacy, white gate' },
+  { id: 'work', label: 'Work', labelAr: 'العمل', type: 'office', area: 'Kuwait City',
+    block: '6', street: 'Al Shuhada', avenue: '', building: 'Al Hamra Tower',
+    floor: '22', flat: '4', phone: '+965 9000 5678', directions: '' },
 ];
 
-// Delivery windows. `fee` is waived above FREE_DELIVERY_THRESHOLD.
+// Delivery types. `fee` is waived above FREE_DELIVERY_THRESHOLD.
 // .NET later: slots table with per-area capacity.
 const SLOTS = [
-  { id: 'express',  en: 'Express',       ar: 'سريع',        subEn: '15–30 min',      subAr: '١٥–٣٠ دقيقة', fee: 0.500, tagEn: 'Fastest', tagAr: 'الأسرع' },
-  { id: 'standard', en: 'Standard',      ar: 'عادي',        subEn: 'Within 2 hours', subAr: 'خلال ساعتين', fee: 0.250 },
-  { id: 'evening',  en: 'Evening slot',  ar: 'فترة المساء', subEn: '6:00 – 9:00 PM', subAr: '٦:٠٠ – ٩:٠٠ م', fee: 0, tagEn: 'Free', tagAr: 'مجاني' },
+  { id: 'express',  en: 'Express',      ar: 'سريع',        subEn: '15–30 min',      subAr: '١٥–٣٠ دقيقة', fee: 0.500, tagEn: 'Fastest', tagAr: 'الأسرع' },
+  { id: 'standard', en: 'Normal',       ar: 'عادي',        subEn: 'Within 2 hours', subAr: 'خلال ساعتين', fee: 0.250 },
+  { id: 'evening',  en: 'Evening slot', ar: 'فترة المساء', subEn: '6:00 – 9:00 PM', subAr: '٦:٠٠ – ٩:٠٠ م', fee: 0, tagEn: 'Free', tagAr: 'مجاني' },
 ];
 
-// Enabled payment methods. `badge` is the little brand tile on the row.
+// Enabled payment methods. `img` is the brand mark shown on the row —
+// placeholder SVGs under images/payments, swap for official assets.
 // .NET later: gateway configuration per store.
 const PAYMENTS = [
-  { id: 'knet', en: 'KNET', ar: 'كي نت', badge: 'KNET',
+  { id: 'knet', en: 'KNET', ar: 'كي نت', img: 'images/payments/knet.svg',
     subEn: 'Pay with your Kuwaiti debit card', subAr: 'الدفع ببطاقة الخصم الكويتية' },
-  { id: 'card', en: 'Credit / debit card', ar: 'بطاقة ائتمان أو خصم', badge: 'VISA',
-    subEn: 'Visa · Mastercard', subAr: 'فيزا · ماستركارد' },
-  { id: 'applepay', en: 'Apple Pay', ar: 'أبل باي', badge: 'APPLE',
+  { id: 'card', en: 'Visa / Mastercard', ar: 'فيزا / ماستركارد',
+    img: 'images/payments/visa.svg', img2: 'images/payments/mastercard.svg',
+    subEn: 'Credit or debit card', subAr: 'بطاقة ائتمان أو خصم' },
+  { id: 'applepay', en: 'Apple Pay', ar: 'أبل باي', img: 'images/payments/applepay.svg',
     subEn: 'Fast and secure — no card details needed', subAr: 'سريع وآمن — بدون بيانات بطاقة' },
-  { id: 'cod', en: 'Cash on delivery', ar: 'الدفع عند التسليم', badge: 'CASH',
+  { id: 'cod', en: 'Cash on delivery', ar: 'الدفع عند التسليم', img: 'images/payments/cash.svg',
     subEn: 'Pay the driver in cash on arrival', subAr: 'ادفع للمندوب نقداً عند الوصول' },
 ];
 
-// Demo promo codes.
+// Demo voucher codes.
 // .NET later: promotions table with validity dates and usage limits.
 const PROMOS = {
-  BOBO10:   { type: 'percent',      value: 10,    en: '10% off your order',   ar: 'خصم ١٠٪ على طلبك' },
-  FRESH500: { type: 'amount',       value: 0.500, en: 'KD 0.500 off',         ar: 'خصم ٠.٥٠٠ د.ك' },
+  BOBO10:   { type: 'percent',      value: 10,    en: '10% off your order',     ar: 'خصم ١٠٪ على طلبك' },
+  FRESH500: { type: 'amount',       value: 0.500, en: 'KD 0.500 off',           ar: 'خصم ٠.٥٠٠ د.ك' },
   FREEDEL:  { type: 'freedelivery', value: 0,     en: 'Free delivery unlocked', ar: 'تم تفعيل التوصيل المجاني' },
 };
 
 function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, (c) => (
+  return String(s ?? '').replace(/[&<>"']/g, (c) => (
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 }
@@ -778,8 +811,40 @@ function loadAddresses() {
   return DEFAULT_ADDRESSES;
 }
 
-// One summary line — shared by the checkout summary and the
-// confirmation page, so both read identically.
+function loadDraft() {
+  try { return JSON.parse(localStorage.getItem(CHECKOUT_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveDraft(draft) {
+  localStorage.setItem(CHECKOUT_KEY, JSON.stringify(draft));
+}
+
+// Cart lines resolved against the catalog
+function cartLines() {
+  return Object.keys(cart)
+    .filter((id) => PRODUCTS[id])
+    .map((id) => ({ id, qty: cart[id], ...PRODUCTS[id] }));
+}
+
+function addressName(addr, isAr) {
+  return (isAr && addr.labelAr) ? addr.labelAr : addr.label;
+}
+
+// The address as one readable line, area last (matching how Kuwaiti
+// addresses are spoken). .NET later: a display helper on the model.
+function addressLine(addr, isAr) {
+  const parts = [];
+  if (addr.block)    parts.push(`${isAr ? 'قطعة' : 'Block'} ${addr.block}`);
+  if (addr.street)   parts.push(`${isAr ? 'شارع' : 'Street'} ${addr.street}`);
+  if (addr.avenue)   parts.push(`${isAr ? 'جادة' : 'Avenue'} ${addr.avenue}`);
+  if (addr.building) parts.push(`${isAr ? 'مبنى' : 'Bldg'} ${addr.building}`);
+  if (addr.floor)    parts.push(`${isAr ? 'طابق' : 'Floor'} ${addr.floor}`);
+  if (addr.flat)     parts.push(`${isAr ? 'شقة' : 'Flat'} ${addr.flat}`);
+  return `${parts.join(', ')} — ${areaLabel(addr.area, isAr)}`;
+}
+
+// One summary line — shared by the payment page and the confirmation
+// page, so both read identically.
 function orderLineHtml(item, isAr) {
   return `
     <div class="bb-checkout-line flex items-center gap-2.5">
@@ -795,107 +860,166 @@ function orderLineHtml(item, isAr) {
   `;
 }
 
-function initCheckoutPage() {
-  const body = document.getElementById('checkoutBody');
-  if (!body) return;
+// Empty-cart guard shared by both checkout steps
+function blockEmptyCheckout(rootId, barId) {
+  const root = document.getElementById(rootId);
+  if (!root) return false;            // not this page
+  if (cartLines().length > 0) return false;
+
+  root.classList.add('hidden');
+  const bar = document.getElementById(barId);
+  if (bar) bar.classList.add('hidden');
+  const empty = document.getElementById('checkoutEmpty');
+  if (empty) empty.classList.remove('hidden');
+  return true;                       // handled — stop here
+}
+
+/* ============================================================
+   7a. STEP 1 — DELIVERY ADDRESS
+   A dropdown of every saved address sits above the address fields,
+   which are always on the page (no "add new address" tap). Picking a
+   saved address fills the fields; "New address" clears them.
+   Only runs when #checkoutAddress exists (checkout-address.html).
+============================================================ */
+function initCheckoutAddressPage() {
+  const root = document.getElementById('checkoutAddress');
+  if (!root) return;
+  if (blockEmptyCheckout('checkoutAddress', 'addressBar')) return;
 
   const isAr = () => document.documentElement.lang === 'ar';
+  const addresses = loadAddresses();
+  const draft = loadDraft();
 
-  let addresses = loadAddresses();
-  let activeAddressId = addresses[0].id;
-  let activeSlotId = SLOTS[0].id;
-  let activePaymentId = PAYMENTS[0].id;
-  let promo = null; // { code, ...PROMOS[code] }
+  const select = document.getElementById('addressSelect');
+  const areaSelect = document.getElementById('addrArea');
+  const errorEl = document.getElementById('addrError');
 
-  const emptyEl = document.getElementById('checkoutEmpty');
-  const barEl = document.getElementById('placeOrderBar');
+  const FIELDS = {
+    label: 'addrLabel', type: 'addrType', area: 'addrArea', block: 'addrBlock',
+    street: 'addrStreet', avenue: 'addrAvenue', building: 'addrBuilding',
+    floor: 'addrFloor', flat: 'addrFlat', phone: 'addrPhone', directions: 'addrDirections',
+  };
+  const field = (key) => document.getElementById(FIELDS[key]);
 
-  // Cart lines, resolved against the catalog once up front
-  function cartLines() {
-    return Object.keys(cart)
-      .filter((id) => PRODUCTS[id])
-      .map((id) => ({ id, qty: cart[id], ...PRODUCTS[id] }));
+  // Areas dropdown — REPEATABLE: one <option> per served area
+  areaSelect.innerHTML = AREAS.map((a) =>
+    `<option value="${escapeHtml(a.en)}" data-en="${escapeHtml(a.en)}" data-ar="${escapeHtml(a.ar)}">${escapeHtml(isAr() ? a.ar : a.en)}</option>`
+  ).join('');
+
+  // Saved-address dropdown — REPEATABLE: one <option> per address, plus
+  // a final "New address" entry so nothing hides behind an extra tap
+  function renderSelect(activeId) {
+    select.innerHTML = [
+      ...addresses.map((a) => {
+        const en = `${a.label} — ${a.area}`;
+        const ar = `${addressName(a, true)} — ${areaLabel(a.area, true)}`;
+        return `<option value="${escapeHtml(a.id)}" data-en="${escapeHtml(en)}" data-ar="${escapeHtml(ar)}">${escapeHtml(isAr() ? ar : en)}</option>`;
+      }),
+      `<option value="new" data-en="+ New address" data-ar="+ عنوان جديد">${isAr() ? '+ عنوان جديد' : '+ New address'}</option>`,
+    ].join('');
+    select.value = activeId;
   }
 
-  // Nothing to check out — bounce the user back to shopping
-  if (cartLines().length === 0) {
-    body.classList.add('hidden');
-    if (barEl) barEl.classList.add('hidden');
-    if (emptyEl) emptyEl.classList.remove('hidden');
+  function fillFields(addr) {
+    Object.keys(FIELDS).forEach((key) => { field(key).value = addr[key] || ''; });
+    if (!addr.type) field('type').value = 'house';
+    if (!addr.area) areaSelect.value = AREAS[0].en;
+  }
+
+  // Start from whatever step 1 saved last, else the first saved address
+  const startId = draft.address && draft.address.id ? draft.address.id : addresses[0].id;
+  const saved = addresses.find((a) => a.id === startId);
+  renderSelect(saved ? startId : 'new');
+  fillFields(draft.address && draft.address.id === startId ? draft.address : (saved || addresses[0]));
+
+  select.addEventListener('change', () => {
+    errorEl.classList.add('hidden');
+    if (select.value === 'new') {
+      fillFields({ area: AREAS[0].en, type: 'house' });
+      field('label').focus();
+      return;
+    }
+    fillFields(addresses.find((a) => a.id === select.value));
+  });
+
+  function continueToPayment() {
+    const addr = {};
+    Object.keys(FIELDS).forEach((key) => { addr[key] = field(key).value.trim(); });
+
+    if (!addr.area || !addr.block || !addr.street) {
+      errorEl.classList.remove('hidden');
+      errorEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+    errorEl.classList.add('hidden');
+
+    const editingSaved = select.value !== 'new';
+    addr.id = editingSaved ? select.value : `addr-${addresses.length + 1}`;
+    if (!addr.label) addr.label = isAr() ? 'عنوان جديد' : 'New address';
+    addr.labelAr = editingSaved
+      ? (addresses.find((a) => a.id === addr.id) || {}).labelAr || addr.label
+      : addr.label;
+
+    // .NET later: POST the address; the response id goes into the draft
+    localStorage.setItem(ADDRESS_KEY,
+      JSON.stringify(addresses.filter((a) => a.id !== addr.id).concat(addr)));
+
+    saveDraft({ ...loadDraft(), address: addr });
+    location.href = 'checkout-payment.html';
+  }
+
+  ['addressContinue', 'addressContinueMobile'].forEach((btnId) => {
+    const btn = document.getElementById(btnId);
+    if (btn) btn.addEventListener('click', continueToPayment);
+  });
+}
+
+initCheckoutAddressPage();
+
+/* ============================================================
+   7b. STEP 2 — PAYMENT
+   Sections, in order: the chosen address (with a link back to step 1),
+   delivery type, voucher, payment options, then order items + totals.
+   Only runs when #checkoutPayment exists (checkout-payment.html).
+============================================================ */
+function initCheckoutPaymentPage() {
+  const root = document.getElementById('checkoutPayment');
+  if (!root) return;
+  if (blockEmptyCheckout('checkoutPayment', 'placeOrderBar')) return;
+
+  const isAr = () => document.documentElement.lang === 'ar';
+  const draft = loadDraft();
+
+  // No address yet — step 1 has to happen first
+  if (!draft.address) {
+    location.replace('checkout-address.html');
     return;
   }
 
-  /* ---------- 1 · addresses ---------- */
-  const addressList = document.getElementById('addressList');
+  let activeSlotId = SLOTS.some((s) => s.id === draft.slotId) ? draft.slotId : SLOTS[0].id;
+  let activePaymentId = PAYMENTS.some((p) => p.id === draft.paymentId) ? draft.paymentId : PAYMENTS[0].id;
+  let promo = draft.promo && PROMOS[draft.promo] ? { code: draft.promo, ...PROMOS[draft.promo] } : null;
 
-  function renderAddresses() {
-    addressList.innerHTML = '';
-    addresses.forEach((addr) => {
-      const active = addr.id === activeAddressId;
-      const btn = document.createElement('button');
-      btn.className = `bb-opt${active ? ' is-active' : ''}`;
-      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-      btn.innerHTML = `
-        <span class="bb-radio"></span>
-        <span class="flex-1 min-w-0">
-          <span class="bb-opt-title block" data-en="${escapeHtml(addr.en)}" data-ar="${escapeHtml(addr.ar)}">${escapeHtml(isAr() ? addr.ar : addr.en)}</span>
-          <span class="bb-opt-sub block" data-en="${escapeHtml(addr.lineEn)}" data-ar="${escapeHtml(addr.lineAr)}">${escapeHtml(isAr() ? addr.lineAr : addr.lineEn)}</span>
-        </span>
-      `;
-      btn.addEventListener('click', () => {
-        activeAddressId = addr.id;
-        renderAddresses();
-      });
-      addressList.appendChild(btn);
-    });
-  }
+  /* ---------- 1 · delivering to ---------- */
+  const addr = draft.address;
+  const labelEl = document.getElementById('payAddrLabel');
+  labelEl.dataset.en = addr.label;
+  labelEl.dataset.ar = addressName(addr, true);
+  labelEl.textContent = isAr() ? labelEl.dataset.ar : labelEl.dataset.en;
 
-  const addToggle = document.getElementById('addAddressToggle');
-  const addForm = document.getElementById('addAddressForm');
-  const addrError = document.getElementById('newAddrError');
+  const areaEl = document.getElementById('payAddrArea');
+  areaEl.dataset.en = areaLabel(addr.area, false);
+  areaEl.dataset.ar = areaLabel(addr.area, true);
+  areaEl.textContent = isAr() ? areaEl.dataset.ar : areaEl.dataset.en;
 
-  if (addToggle && addForm) {
-    addToggle.addEventListener('click', () => {
-      addForm.classList.toggle('hidden');
-      if (!addForm.classList.contains('hidden')) document.getElementById('newAddrArea').focus();
-    });
-    document.getElementById('cancelAddressBtn').addEventListener('click', () => {
-      addForm.classList.add('hidden');
-      addrError.classList.add('hidden');
-    });
-    document.getElementById('saveAddressBtn').addEventListener('click', () => {
-      const label = document.getElementById('newAddrLabel').value.trim();
-      const area = document.getElementById('newAddrArea').value.trim();
-      const block = document.getElementById('newAddrBlock').value.trim();
-      const street = document.getElementById('newAddrStreet').value.trim();
-      const building = document.getElementById('newAddrBuilding').value.trim();
+  const lineEl = document.getElementById('payAddrLine');
+  lineEl.dataset.en = addressLine(addr, false);
+  lineEl.dataset.ar = addressLine(addr, true);
+  lineEl.textContent = isAr() ? lineEl.dataset.ar : lineEl.dataset.en;
 
-      if (!area || !block || !street) {
-        addrError.classList.remove('hidden');
-        return;
-      }
-      addrError.classList.add('hidden');
+  document.getElementById('payAddrPhone').textContent = addr.phone || '';
 
-      // .NET later: POST the address, then re-bind from the response
-      const line = `Block ${block}, Street ${street}${building ? `, Building ${building}` : ''} — ${area}`;
-      const name = label || (isAr() ? 'عنوان جديد' : 'New address');
-      const addr = {
-        id: `addr-${addresses.length + 1}`,
-        en: name, ar: name,
-        lineEn: line, lineAr: line,
-      };
-      addresses = [...addresses, addr];
-      localStorage.setItem(ADDRESS_KEY, JSON.stringify(addresses));
-      activeAddressId = addr.id;
-
-      ['newAddrLabel', 'newAddrArea', 'newAddrBlock', 'newAddrStreet', 'newAddrBuilding']
-        .forEach((elId) => { document.getElementById(elId).value = ''; });
-      addForm.classList.add('hidden');
-      renderAddresses();
-    });
-  }
-
-  /* ---------- 2 · delivery slots ---------- */
+  /* ---------- 2 · delivery type ---------- */
   const slotList = document.getElementById('slotList');
 
   function renderSlots() {
@@ -919,13 +1043,47 @@ function initCheckoutPage() {
       btn.addEventListener('click', () => {
         activeSlotId = slot.id;
         renderSlots();
-        renderTotals(); // the slot fee feeds straight into the total
+        renderTotals();   // the delivery fee feeds straight into the total
       });
       slotList.appendChild(btn);
     });
   }
 
-  /* ---------- 3 · payment methods ---------- */
+  /* ---------- 3 · voucher ---------- */
+  const promoInput = document.getElementById('promoInput');
+  const promoMsg = document.getElementById('promoMsg');
+
+  function showPromoMsg(text, ok) {
+    promoMsg.textContent = text;
+    promoMsg.classList.remove('hidden', 'is-ok', 'is-bad');
+    promoMsg.classList.add(ok ? 'is-ok' : 'is-bad');
+  }
+
+  if (promo) {
+    promoInput.value = promo.code;
+    showPromoMsg(`✓ ${isAr() ? promo.ar : promo.en}`, true);
+  }
+
+  document.getElementById('promoApplyBtn').addEventListener('click', () => {
+    const code = promoInput.value.trim().toUpperCase();
+    if (!code) {
+      promo = null;
+      promoMsg.classList.add('hidden');
+      renderTotals();
+      return;
+    }
+    const found = PROMOS[code];
+    if (!found) {
+      promo = null;
+      showPromoMsg(isAr() ? 'كود القسيمة غير صحيح' : 'That voucher code is not valid', false);
+    } else {
+      promo = { code, ...found };
+      showPromoMsg(`✓ ${isAr() ? found.ar : found.en}`, true);
+    }
+    renderTotals();
+  });
+
+  /* ---------- 4 · payment options ---------- */
   const paymentList = document.getElementById('paymentList');
   const cardFields = document.getElementById('cardFields');
 
@@ -936,9 +1094,12 @@ function initCheckoutPage() {
       const btn = document.createElement('button');
       btn.className = `bb-opt bb-opt--center${active ? ' is-active' : ''}`;
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      // Brand marks — Visa/Mastercard share a row, hence two images
+      const marks = [pay.img, pay.img2].filter(Boolean)
+        .map((src) => `<img src="${src}" alt="" class="bb-pay-img" />`).join('');
       btn.innerHTML = `
         <span class="bb-radio"></span>
-        <span class="bb-pay-badge">${pay.badge}</span>
+        <span class="bb-pay-marks">${marks}</span>
         <span class="flex-1 min-w-0">
           <span class="bb-opt-title block" data-en="${pay.en}" data-ar="${pay.ar}">${isAr() ? pay.ar : pay.en}</span>
           <span class="bb-opt-sub block" data-en="${pay.subEn}" data-ar="${pay.subAr}">${isAr() ? pay.subAr : pay.subEn}</span>
@@ -954,44 +1115,22 @@ function initCheckoutPage() {
     if (cardFields) cardFields.classList.toggle('hidden', activePaymentId !== 'card');
   }
 
-  /* ---------- summary lines ---------- */
+  /* ---------- 5 · order items and details ---------- */
   function renderItems() {
-    const list = document.getElementById('checkoutItems');
-    list.innerHTML = cartLines().map((item) => orderLineHtml(item, isAr())).join('');
+    document.getElementById('checkoutItems').innerHTML =
+      cartLines().map((item) => orderLineHtml(item, isAr())).join('');
   }
 
-  /* ---------- promo code ---------- */
-  const promoInput = document.getElementById('promoInput');
-  const promoMsg = document.getElementById('promoMsg');
-
-  function showPromoMsg(text, ok) {
-    promoMsg.textContent = text;
-    promoMsg.classList.remove('hidden', 'is-ok', 'is-bad');
-    promoMsg.classList.add(ok ? 'is-ok' : 'is-bad');
-  }
-
-  document.getElementById('promoApplyBtn').addEventListener('click', () => {
-    const code = promoInput.value.trim().toUpperCase();
-    if (!code) {
-      promo = null;
-      promoMsg.classList.add('hidden');
-      renderTotals();
-      return;
-    }
-    const found = PROMOS[code];
-    if (!found) {
-      promo = null;
-      showPromoMsg(isAr() ? 'كود الخصم غير صحيح' : 'That promo code is not valid', false);
-    } else {
-      promo = { code, ...found };
-      showPromoMsg(`✓ ${isAr() ? found.ar : found.en}`, true);
-    }
-    renderTotals();
-  });
+  // Restore the note / contactless choice when coming back from step 1
+  const noteEl = document.getElementById('orderNote');
+  const contactlessEl = document.getElementById('contactlessOpt');
+  if (draft.note) noteEl.value = draft.note;
+  if (draft.contactless) contactlessEl.checked = true;
 
   /* ---------- totals ---------- */
-  // Kept as one function so every input (slot, promo, cart) recomputes
-  // the same way. .NET later: the server is the source of truth here.
+  // One function so every input (delivery type, voucher, cart)
+  // recomputes the same way.
+  // .NET later: the server is the source of truth here.
   function computeTotals() {
     const lines = cartLines();
     const subtotal = lines.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -1029,10 +1168,12 @@ function initCheckoutPage() {
   }
 
   /* ---------- place order ---------- */
+  let placing = false;   // stops the draft-sync below from resurrecting the draft
+
   function placeOrder(btn) {
     const { lines, subtotal, delivery, discount, total, slot } = computeTotals();
-    const address = addresses.find((a) => a.id === activeAddressId);
     const payment = PAYMENTS.find((p) => p.id === activePaymentId);
+    placing = true;
 
     // Brief pending state so the tap always feels acknowledged
     btn.disabled = true;
@@ -1044,18 +1185,19 @@ function initCheckoutPage() {
       placedAt: new Date().toISOString(),
       items: lines.map(({ id, en, ar, pack, price, img, qty }) => ({ id, en, ar, pack, price, img, qty })),
       subtotal, delivery, discount, total,
-      address,
+      address: draft.address,
       slot: { id: slot.id, en: slot.en, ar: slot.ar, subEn: slot.subEn, subAr: slot.subAr },
-      payment: { id: payment.id, en: payment.en, ar: payment.ar },
+      payment: { id: payment.id, en: payment.en, ar: payment.ar, img: payment.img },
       promo: promo ? promo.code : null,
-      note: document.getElementById('orderNote').value.trim(),
-      contactless: document.getElementById('contactlessOpt').checked,
+      note: noteEl.value.trim(),
+      contactless: contactlessEl.checked,
     };
 
     // .NET later: POST the order, then redirect to /order/{id}
     localStorage.setItem(ORDER_KEY, JSON.stringify(order));
     localStorage.removeItem(CART_KEY);
-    location.href = 'order-success.html';
+    localStorage.removeItem(CHECKOUT_KEY);
+    location.href = 'checkout-confirm.html';
   }
 
   ['placeOrderBtn', 'placeOrderBtnMobile'].forEach((btnId) => {
@@ -1063,21 +1205,35 @@ function initCheckoutPage() {
     if (btn) btn.addEventListener('click', () => placeOrder(btn));
   });
 
-  renderAddresses();
+  // Keep the draft current so stepping back to the address page and
+  // returning does not lose the delivery type / voucher / note choices.
+  ['click', 'input'].forEach((evt) => root.addEventListener(evt, () => {
+    if (placing) return;   // the order is on its way — leave the cleared draft alone
+    saveDraft({
+      ...loadDraft(),
+      slotId: activeSlotId,
+      paymentId: activePaymentId,
+      promo: promo ? promo.code : null,
+      note: noteEl.value,
+      contactless: contactlessEl.checked,
+    });
+  }));
+
   renderSlots();
   renderPayments();
   renderItems();
   renderTotals();
 }
 
-initCheckoutPage();
+initCheckoutPaymentPage();
 
 /* ============================================================
-   8. ORDER CONFIRMED — reads the order checkout.html just saved.
-   Only runs when #orderConfirmed exists (order-success.html).
+   7c. STEP 3 — ORDER CONFIRMED
+   Reads the order step 2 just saved.
+   Only runs when #orderConfirmed exists (checkout-confirm.html).
    .NET later: server renders /order/{id} from the DB instead.
 ============================================================ */
-function initOrderSuccessPage() {
+function initCheckoutConfirmPage() {
   const root = document.getElementById('orderConfirmed');
   if (!root) return;
 
@@ -1096,21 +1252,24 @@ function initOrderSuccessPage() {
   document.getElementById('successOrderId').textContent = `#${order.id}`;
   document.title = `BoboMart — Order #${order.id}`;
 
-  // Arrival window comes from the chosen slot
+  // Arrival window comes from the chosen delivery type
   const etaEl = document.getElementById('successEta');
   etaEl.dataset.en = order.slot.subEn;
   etaEl.dataset.ar = order.slot.subAr;
   etaEl.textContent = isAr() ? order.slot.subAr : order.slot.subEn;
 
   const addrLabel = document.getElementById('successAddrLabel');
-  addrLabel.dataset.en = order.address.en;
-  addrLabel.dataset.ar = order.address.ar;
-  addrLabel.textContent = isAr() ? order.address.ar : order.address.en;
+  addrLabel.dataset.en = `${order.address.label} · ${areaLabel(order.address.area, false)}`;
+  addrLabel.dataset.ar = `${addressName(order.address, true)} · ${areaLabel(order.address.area, true)}`;
+  addrLabel.textContent = isAr() ? addrLabel.dataset.ar : addrLabel.dataset.en;
 
   const addrLine = document.getElementById('successAddrLine');
-  addrLine.dataset.en = order.address.lineEn;
-  addrLine.dataset.ar = order.address.lineAr;
-  addrLine.textContent = isAr() ? order.address.lineAr : order.address.lineEn;
+  addrLine.dataset.en = addressLine(order.address, false);
+  addrLine.dataset.ar = addressLine(order.address, true);
+  addrLine.textContent = isAr() ? addrLine.dataset.ar : addrLine.dataset.en;
+
+  const payImg = document.getElementById('successPayImg');
+  if (payImg && order.payment.img) payImg.src = order.payment.img;
 
   const payEl = document.getElementById('successPayment');
   payEl.dataset.en = order.payment.en;
@@ -1136,4 +1295,4 @@ function initOrderSuccessPage() {
   document.getElementById('successTotal').textContent = `${kd} ${fmtKD(order.total)}`;
 }
 
-initOrderSuccessPage();
+initCheckoutConfirmPage();

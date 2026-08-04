@@ -1,0 +1,7 @@
+<!-- Placeholder payment mark — swap for the official brand asset before launch -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 30" role="img" aria-label="KNET">
+  <rect width="48" height="30" rx="4" fill="#ffffff" stroke="#e5e7eb"/>
+  <text x="23" y="18" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"
+        font-size="10.5" font-weight="bold" fill="#0F6E64">KNET</text>
+  <path d="M11 21.5h26" stroke="#8DC63F" stroke-width="2" stroke-linecap="round"/>
+</svg>

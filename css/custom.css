@@ -329,20 +329,14 @@ html[dir="rtl"] .bb-order-step.is-current .bb-order-step-bar {
   color: #F5A11A;
 }
 
-/* Payment brand badge (KNET / VISA / cash …) */
-.bb-pay-badge {
-  width: 38px;
-  height: 26px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  color: #374151;
-  font-size: 8.5px;
-  font-weight: 800;
-  letter-spacing: .02em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Payment brand marks (KNET / Visa / Mastercard / Apple Pay / cash).
+   Placeholder SVGs live in images/payments — swap for official assets. */
+.bb-pay-marks { display: flex; align-items: center; gap: 4px; flex: none; }
+.bb-pay-img {
+  width: 40px;
+  height: 25px;
+  border-radius: 5px;
+  object-fit: contain;
   flex: none;
 }
 
@@ -363,6 +357,20 @@ html[dir="rtl"] .bb-order-step.is-current .bb-order-step-bar {
 }
 .bb-field:focus { border-color: #3DA829; }
 .bb-field::placeholder { color: #9ca3af; font-weight: 600; }
+
+/* Dropdowns — same shell as .bb-field with our own chevron, so the
+   native arrow does not fight the rounded field on any platform. */
+.bb-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-inline-end: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+html[dir="rtl"] .bb-select { background-position: left 14px center; }
 
 /* Promo code row */
 .bb-promo-msg { font-size: 11px; font-weight: 800; margin-top: 6px; }
