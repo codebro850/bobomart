@@ -29,7 +29,7 @@ Rules:
 
 ### 2.1 Responsive App/Website Behavior
 - **Mobile (< 768px):** app-like experience with a fixed **bottom tab bar** — Home, Categories, Cart, Orders, Profile.
-- **Desktop (≥ 768px):** classic website layout with a top header — logo, search bar, language switcher, cart, and **profile picture at the top right**.
+- **Desktop (≥ 768px):** classic website layout with a top header — logo, search bar, then the nav links (Home, Categories, Orders), cart and a **“Hi &lt;customer name&gt;” link to the profile, all aligned to the right**.
 
 ### 2.2 Language Support (EN / AR)
 - Language switcher visible in the header (English ⇄ العربية).
@@ -56,7 +56,7 @@ Rules:
 - After adding, the button becomes a stepper (`− 1 +`) so the user can **add only 1 more at a time** (increment/decrement by 1, with a per-item max limit).
 
 ### 2.6 Profile
-- **Profile picture shown at the top** of the app (header on desktop, profile tab/top bar on mobile).
+- **Greeting link at the top** on desktop (“Hi &lt;customer name&gt;” → profile page); the profile picture stays on the mobile profile tab and profile page.
 - Profile page: user info, saved addresses, order history, language preference.
 
 ---

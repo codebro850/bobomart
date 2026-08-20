@@ -372,6 +372,32 @@ html[dir="rtl"] .bb-order-step.is-current .bb-order-step-bar {
 }
 html[dir="rtl"] .bb-select { background-position: left 14px center; }
 
+/* Mobile: fields and dropdowns follow the device view, not the desktop
+   one — they never exceed the card they sit in, the text is 16px so the
+   phone does not zoom the page when the picker opens, the tap target is
+   a full 46px, and a long option label (a saved address, a long area
+   name) is clipped with an ellipsis instead of stretching the field. */
+@media (max-width: 767px) {
+  .bb-field {
+    max-width: 100%;
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+  .bb-select {
+    width: 100%;
+    min-height: 46px;
+    padding-inline-end: 44px;
+    background-size: 18px 18px;
+    background-position: right 13px center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  html[dir="rtl"] .bb-select { background-position: left 13px center; }
+  /* Native picker text follows the device too */
+  .bb-select option { font-size: 16px; }
+}
+
 /* Promo code row */
 .bb-promo-msg { font-size: 11px; font-weight: 800; margin-top: 6px; }
 .bb-promo-msg.is-ok { color: #3DA829; }

@@ -63,24 +63,24 @@
         </div>
       </div>
 
-      <!-- Desktop nav links -->
-      <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600">
+      <!-- Desktop nav links — right-aligned, cart + greeting sit after them -->
+      <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600 ms-auto">
         <a href="index.html" class="hover:text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
         <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
         <a href="orders.html" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
       </nav>
 
-      <!-- Actions: cart + profile avatar -->
-      <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0">
+      <!-- Actions: cart + "Hi <name>" profile link -->
+      <div class="bb-header-actions flex items-center gap-2 md:gap-3 shrink-0 ms-auto lg:ms-0">
         <a href="cart.html" class="bb-cart-btn relative p-2 rounded-full bg-brand-greenlight transition" aria-label="Cart">
           <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           <span class="bb-cart-badge absolute -top-0.5 -right-0.5 bg-brand-orange text-white text-[10px] font-bold rounded-full min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
         </a>
 
-        <!-- .NET: src bound to the logged-in user's avatar -->
-        <a href="profile.html" class="bb-profile-btn hidden md:block shrink-0" aria-label="Profile">
-          <img src="images/profile.jpg" alt=""
-               class="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover border-2 border-brand-greenlight hover:border-brand-green transition" />
+        <!-- .NET: name bound to the logged-in user (@Model.User.FullName) -->
+        <a href="profile.html" class="bb-profile-btn hidden md:flex items-center gap-1 max-w-[190px] text-sm font-extrabold text-gray-700 hover:text-brand-green transition" aria-label="Profile">
+          <span data-en="Hi" data-ar="مرحباً">Hi</span>
+          <span class="bb-user-name truncate">Customer Name</span>
         </a>
       </div>
     </div>
@@ -91,9 +91,9 @@
        Five sections, in order:
          1. the chosen delivery address (+ link back to change it)
          2. delivery type
-         3. voucher
-         4. payment options
-         5. order items and details
+         3. cart details (items + delivery instructions)
+         4. voucher — then the price details it feeds into
+         5. payment (+ place order)
        Rendered by js/main.js from the checkout draft saved on step 1.
        .NET later: a Checkout/Payment view; "Place order" POSTs to the
        order controller and redirects to the confirmation page.
@@ -141,12 +141,12 @@
 
     <div id="checkoutPayment" class="space-y-4">
 
-      <!-- 1 · DELIVERING TO — the important fields of the chosen address -->
+      <!-- 1 · DELIVERY ADDRESS — the important fields of the chosen address -->
       <section class="bb-checkout-card">
         <div class="flex items-start justify-between gap-3">
           <h2 class="bb-checkout-card-title mb-0">
             <span class="bb-checkout-card-num">1</span>
-            <span data-en="Delivering to" data-ar="التوصيل إلى">Delivering to</span>
+            <span data-en="Delivery address" data-ar="عنوان التوصيل">Delivery address</span>
           </h2>
           <!-- Straight back to step 1 to pick a different address -->
           <a href="checkout-address.html" class="shrink-0 text-xs font-extrabold text-brand-green hover:opacity-80 transition"
@@ -181,10 +181,43 @@
         <div id="slotList" class="grid sm:grid-cols-3 gap-2.5"></div>
       </section>
 
-      <!-- 3 · VOUCHER -->
+      <!-- 3 · CART DETAILS — the items being paid for, plus the delivery
+           instructions that travel with them -->
+      <section class="bb-checkout-card">
+        <div class="flex items-start justify-between gap-3">
+          <h2 class="bb-checkout-card-title mb-0">
+            <span class="bb-checkout-card-num">3</span>
+            <span data-en="Cart details" data-ar="تفاصيل السلة">Cart details</span>
+          </h2>
+          <a href="cart.html" class="shrink-0 text-xs font-extrabold text-brand-green hover:opacity-80 transition"
+             data-en="Edit cart" data-ar="تعديل السلة">Edit cart</a>
+        </div>
+
+        <!-- REPEATABLE: .bb-checkout-line — one per cart line (filled by JS) -->
+        <div id="checkoutItems" class="space-y-2.5 mt-3"></div>
+
+        <!-- Delivery instructions stay with the cart details -->
+        <div class="mt-4 border-t border-gray-100 pt-4">
+          <label class="bb-label" for="orderNote" data-en="Delivery instructions" data-ar="تعليمات التوصيل">Delivery instructions</label>
+          <textarea id="orderNote" rows="2" class="bb-field resize-none"
+                    data-placeholder-en="Ring the bell twice, leave at the door…"
+                    data-placeholder-ar="اقرع الجرس مرتين، اتركه عند الباب…"
+                    placeholder="Ring the bell twice, leave at the door…"></textarea>
+
+          <label class="flex items-start gap-2.5 mt-3 cursor-pointer">
+            <input id="contactlessOpt" type="checkbox" class="mt-0.5 w-4 h-4 accent-brand-green shrink-0" />
+            <span class="text-xs font-bold text-gray-600"
+                  data-en="Contactless delivery — leave my order at the door"
+                  data-ar="توصيل بدون تلامس — اترك طلبي عند الباب">Contactless delivery — leave my order at the door</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 4 · VOUCHER — under the cart items and above the price details,
+           so the discount is applied before the totals are read -->
       <section class="bb-checkout-card">
         <h2 class="bb-checkout-card-title">
-          <span class="bb-checkout-card-num">3</span>
+          <span class="bb-checkout-card-num">4</span>
           <span data-en="Voucher" data-ar="قسيمة الخصم">Voucher</span>
         </h2>
 
@@ -199,11 +232,37 @@
         <p id="promoMsg" class="hidden bb-promo-msg"></p>
       </section>
 
-      <!-- 4 · PAYMENT OPTIONS (with brand images) -->
+      <!-- PRICE DETAILS — subtotal, delivery charges, voucher discount and
+           total; recomputed by JS whenever anything above changes -->
+      <section class="bb-checkout-card">
+        <h2 class="bb-checkout-card-title" data-en="Price details" data-ar="تفاصيل السعر">Price details</h2>
+
+        <div class="space-y-2 text-sm font-semibold text-gray-600">
+          <div class="flex items-center justify-between">
+            <span data-en="Subtotal" data-ar="المجموع الفرعي">Subtotal</span>
+            <span id="checkoutSubtotal" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span data-en="Delivery charges" data-ar="رسوم التوصيل">Delivery charges</span>
+            <span id="checkoutDelivery" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
+          </div>
+          <div id="checkoutDiscountRow" class="hidden items-center justify-between">
+            <span data-en="Voucher discount" data-ar="خصم القسيمة">Voucher discount</span>
+            <span id="checkoutDiscount" class="bb-price font-extrabold text-brand-green">− KD 0.000</span>
+          </div>
+          <div class="border-t border-gray-200 pt-2 flex items-center justify-between text-base">
+            <span class="font-extrabold text-gray-900" data-en="Total" data-ar="الإجمالي">Total</span>
+            <span id="checkoutTotal" class="bb-price font-extrabold text-brand-green">KD 0.000</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 · PAYMENT (with brand images) — last section, followed by the
+           place-order action -->
       <section class="bb-checkout-card">
         <h2 class="bb-checkout-card-title">
-          <span class="bb-checkout-card-num">4</span>
-          <span data-en="Payment options" data-ar="طرق الدفع">Payment options</span>
+          <span class="bb-checkout-card-num">5</span>
+          <span data-en="Payment" data-ar="الدفع">Payment</span>
         </h2>
 
         <!-- REPEATABLE: .bb-opt — one per enabled payment method -->
@@ -231,57 +290,6 @@
           <p class="text-[11px] font-bold text-gray-400"
              data-en="🔒 Payments are processed securely. Card details are never stored."
              data-ar="🔒 تتم معالجة المدفوعات بشكل آمن. لا يتم تخزين بيانات البطاقة.">🔒 Payments are processed securely. Card details are never stored.</p>
-        </div>
-      </section>
-
-      <!-- 5 · ORDER ITEMS AND DETAILS -->
-      <section class="bb-checkout-card">
-        <div class="flex items-start justify-between gap-3">
-          <h2 class="bb-checkout-card-title mb-0">
-            <span class="bb-checkout-card-num">5</span>
-            <span data-en="Order items & details" data-ar="منتجات الطلب والتفاصيل">Order items &amp; details</span>
-          </h2>
-          <a href="cart.html" class="shrink-0 text-xs font-extrabold text-brand-green hover:opacity-80 transition"
-             data-en="Edit cart" data-ar="تعديل السلة">Edit cart</a>
-        </div>
-
-        <!-- REPEATABLE: .bb-checkout-line — one per cart line (filled by JS) -->
-        <div id="checkoutItems" class="space-y-2.5 mt-3"></div>
-
-        <!-- Delivery instructions live with the order details -->
-        <div class="mt-4 border-t border-gray-100 pt-4">
-          <label class="bb-label" for="orderNote" data-en="Delivery instructions" data-ar="تعليمات التوصيل">Delivery instructions</label>
-          <textarea id="orderNote" rows="2" class="bb-field resize-none"
-                    data-placeholder-en="Ring the bell twice, leave at the door…"
-                    data-placeholder-ar="اقرع الجرس مرتين، اتركه عند الباب…"
-                    placeholder="Ring the bell twice, leave at the door…"></textarea>
-
-          <label class="flex items-start gap-2.5 mt-3 cursor-pointer">
-            <input id="contactlessOpt" type="checkbox" class="mt-0.5 w-4 h-4 accent-brand-green shrink-0" />
-            <span class="text-xs font-bold text-gray-600"
-                  data-en="Contactless delivery — leave my order at the door"
-                  data-ar="توصيل بدون تلامس — اترك طلبي عند الباب">Contactless delivery — leave my order at the door</span>
-          </label>
-        </div>
-
-        <!-- Totals -->
-        <div class="mt-4 border-t border-gray-100 pt-4 space-y-2 text-sm font-semibold text-gray-600">
-          <div class="flex items-center justify-between">
-            <span data-en="Subtotal" data-ar="المجموع الفرعي">Subtotal</span>
-            <span id="checkoutSubtotal" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span data-en="Delivery" data-ar="التوصيل">Delivery</span>
-            <span id="checkoutDelivery" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
-          </div>
-          <div id="checkoutDiscountRow" class="hidden items-center justify-between">
-            <span data-en="Voucher discount" data-ar="خصم القسيمة">Voucher discount</span>
-            <span id="checkoutDiscount" class="bb-price font-extrabold text-brand-green">− KD 0.000</span>
-          </div>
-          <div class="border-t border-gray-200 pt-2 flex items-center justify-between text-base">
-            <span class="font-extrabold text-gray-900" data-en="Total" data-ar="الإجمالي">Total</span>
-            <span id="checkoutTotal" class="bb-price font-extrabold text-brand-green">KD 0.000</span>
-          </div>
         </div>
 
         <!-- Desktop place-order button (mobile uses the fixed bar below) -->

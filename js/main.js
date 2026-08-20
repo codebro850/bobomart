@@ -716,16 +716,18 @@ initProductPage();
 /* ============================================================
    7. CHECKOUT — three pages, one shared draft.
         step 1  checkout-address.html  → delivery address
-        step 2  checkout-payment.html  → delivery type, voucher,
-                                         payment options, order items
+        step 2  checkout-payment.html  → delivery type, cart details,
+                                         voucher, payment
         step 3  checkout-confirm.html  → order confirmed
    The draft lives in localStorage so each page picks up where the
    previous one left off.
    .NET later: the draft becomes TempData / a server-side checkout
    session and each step is its own Checkout action.
 ============================================================ */
-const ADDRESS_KEY = 'bobomart-addresses';
-const CHECKOUT_KEY = 'bobomart-checkout';
+// Keys carry a version so a browser that already visited the demo drops
+// its saved copy of the old contact numbers instead of showing them back.
+const ADDRESS_KEY = 'bobomart-addresses-v2';
+const CHECKOUT_KEY = 'bobomart-checkout-v2';
 const ORDER_KEY = 'bobomart-last-order';
 
 // Areas served, used for the Area dropdown on step 1.
@@ -756,14 +758,19 @@ function areaLabel(en, isAr) {
 
 // Saved addresses of the logged-in user, held as structured fields so
 // step 1 can fill its form and step 2 can show just the important ones.
+// Demo contact numbers are deliberately unreachable: a Kuwaiti number
+// never starts with 0 (mobiles start 5/6/9, landlines 2), so nothing
+// here can ring a real person. Keep it that way — do not "fix" these
+// into realistic-looking numbers. Buildings/streets are numbers only,
+// so no demo address points at a real place either.
 // .NET later: the user's addresses table.
 const DEFAULT_ADDRESSES = [
   { id: 'home', label: 'Home', labelAr: 'المنزل', type: 'apartment', area: 'Salmiya',
     block: '4', street: '12', avenue: '', building: '8', floor: '2', flat: '3',
-    phone: '+965 9000 1234', directions: 'Near the pharmacy, white gate' },
+    phone: '+965 0000 1111', directions: 'Near the pharmacy, white gate' },
   { id: 'work', label: 'Work', labelAr: 'العمل', type: 'office', area: 'Kuwait City',
-    block: '6', street: 'Al Shuhada', avenue: '', building: 'Al Hamra Tower',
-    floor: '22', flat: '4', phone: '+965 9000 5678', directions: '' },
+    block: '6', street: '10', avenue: '', building: '1',
+    floor: '22', flat: '4', phone: '+965 0000 2222', directions: '' },
 ];
 
 // Delivery types. `fee` is waived above FREE_DELIVERY_THRESHOLD.
@@ -979,7 +986,8 @@ initCheckoutAddressPage();
 /* ============================================================
    7b. STEP 2 — PAYMENT
    Sections, in order: the chosen address (with a link back to step 1),
-   delivery type, voucher, payment options, then order items + totals.
+   delivery type, cart details, voucher, the price details it feeds,
+   then payment.
    Only runs when #checkoutPayment exists (checkout-payment.html).
 ============================================================ */
 function initCheckoutPaymentPage() {
@@ -1049,7 +1057,19 @@ function initCheckoutPaymentPage() {
     });
   }
 
-  /* ---------- 3 · voucher ---------- */
+  /* ---------- 3 · cart details (items + instructions) ---------- */
+  function renderItems() {
+    document.getElementById('checkoutItems').innerHTML =
+      cartLines().map((item) => orderLineHtml(item, isAr())).join('');
+  }
+
+  // Restore the note / contactless choice when coming back from step 1
+  const noteEl = document.getElementById('orderNote');
+  const contactlessEl = document.getElementById('contactlessOpt');
+  if (draft.note) noteEl.value = draft.note;
+  if (draft.contactless) contactlessEl.checked = true;
+
+  /* ---------- 4 · voucher ---------- */
   const promoInput = document.getElementById('promoInput');
   const promoMsg = document.getElementById('promoMsg');
 
@@ -1083,7 +1103,7 @@ function initCheckoutPaymentPage() {
     renderTotals();
   });
 
-  /* ---------- 4 · payment options ---------- */
+  /* ---------- 5 · payment ---------- */
   const paymentList = document.getElementById('paymentList');
   const cardFields = document.getElementById('cardFields');
 
@@ -1114,18 +1134,6 @@ function initCheckoutPaymentPage() {
     // Card fields belong to the card method only
     if (cardFields) cardFields.classList.toggle('hidden', activePaymentId !== 'card');
   }
-
-  /* ---------- 5 · order items and details ---------- */
-  function renderItems() {
-    document.getElementById('checkoutItems').innerHTML =
-      cartLines().map((item) => orderLineHtml(item, isAr())).join('');
-  }
-
-  // Restore the note / contactless choice when coming back from step 1
-  const noteEl = document.getElementById('orderNote');
-  const contactlessEl = document.getElementById('contactlessOpt');
-  if (draft.note) noteEl.value = draft.note;
-  if (draft.contactless) contactlessEl.checked = true;
 
   /* ---------- totals ---------- */
   // One function so every input (delivery type, voucher, cart)
@@ -1220,8 +1228,8 @@ function initCheckoutPaymentPage() {
   }));
 
   renderSlots();
-  renderPayments();
   renderItems();
+  renderPayments();
   renderTotals();
 }
 
