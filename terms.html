@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — Categories</title>
+  <title>BoboMart — Terms & privacy</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -65,7 +65,7 @@
       <!-- Desktop nav links — right-aligned, cart + greeting sit after them -->
       <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600 ms-auto">
         <a href="index.html" class="hover:text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
-        <a href="categories.html" class="text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
+        <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
         <a href="orders.html" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
       </nav>
 
@@ -84,88 +84,90 @@
       </div>
     </div>
   </header>
+  <main class="max-w-3xl mx-auto px-4">
 
-  <main class="max-w-7xl mx-auto px-4">
 
     <!-- ============================================================
-         ALL CATEGORIES — grid of category cards
-         REPEATABLE: .bb-category-card — Razor loop over categories
-         .NET: item counts come from products table
+         TERMS & PRIVACY — one page, two anchored halves
+         Placeholder legal copy for the design review; the client's
+         lawyer replaces the wording before launch.
+         .NET later: a CMS page or a static Razor view.
     ============================================================ -->
-    <section class="bb-all-categories mt-6">
-      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-1"
-          data-en="All categories" data-ar="جميع الفئات">All categories</h1>
-      <p class="text-xs md:text-sm text-gray-500 font-semibold mb-5"
-         data-en="Browse everything we deliver" data-ar="تصفح كل ما نوصله لك">Browse everything we deliver</p>
+    <section id="termsPage" class="mt-6 mb-2">
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold"
+          data-en="Terms &amp; privacy" data-ar="الشروط والخصوصية">Terms &amp; privacy</h1>
+      <p class="text-xs font-bold text-gray-400 mt-1"
+         data-en="Last updated 1 September 2026" data-ar="آخر تحديث ١ سبتمبر ٢٠٢٦">Last updated 1 September 2026</p>
 
-      <div class="bb-category-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-        <!-- REPEATABLE: category card -->
-        <a href="category.html?cat=fruitsveg" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/fruitsveg.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Fruits & Veg" data-ar="فواكه وخضار">Fruits &amp; Veg</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="48 items" data-ar="٤٨ منتج">48 items</span>
-        </a>
+      <!-- Jump list -->
+      <div class="bb-toc mt-5 mb-8">
+        <a href="#terms" data-en="Terms of use" data-ar="شروط الاستخدام">Terms of use</a>
+        <a href="#orders" data-en="Orders &amp; prices" data-ar="الطلبات والأسعار">Orders &amp; prices</a>
+        <a href="#privacy" data-en="Privacy" data-ar="الخصوصية">Privacy</a>
+        <a href="#cookies" data-en="Cookies" data-ar="ملفات الارتباط">Cookies</a>
+        <a href="#rights" data-en="Your rights" data-ar="حقوقك">Your rights</a>
+      </div>
 
-        <a href="category.html?cat=dairy" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/milk.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Dairy & Eggs" data-ar="ألبان وبيض">Dairy &amp; Eggs</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="32 items" data-ar="٣٢ منتج">32 items</span>
-        </a>
+      <div class="bb-prose">
+        <h2 id="terms" data-en="Terms of use" data-ar="شروط الاستخدام">Terms of use</h2>
+        <p data-en="BoboMart is a grocery delivery service operating in the State of Kuwait. By placing an order you agree to these terms. If you do not agree with them, please do not use the service."
+           data-ar="بوبومارت خدمة لتوصيل البقالة تعمل في دولة الكويت. بإتمامك أي طلب فإنك توافق على هذه الشروط، وإذا كنت لا توافق عليها فيرجى عدم استخدام الخدمة.">BoboMart is a grocery delivery service operating in the State of Kuwait. By placing an order you agree to these terms. If you do not agree with them, please do not use the service.</p>
+        <p data-en="You must be 18 or older to hold an account. You are responsible for keeping your password to yourself and for every order placed from your account."
+           data-ar="يجب أن يكون عمرك ١٨ عاماً أو أكثر لامتلاك حساب. وأنت مسؤول عن الحفاظ على سرية كلمة المرور وعن كل طلب يتم من حسابك.">You must be 18 or older to hold an account. You are responsible for keeping your password to yourself and for every order placed from your account.</p>
 
-        <a href="category.html?cat=bakery" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/bread.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Bakery" data-ar="مخبوزات">Bakery</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="21 items" data-ar="٢١ منتج">21 items</span>
-        </a>
+        <h2 id="orders" data-en="Orders &amp; prices" data-ar="الطلبات والأسعار">Orders &amp; prices</h2>
+        <p data-en="All prices are shown in Kuwaiti Dinar (KD) and include applicable taxes. Prices and offers can change at any time, but the price you see at checkout is the price you pay for that order."
+           data-ar="جميع الأسعار معروضة بالدينار الكويتي (د.ك) وتشمل الضرائب المطبقة. قد تتغير الأسعار والعروض في أي وقت، لكن السعر الذي تراه عند الدفع هو السعر الذي تدفعه لذلك الطلب.">All prices are shown in Kuwaiti Dinar (KD) and include applicable taxes. Prices and offers can change at any time, but the price you see at checkout is the price you pay for that order.</p>
+        <ul>
+          <li data-en="An order is confirmed once payment is authorised and you see the confirmation screen."
+              data-ar="يُعتبر الطلب مؤكداً بمجرد تفويض الدفع وظهور شاشة التأكيد.">An order is confirmed once payment is authorised and you see the confirmation screen.</li>
+          <li data-en="Deal of the Day prices apply only while the countdown is running."
+              data-ar="تسري أسعار عرض اليوم أثناء عمل العدّاد فقط.">Deal of the Day prices apply only while the countdown is running.</li>
+          <li data-en="Delivery is free on orders of 100 KD or more; below that the fee shown at checkout applies."
+              data-ar="التوصيل مجاني للطلبات بقيمة ١٠٠ د.ك فأكثر، وأقل من ذلك تُطبَّق الرسوم الظاهرة عند الدفع.">Delivery is free on orders of 100 KD or more; below that the fee shown at checkout applies.</li>
+          <li data-en="We may limit the quantity of any single item per order."
+              data-ar="يجوز لنا تحديد الكمية المسموح بها من أي منتج في الطلب الواحد.">We may limit the quantity of any single item per order.</li>
+        </ul>
+        <p data-en="Returns, refunds and cancellations are covered by our returns policy, which forms part of these terms."
+           data-ar="يخضع الإرجاع والاسترجاع والإلغاء لسياسة الإرجاع لدينا، وهي جزء من هذه الشروط.">Returns, refunds and cancellations are covered by our returns policy, which forms part of these terms.</p>
 
-        <a href="category.html?cat=beverages" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/beverages.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Beverages" data-ar="مشروبات">Beverages</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="40 items" data-ar="٤٠ منتج">40 items</span>
-        </a>
+        <h2 id="privacy" data-en="Privacy" data-ar="الخصوصية">Privacy</h2>
+        <p data-en="We collect only what a grocery order needs: your name, email, mobile number, delivery addresses and order history. Card details are handled by our payment gateway and are never stored on our own servers."
+           data-ar="نجمع فقط ما يحتاجه طلب البقالة: اسمك وبريدك الإلكتروني ورقم جوالك وعناوين التوصيل وسجل الطلبات. أما بيانات البطاقة فتتولاها بوابة الدفع ولا تُخزَّن على خوادمنا إطلاقاً.">We collect only what a grocery order needs: your name, email, mobile number, delivery addresses and order history. Card details are handled by our payment gateway and are never stored on our own servers.</p>
+        <h3 data-en="What we use it for" data-ar="فيم نستخدمها">What we use it for</h3>
+        <ul>
+          <li data-en="Delivering your order and letting you track it."
+              data-ar="توصيل طلبك وتمكينك من تتبعه.">Delivering your order and letting you track it.</li>
+          <li data-en="Answering support messages about an order."
+              data-ar="الرد على رسائل الدعم المتعلقة بالطلب.">Answering support messages about an order.</li>
+          <li data-en="Sending offers — only if you opted in, and you can switch it off at any time."
+              data-ar="إرسال العروض — فقط إذا وافقت على ذلك، ويمكنك إيقافها في أي وقت.">Sending offers — only if you opted in, and you can switch it off at any time.</li>
+        </ul>
+        <p data-en="We share data with the delivery driver assigned to your order and with our payment provider. We do not sell your data to anyone."
+           data-ar="نشارك البيانات مع مندوب التوصيل المكلّف بطلبك ومع مزود خدمة الدفع، ولا نبيع بياناتك لأي جهة.">We share data with the delivery driver assigned to your order and with our payment provider. We do not sell your data to anyone.</p>
 
-        <a href="category.html?cat=snacks" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/snacks.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Snacks" data-ar="وجبات خفيفة">Snacks</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="55 items" data-ar="٥٥ منتج">55 items</span>
-        </a>
+        <h2 id="cookies" data-en="Cookies &amp; local storage" data-ar="ملفات الارتباط والتخزين المحلي">Cookies &amp; local storage</h2>
+        <p data-en="The site keeps your chosen language, your cart and your session in your browser so the app works between visits. Nothing in that storage identifies you to anyone else."
+           data-ar="يحتفظ الموقع في متصفحك بلغتك المختارة وسلتك وجلستك ليعمل التطبيق بين الزيارات، ولا يُعرّف أي مما يُخزَّن هويتك لأي طرف آخر.">The site keeps your chosen language, your cart and your session in your browser so the app works between visits. Nothing in that storage identifies you to anyone else.</p>
 
-        <a href="category.html?cat=rice" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/rice.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Rice & Grains" data-ar="أرز وحبوب">Rice &amp; Grains</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="18 items" data-ar="١٨ منتج">18 items</span>
-        </a>
+        <h2 id="rights" data-en="Your rights" data-ar="حقوقك">Your rights</h2>
+        <p data-en="You can ask for a copy of your data, correct anything that is wrong, or delete your account entirely from the account details page. Deleting the account removes your addresses and order history and cannot be undone."
+           data-ar="يمكنك طلب نسخة من بياناتك أو تصحيح أي معلومة خاطئة أو حذف حسابك بالكامل من صفحة بيانات الحساب. ويؤدي حذف الحساب إلى إزالة عناوينك وسجل طلباتك دون إمكانية التراجع.">You can ask for a copy of your data, correct anything that is wrong, or delete your account entirely from the account details page. Deleting the account removes your addresses and order history and cannot be undone.</p>
 
-        <a href="category.html?cat=frozen" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/frozen.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Frozen" data-ar="مجمدات">Frozen</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="26 items" data-ar="٢٦ منتج">26 items</span>
-        </a>
+        <h2 data-en="Contact" data-ar="التواصل">Contact</h2>
+        <p data-en="Questions about these terms or your data? Message us from the help page and we reply within a few hours."
+           data-ar="لديك سؤال عن هذه الشروط أو عن بياناتك؟ راسلنا من صفحة المساعدة وسنرد خلال ساعات قليلة.">Questions about these terms or your data? Message us from the help page and we reply within a few hours.</p>
 
-        <a href="category.html?cat=household" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/household.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Household" data-ar="منزلية">Household</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="34 items" data-ar="٣٤ منتج">34 items</span>
-        </a>
+        <h2 data-en="Governing law" data-ar="القانون الواجب التطبيق">Governing law</h2>
+        <p data-en="These terms are governed by the laws of the State of Kuwait, and the courts of Kuwait have jurisdiction over any dispute arising from them."
+           data-ar="تخضع هذه الشروط لقوانين دولة الكويت، وتختص محاكم الكويت بالنظر في أي نزاع ينشأ عنها.">These terms are governed by the laws of the State of Kuwait, and the courts of Kuwait have jurisdiction over any dispute arising from them.</p>
+      </div>
 
-        <a href="category.html?cat=meat" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/chicken.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Meat & Poultry" data-ar="لحوم ودواجن">Meat &amp; Poultry</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="22 items" data-ar="٢٢ منتج">22 items</span>
-        </a>
-
-        <a href="category.html?cat=oils" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/oliveoil.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Oils & Condiments" data-ar="زيوت وتوابل">Oils &amp; Condiments</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="29 items" data-ar="٢٩ منتج">29 items</span>
-        </a>
+      <div class="flex flex-col sm:flex-row gap-3 mt-8">
+        <a href="help.html#contact" class="bb-btn bb-btn--primary" data-en="Contact support" data-ar="تواصل مع الدعم">Contact support</a>
+        <a href="index.html" class="bb-btn bb-btn--ghost" data-en="Back to shopping" data-ar="العودة للتسوق">Back to shopping</a>
       </div>
     </section>
-
-    <!-- ============================================================
-         FOOTER — sitewide links (mobile + desktop)
-         .NET: becomes a shared _Footer partial
-    ============================================================ -->
     <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
@@ -239,7 +241,7 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
     </a>
-    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
     </a>

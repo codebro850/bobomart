@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — Product</title>
+  <title>BoboMart — Notifications</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="css/custom.css" />
 </head>
 
-<body class="bb-page font-en bg-white text-gray-800 pb-28 md:pb-0">
+<body class="bb-page font-en bg-white text-gray-800 pb-20 md:pb-0">
 
   <!-- OFFER STRIP -->
   <div class="bb-offer-strip bg-brand-green text-white text-center text-xs sm:text-sm font-bold py-2 px-4">
@@ -84,106 +84,139 @@
       </div>
     </div>
   </header>
+  <main class="max-w-3xl mx-auto px-4">
 
-  <!-- ============================================================
-       PRODUCT DETAIL — quick-commerce style single product view.
-       Big image, name, pack, price and a short description with an
-       "Add to cart" buy bar. Rendered by js/main.js from ?id=<id>.
-       .NET later: server renders /product/{id} from the DB.
-  ============================================================ -->
-  <main class="max-w-5xl mx-auto px-4">
 
     <!-- Back bar -->
     <div class="pt-4 pb-1">
-      <button onclick="history.length > 1 ? history.back() : location.assign('index.html')"
-              class="bb-back-btn inline-flex items-center gap-1.5 text-sm font-extrabold text-gray-600 hover:text-brand-green transition"
-              aria-label="Go back">
+      <a href="profile.html" class="bb-back-btn inline-flex items-center gap-1.5 text-sm font-extrabold text-gray-600 hover:text-brand-green transition">
         <svg class="bb-chevron w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-        <span data-en="Back" data-ar="رجوع">Back</span>
-      </button>
-    </div>
-
-    <!-- Product found -->
-    <div id="productDetail" class="py-3 md:py-6 md:flex md:items-start md:gap-10">
-
-      <!-- Image -->
-      <div class="md:w-2/5 md:shrink-0 md:sticky md:top-24">
-        <div class="relative bg-gray-50 border border-gray-100 rounded-3xl p-5 md:p-8">
-          <span id="productDiscount" class="bb-discount-badge hidden absolute top-4 left-4 bg-brand-orange text-white text-xs font-extrabold rounded-full px-2.5 py-1">-0%</span>
-          <img id="productImg" src="" alt="" class="w-full aspect-square object-contain mx-auto" />
-        </div>
-      </div>
-
-      <!-- Info -->
-      <div class="mt-5 md:mt-0 md:flex-1 md:min-w-0">
-
-        <!-- Delivery time chip (quick-commerce signature) -->
-        <span class="inline-flex items-center gap-1 bg-brand-greenlight text-brand-green text-[11px] font-extrabold rounded-full px-2.5 py-1">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          <span data-en="Delivered in 20 min" data-ar="التوصيل خلال ٢٠ دقيقة">Delivered in 20 min</span>
-        </span>
-
-        <h1 id="productName" class="text-xl md:text-2xl font-extrabold mt-3 leading-snug">Product</h1>
-        <span id="productPack" class="inline-block text-xs font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2.5 py-1 mt-2"></span>
-
-        <!-- Price — "KD" first, in the same font style as the amount -->
-        <div class="bb-price-row flex items-baseline gap-3 mt-4">
-          <span class="bb-price text-2xl md:text-3xl font-extrabold text-gray-900">
-            <span data-en="KD" data-ar="د.ك">KD</span> <span id="productPrice">0.000</span>
-          </span>
-          <span id="productOldPrice" class="bb-price-old hidden text-gray-400 text-lg line-through font-bold"></span>
-        </div>
-        <p class="text-[11px] font-bold text-gray-400 mt-1" data-en="Inclusive of all taxes" data-ar="شامل جميع الضرائب">Inclusive of all taxes</p>
-
-        <!-- Short description -->
-        <section class="mt-6">
-          <h2 class="text-sm font-extrabold text-gray-900 mb-1.5" data-en="About this product" data-ar="عن المنتج">About this product</h2>
-          <p id="productDesc" class="text-sm leading-relaxed text-gray-600"></p>
-        </section>
-
-        <!-- Quick highlights -->
-        <div class="grid grid-cols-3 gap-2 mt-6">
-          <div class="text-center bg-gray-50 border border-gray-100 rounded-2xl py-3 px-1">
-            <svg class="w-5 h-5 mx-auto text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
-            <p class="text-[10px] font-extrabold text-gray-600 mt-1.5 leading-tight" data-en="Fast delivery" data-ar="توصيل سريع">Fast delivery</p>
-          </div>
-          <div class="text-center bg-gray-50 border border-gray-100 rounded-2xl py-3 px-1">
-            <svg class="w-5 h-5 mx-auto text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
-            <p class="text-[10px] font-extrabold text-gray-600 mt-1.5 leading-tight" data-en="Freshness guaranteed" data-ar="طازج ومضمون">Freshness guaranteed</p>
-          </div>
-          <div class="text-center bg-gray-50 border border-gray-100 rounded-2xl py-3 px-1">
-            <svg class="w-5 h-5 mx-auto text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            <p class="text-[10px] font-extrabold text-gray-600 mt-1.5 leading-tight" data-en="Easy returns" data-ar="إرجاع سهل">Easy returns</p>
-          </div>
-        </div>
-
-        <!-- BUY BAR — fixed at the bottom on mobile, inline on desktop -->
-        <div class="bb-buy-bar fixed inset-x-0 bottom-0 z-40 bg-white border-t border-gray-100 px-4 py-3
-                    md:static md:mt-8 md:border md:border-gray-100 md:rounded-2xl md:p-4">
-          <div class="max-w-5xl mx-auto flex items-center gap-4">
-            <div class="shrink-0">
-              <div class="flex items-baseline gap-2">
-                <span class="text-lg font-extrabold text-gray-900" id="productPriceBar"></span>
-              </div>
-              <span class="text-[11px] font-bold text-gray-400" data-en="Best price" data-ar="أفضل سعر">Best price</span>
-            </div>
-            <div id="productCartControl" class="bb-cart-control ml-auto w-40 md:w-52" data-variant="wide" data-product=""></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Product not found -->
-    <div id="productNotFound" class="hidden text-center py-20">
-      <p class="text-base font-extrabold text-gray-500" data-en="Product not found" data-ar="المنتج غير موجود">Product not found</p>
-      <a href="index.html" class="inline-block mt-4 bg-brand-green text-white text-sm font-extrabold rounded-full px-6 py-2.5"
-         data-en="Back to home" data-ar="العودة للرئيسية">Back to home</a>
+        <span data-en="Back to profile" data-ar="رجوع إلى حسابي">Back to profile</span>
+      </a>
     </div>
 
     <!-- ============================================================
-         FOOTER — sitewide links (mobile + desktop)
-         .NET: becomes a shared _Footer partial
+         NOTIFICATIONS — what we send and where
+         Every switch carries a data-notif key; the choices are stored
+         so the page comes back the way the customer left it.
+         .NET later: Account/Notifications bound to a preferences table.
     ============================================================ -->
+    <section id="accountNotifications" class="mb-2">
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mt-2"
+          data-en="Notifications" data-ar="الإشعارات">Notifications</h1>
+      <p class="text-xs font-bold text-gray-400 mt-1 mb-5"
+         data-en="Choose what we tell you about, and where."
+         data-ar="اختر ما نخبرك به وأين نرسله.">Choose what we tell you about, and where.</p>
+
+      <!-- ORDER UPDATES — kept separate from marketing on purpose -->
+      <section class="bb-checkout-card">
+        <h2 class="bb-checkout-card-title">
+          <span class="bb-checkout-card-num">1</span>
+          <span data-en="Order updates" data-ar="تحديثات الطلب">Order updates</span>
+        </h2>
+
+        <div class="divide-y divide-gray-100">
+          <!-- REPEATABLE: one row per notification type -->
+          <div class="flex items-center gap-3 py-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-extrabold text-gray-900"
+                 data-en="Order accepted &amp; on the way" data-ar="تم قبول الطلب وهو في الطريق">Order accepted &amp; on the way</p>
+              <p class="text-[11px] font-bold text-gray-500 mt-0.5"
+                 data-en="A push when the driver picks up your order"
+                 data-ar="إشعار عند استلام المندوب لطلبك">A push when the driver picks up your order</p>
+            </div>
+            <label class="bb-switch">
+              <input type="checkbox" data-notif="order-status" checked />
+              <span class="bb-switch-track"></span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 py-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-extrabold text-gray-900"
+                 data-en="Delivery SMS" data-ar="رسالة نصية عند التوصيل">Delivery SMS</p>
+              <p class="text-[11px] font-bold text-gray-500 mt-0.5"
+                 data-en="A text with the driver's number when he sets off"
+                 data-ar="رسالة تحمل رقم المندوب عند انطلاقه">A text with the driver&#39;s number when he sets off</p>
+            </div>
+            <label class="bb-switch">
+              <input type="checkbox" data-notif="delivery-sms" checked />
+              <span class="bb-switch-track"></span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 py-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-extrabold text-gray-900"
+                 data-en="Order receipt by email" data-ar="إيصال الطلب بالبريد">Order receipt by email</p>
+              <p class="text-[11px] font-bold text-gray-500 mt-0.5"
+                 data-en="An itemised receipt after every delivery"
+                 data-ar="إيصال مفصل بعد كل عملية توصيل">An itemised receipt after every delivery</p>
+            </div>
+            <label class="bb-switch">
+              <input type="checkbox" data-notif="receipt-email" checked />
+              <span class="bb-switch-track"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- OFFERS -->
+      <section class="bb-checkout-card mt-4">
+        <h2 class="bb-checkout-card-title">
+          <span class="bb-checkout-card-num">2</span>
+          <span data-en="Offers &amp; deals" data-ar="العروض والخصومات">Offers &amp; deals</span>
+        </h2>
+
+        <div class="divide-y divide-gray-100">
+          <div class="flex items-center gap-3 py-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-extrabold text-gray-900"
+                 data-en="Deal of the Day" data-ar="عرض اليوم">Deal of the Day</p>
+              <p class="text-[11px] font-bold text-gray-500 mt-0.5"
+                 data-en="One message each morning with the day's deal"
+                 data-ar="رسالة كل صباح بعرض اليوم">One message each morning with the day&#39;s deal</p>
+            </div>
+            <label class="bb-switch">
+              <input type="checkbox" data-notif="deal-of-day" checked />
+              <span class="bb-switch-track"></span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 py-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-extrabold text-gray-900"
+                 data-en="WhatsApp offers" data-ar="عروض واتساب">WhatsApp offers</p>
+              <p class="text-[11px] font-bold text-gray-500 mt-0.5"
+                 data-en="Vouchers and seasonal offers on WhatsApp"
+                 data-ar="قسائم وعروض موسمية على واتساب">Vouchers and seasonal offers on WhatsApp</p>
+            </div>
+            <label class="bb-switch">
+              <input type="checkbox" data-notif="whatsapp-offers" />
+              <span class="bb-switch-track"></span>
+            </label>
+          </div>
+
+          <div class="flex items-center gap-3 py-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-[13px] font-extrabold text-gray-900"
+                 data-en="Back in stock" data-ar="عاد للتوفر">Back in stock</p>
+              <p class="text-[11px] font-bold text-gray-500 mt-0.5"
+                 data-en="When something you wanted is available again"
+                 data-ar="عند توفر منتج كنت تبحث عنه">When something you wanted is available again</p>
+            </div>
+            <label class="bb-switch">
+              <input type="checkbox" data-notif="back-in-stock" checked />
+              <span class="bb-switch-track"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <p id="notifSaved" class="bb-promo-msg is-ok hidden mt-4"
+         data-en="Your notification settings have been saved"
+         data-ar="تم حفظ إعدادات الإشعارات">Your notification settings have been saved</p>
+    </section>
     <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
@@ -250,6 +283,31 @@
       </div>
     </footer>
   </main>
+
+  <!-- BOTTOM TAB BAR — mobile only -->
+  <nav class="bb-tabbar md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-100 flex justify-around items-center py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <a href="index.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
+    </a>
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
+    </a>
+    <a href="cart.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400 relative">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
+      <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
+    </a>
+    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
+    </a>
+    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
+    </a>
+  </nav>
 
   <script src="js/main.js"></script>
 </body>

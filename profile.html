@@ -95,6 +95,23 @@
       <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-5"
           data-en="My profile" data-ar="حسابي">My profile</h1>
 
+      <!-- SIGNED OUT — shown when the customer has logged out.
+           .NET: rendered when User.Identity.IsAuthenticated is false -->
+      <div id="profileSignedOut" class="hidden text-center py-10">
+        <div class="text-5xl mb-3">👋</div>
+        <p class="font-extrabold text-gray-700" data-en="You are not signed in" data-ar="لم تسجل الدخول">You are not signed in</p>
+        <p class="text-sm text-gray-400 font-semibold mt-1"
+           data-en="Sign in to see your addresses, orders and saved cart"
+           data-ar="سجّل دخولك لعرض عناوينك وطلباتك وسلتك المحفوظة">Sign in to see your addresses, orders and saved cart</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center mt-6 max-w-sm mx-auto">
+          <a href="login.html" class="bb-btn bb-btn--primary" data-en="Sign in" data-ar="تسجيل الدخول">Sign in</a>
+          <a href="register.html" class="bb-btn bb-btn--ghost" data-en="Create an account" data-ar="أنشئ حساباً">Create an account</a>
+        </div>
+      </div>
+
+      <!-- SIGNED IN — the whole profile, hidden while logged out -->
+      <div id="profileSignedIn">
+
       <!-- User card -->
       <div class="bb-user-card flex items-center gap-4 bg-brand-greenlight/60 border border-brand-green/20 rounded-2xl p-4 md:p-5">
         <!-- .NET: src bound to @Model.User.AvatarUrl -->
@@ -102,19 +119,19 @@
              class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-brand-green shrink-0" />
         <div class="flex-1 min-w-0">
           <!-- .NET: @Model.User.FullName / phone -->
-          <p class="font-extrabold text-base md:text-lg truncate">Customer Name</p>
-          <p class="text-xs text-gray-500 font-bold" dir="ltr">+965 0000 0000</p>
+          <p class="bb-user-name font-extrabold text-base md:text-lg truncate">Customer Name</p>
+          <p class="bb-user-phone text-xs text-gray-500 font-bold" dir="ltr">+965 0000 0000</p>
           <p class="text-[11px] text-brand-green font-extrabold mt-0.5" data-en="⭐ Loyal customer · 24 orders" data-ar="⭐ عميل مميز · ٢٤ طلب">⭐ Loyal customer · 24 orders</p>
         </div>
-        <button class="shrink-0 text-xs font-extrabold text-brand-green border border-brand-green/40 rounded-full px-4 py-1.5 hover:bg-brand-green hover:text-white transition"
-                data-en="Edit" data-ar="تعديل">Edit</button>
+        <a href="account-details.html" class="shrink-0 text-xs font-extrabold text-brand-green border border-brand-green/40 rounded-full px-4 py-1.5 hover:bg-brand-green hover:text-white transition"
+           data-en="Edit" data-ar="تعديل">Edit</a>
       </div>
 
       <!-- Settings menu -->
       <div class="bb-profile-menu mt-5 divide-y divide-gray-100 border border-gray-100 rounded-2xl overflow-hidden">
 
         <!-- Addresses -->
-        <a href="#" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
+        <a href="account-addresses.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
           <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
             <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
           </span>
@@ -123,7 +140,7 @@
         </a>
 
         <!-- Payment methods -->
-        <a href="#" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
+        <a href="account-payments.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
           <span class="w-9 h-9 rounded-full bg-brand-orangelight flex items-center justify-center shrink-0">
             <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           </span>
@@ -142,7 +159,7 @@
         </button>
 
         <!-- Notifications -->
-        <a href="#" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
+        <a href="account-notifications.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
           <span class="w-9 h-9 rounded-full bg-brand-orangelight flex items-center justify-center shrink-0">
             <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           </span>
@@ -151,7 +168,7 @@
         </a>
 
         <!-- Help & support -->
-        <a href="#" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
+        <a href="help.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
           <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
             <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </span>
@@ -162,8 +179,9 @@
 
       <!-- Logout -->
       <!-- .NET: posts to logout action -->
-      <button class="w-full mt-5 border border-red-200 text-red-500 font-extrabold text-sm rounded-full py-3 hover:bg-red-50 transition"
+      <button id="logoutBtn" class="w-full mt-5 border border-red-200 text-red-500 font-extrabold text-sm rounded-full py-3 hover:bg-red-50 transition"
               data-en="Log out" data-ar="تسجيل الخروج">Log out</button>
+      </div><!-- /#profileSignedIn -->
     </section>
 
     <!-- ============================================================
@@ -211,6 +229,8 @@
             <li><a href="orders.html" data-en="My orders" data-ar="طلباتي">My orders</a></li>
             <li><a href="cart.html" data-en="My cart" data-ar="سلتي">My cart</a></li>
             <li><a href="profile.html" data-en="Language / اللغة" data-ar="اللغة / Language">Language / اللغة</a></li>
+            <li><a href="login.html" data-en="Sign in" data-ar="تسجيل الدخول">Sign in</a></li>
+            <li><a href="register.html" data-en="Create an account" data-ar="أنشئ حساباً">Create an account</a></li>
           </ul>
         </div>
 
@@ -218,10 +238,10 @@
         <div>
           <h3 class="bb-footer-title" data-en="Help" data-ar="المساعدة">Help</h3>
           <ul class="bb-footer-links">
-            <li><a href="#" data-en="Contact us" data-ar="اتصل بنا">Contact us</a></li>
-            <li><a href="#" data-en="Delivery information" data-ar="معلومات التوصيل">Delivery information</a></li>
-            <li><a href="#" data-en="Returns & refunds" data-ar="الإرجاع والاستبدال">Returns &amp; refunds</a></li>
-            <li><a href="#" data-en="Terms & privacy" data-ar="الشروط والخصوصية">Terms &amp; privacy</a></li>
+            <li><a href="help.html#contact" data-en="Contact us" data-ar="اتصل بنا">Contact us</a></li>
+            <li><a href="delivery-info.html" data-en="Delivery information" data-ar="معلومات التوصيل">Delivery information</a></li>
+            <li><a href="returns.html" data-en="Returns & refunds" data-ar="الإرجاع والاستبدال">Returns &amp; refunds</a></li>
+            <li><a href="terms.html" data-en="Terms & privacy" data-ar="الشروط والخصوصية">Terms &amp; privacy</a></li>
           </ul>
         </div>
       </div>

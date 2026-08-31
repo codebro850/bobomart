@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — My Orders</title>
+  <title>BoboMart — Help & support</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -66,7 +66,7 @@
       <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600 ms-auto">
         <a href="index.html" class="hover:text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
         <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
-        <a href="orders.html" class="text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
+        <a href="orders.html" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
       </nav>
 
       <!-- Actions: cart + "Hi <name>" profile link (desktop only — mobile reaches profile from the tab bar; the language switch lives inside the profile page) -->
@@ -84,153 +84,161 @@
       </div>
     </div>
   </header>
-
   <main class="max-w-3xl mx-auto px-4">
 
+
     <!-- ============================================================
-         MY ORDERS — order history list
-         REPEATABLE: .bb-order-card — Razor loop over user's orders
-         .NET: status, items, totals bound from orders table
+         HELP & SUPPORT — contact channels, FAQ, message form
+         .NET later: a Support view; the form POSTs to a ticket action.
     ============================================================ -->
-    <section class="bb-orders mt-6">
-      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-5"
-          data-en="My orders" data-ar="طلباتي">My orders</h1>
+    <section id="helpPage" class="mt-6 mb-2">
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold"
+          data-en="Help &amp; support" data-ar="المساعدة والدعم">Help &amp; support</h1>
+      <p class="text-xs font-bold text-gray-400 mt-1"
+         data-en="We answer every day from 8:00 AM to 11:00 PM Kuwait time."
+         data-ar="نرد يومياً من ٨:٠٠ صباحاً حتى ١١:٠٠ مساءً بتوقيت الكويت.">We answer every day from 8:00 AM to 11:00 PM Kuwait time.</p>
 
-      <div class="space-y-4">
-
-        <!-- REPEATABLE: order card — ACTIVE (on the way) -->
-        <div class="bb-order-card border border-brand-green/30 bg-brand-greenlight/40 rounded-2xl p-4 md:p-5">
-          <div class="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <p class="font-extrabold text-sm">#BM-2481</p>
-              <p class="text-[11px] text-gray-400 font-bold" data-en="Today, 2:45 PM" data-ar="اليوم، ٢:٤٥ م">Today, 2:45 PM</p>
-            </div>
-            <span class="bb-order-status shrink-0 bg-brand-green text-white text-[10px] font-extrabold rounded-full px-3 py-1"
-                  data-en="🛵 On the way" data-ar="🛵 في الطريق">🛵 On the way</span>
+      <!-- CONTACT CHANNELS
+           Demo contacts only: a Kuwaiti number never starts with 0, so
+           nothing here can ring a real person. Keep it that way.
+           REPEATABLE: one .bb-contact-tile per support channel -->
+      <div id="contact" class="grid sm:grid-cols-2 gap-3 mt-6">
+        <a href="#" class="bb-contact-tile">
+          <span class="w-10 h-10 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-brand-green" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l4.9-1.3A10 10 0 1 0 12 2Zm5.1 14.1c-.2.6-1.2 1.2-1.7 1.2-.5 0-1.2 0-2.4-.5a10 10 0 0 1-4-3.5c-.7-1-1-1.9-1-2.6 0-.7.4-1.4.8-1.7.3-.3.6-.3.8-.3h.5c.2 0 .4 0 .6.4l.7 1.7c0 .2 0 .4-.1.5l-.4.5c-.2.2-.2.3-.1.5a7 7 0 0 0 3.1 2.7c.2.1.4.1.6-.1l.7-.8c.2-.2.3-.2.5-.1l1.6.8c.2.1.3.2.3.4 0 .2 0 .7-.2 1.1Z"/></svg>
+          </span>
+          <div class="min-w-0">
+            <p class="text-[13px] font-extrabold text-gray-900" data-en="WhatsApp us" data-ar="راسلنا على واتساب">WhatsApp us</p>
+            <p class="text-[11.5px] font-bold text-gray-500" dir="ltr">+965 0000 0000</p>
           </div>
+        </a>
 
-          <!-- item thumbnails -->
-          <div class="flex items-center gap-2 mb-3">
-            <img src="images/products/milk.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-white" />
-            <img src="images/products/bread.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-white" />
-            <img src="images/products/eggs.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-white" />
-            <span class="text-[11px] font-extrabold text-gray-500" data-en="+2 more" data-ar="+٢ أخرى">+2 more</span>
+        <a href="#" class="bb-contact-tile">
+          <span class="w-10 h-10 rounded-full bg-brand-orangelight flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.2 2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.4 1.8.6 2.8.8a2 2 0 0 1 1.7 2Z"/></svg>
+          </span>
+          <div class="min-w-0">
+            <p class="text-[13px] font-extrabold text-gray-900" data-en="Call the store" data-ar="اتصل بالمتجر">Call the store</p>
+            <p class="text-[11.5px] font-bold text-gray-500" dir="ltr">+965 0000 0000</p>
           </div>
+        </a>
 
-          <div class="flex items-center justify-between">
-            <p class="bb-price text-sm font-extrabold text-gray-900"><span data-en="KD" data-ar="د.ك">KD</span> 4.350
-              <span class="text-[11px] text-gray-400 font-bold" data-en="· 5 items" data-ar="· ٥ منتجات">· 5 items</span></p>
-            <!-- .NET: link to live tracking view -->
-            <a href="#" class="text-brand-green text-xs font-extrabold" data-en="Track order →" data-ar="← تتبع الطلب">Track order →</a>
+        <a href="#" class="bb-contact-tile">
+          <span class="w-10 h-10 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+          </span>
+          <div class="min-w-0">
+            <p class="text-[13px] font-extrabold text-gray-900" data-en="Email us" data-ar="راسلنا بالبريد">Email us</p>
+            <p class="text-[11.5px] font-bold text-gray-500 truncate" dir="ltr">support@bobomart.example</p>
           </div>
+        </a>
 
-          <!-- ============================================================
-               ORDER STATUS BAR — three separate sections
-               .NET: add .is-done / .is-current per the order's status
-          ============================================================ -->
-          <div class="bb-order-progress mt-4">
-            <div class="grid grid-cols-3 gap-2">
-              <div class="bb-order-step is-done">
-                <span class="bb-order-step-bar"></span>
-                <span class="bb-order-step-label" data-en="Order Accepted" data-ar="تم قبول الطلب">Order Accepted</span>
-              </div>
-              <div class="bb-order-step is-done">
-                <span class="bb-order-step-bar"></span>
-                <span class="bb-order-step-label" data-en="Preparing" data-ar="قيد التحضير">Preparing</span>
-              </div>
-              <div class="bb-order-step is-current">
-                <span class="bb-order-step-bar"></span>
-                <span class="bb-order-step-label" data-en="On the Way" data-ar="في الطريق">On the Way</span>
-              </div>
-            </div>
-            <p class="text-[11px] text-gray-500 font-bold mt-2.5" data-en="Arriving in ~15 min" data-ar="يصل خلال ~١٥ دقيقة">Arriving in ~15 min</p>
+        <a href="orders.html" class="bb-contact-tile">
+          <span class="w-10 h-10 rounded-full bg-brand-orangelight flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+          </span>
+          <div class="min-w-0">
+            <p class="text-[13px] font-extrabold text-gray-900" data-en="Track an order" data-ar="تتبع طلباً">Track an order</p>
+            <p class="text-[11.5px] font-bold text-gray-500" data-en="Live status of every order" data-ar="حالة كل طلب مباشرة">Live status of every order</p>
           </div>
-        </div>
-
-        <!-- REPEATABLE: order card — DELIVERED -->
-        <div class="bb-order-card border border-gray-100 rounded-2xl p-4 md:p-5">
-          <div class="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <p class="font-extrabold text-sm">#BM-2437</p>
-              <p class="text-[11px] text-gray-400 font-bold" data-en="Jul 15, 6:20 PM" data-ar="١٥ يوليو، ٦:٢٠ م">Jul 15, 6:20 PM</p>
-            </div>
-            <span class="bb-order-status shrink-0 bg-brand-greenlight text-brand-green text-[10px] font-extrabold rounded-full px-3 py-1"
-                  data-en="✓ Delivered" data-ar="✓ تم التوصيل">✓ Delivered</span>
-          </div>
-
-          <div class="flex items-center gap-2 mb-3">
-            <img src="images/products/rice.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-            <img src="images/products/chicken.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-            <img src="images/products/oliveoil.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-          </div>
-
-          <div class="flex items-center justify-between">
-            <p class="bb-price text-sm font-extrabold text-gray-900"><span data-en="KD" data-ar="د.ك">KD</span> 9.600
-              <span class="text-[11px] text-gray-400 font-bold" data-en="· 3 items" data-ar="· ٣ منتجات">· 3 items</span></p>
-            <!-- .NET: re-adds order lines to cart -->
-            <button class="bg-brand-green text-white text-xs font-extrabold rounded-full px-4 py-1.5 hover:opacity-90 transition"
-                    data-en="Reorder" data-ar="إعادة الطلب">Reorder</button>
-          </div>
-        </div>
-
-        <!-- REPEATABLE: order card — DELIVERED -->
-        <div class="bb-order-card border border-gray-100 rounded-2xl p-4 md:p-5">
-          <div class="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <p class="font-extrabold text-sm">#BM-2395</p>
-              <p class="text-[11px] text-gray-400 font-bold" data-en="Jul 12, 11:05 AM" data-ar="١٢ يوليو، ١١:٠٥ ص">Jul 12, 11:05 AM</p>
-            </div>
-            <span class="bb-order-status shrink-0 bg-brand-greenlight text-brand-green text-[10px] font-extrabold rounded-full px-3 py-1"
-                  data-en="✓ Delivered" data-ar="✓ تم التوصيل">✓ Delivered</span>
-          </div>
-
-          <div class="flex items-center gap-2 mb-3">
-            <img src="images/products/apples.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-            <img src="images/products/bananas.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-            <img src="images/products/tomatoes.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-            <img src="images/products/cheese.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-            <span class="text-[11px] font-extrabold text-gray-500" data-en="+3 more" data-ar="+٣ أخرى">+3 more</span>
-          </div>
-
-          <div class="flex items-center justify-between">
-            <p class="bb-price text-sm font-extrabold text-gray-900"><span data-en="KD" data-ar="د.ك">KD</span> 6.750
-              <span class="text-[11px] text-gray-400 font-bold" data-en="· 7 items" data-ar="· ٧ منتجات">· 7 items</span></p>
-            <button class="bg-brand-green text-white text-xs font-extrabold rounded-full px-4 py-1.5 hover:opacity-90 transition"
-                    data-en="Reorder" data-ar="إعادة الطلب">Reorder</button>
-          </div>
-        </div>
-
-        <!-- REPEATABLE: order card — CANCELLED -->
-        <div class="bb-order-card border border-gray-100 rounded-2xl p-4 md:p-5 opacity-80">
-          <div class="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <p class="font-extrabold text-sm">#BM-2350</p>
-              <p class="text-[11px] text-gray-400 font-bold" data-en="Jul 8, 9:30 PM" data-ar="٨ يوليو، ٩:٣٠ م">Jul 8, 9:30 PM</p>
-            </div>
-            <span class="bb-order-status shrink-0 bg-red-50 text-red-500 text-[10px] font-extrabold rounded-full px-3 py-1"
-                  data-en="✕ Cancelled" data-ar="✕ ملغي">✕ Cancelled</span>
-          </div>
-
-          <div class="flex items-center gap-2 mb-3">
-            <img src="images/products/chips.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-            <img src="images/products/cornflakes.jpg" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-100" />
-          </div>
-
-          <div class="flex items-center justify-between">
-            <p class="bb-price text-sm font-extrabold text-gray-900"><span data-en="KD" data-ar="د.ك">KD</span> 1.250
-              <span class="text-[11px] text-gray-400 font-bold" data-en="· 2 items" data-ar="· منتجان">· 2 items</span></p>
-            <button class="bg-brand-green text-white text-xs font-extrabold rounded-full px-4 py-1.5 hover:opacity-90 transition"
-                    data-en="Reorder" data-ar="إعادة الطلب">Reorder</button>
-          </div>
-        </div>
-
+        </a>
       </div>
-    </section>
 
-    <!-- ============================================================
-         FOOTER — sitewide links (mobile + desktop)
-         .NET: becomes a shared _Footer partial
-    ============================================================ -->
+      <!-- FAQ — native <details>, so it works with JS switched off
+           REPEATABLE: one .bb-faq-item per question -->
+      <h2 class="text-base md:text-lg font-extrabold mt-10 mb-4"
+          data-en="Frequently asked" data-ar="الأسئلة الشائعة">Frequently asked</h2>
+
+      <div class="bb-faq space-y-2.5">
+        <details class="bb-faq-item" open>
+          <summary data-en="How fast is delivery?" data-ar="كم تستغرق مدة التوصيل؟">How fast is delivery?</summary>
+          <p data-en="Express orders arrive in 15–30 minutes. Normal delivery arrives within 2 hours, and the evening slot lands between 6:00 and 9:00 PM."
+             data-ar="طلبات التوصيل السريع تصل خلال ١٥–٣٠ دقيقة، والتوصيل العادي خلال ساعتين، وفترة المساء بين ٦:٠٠ و ٩:٠٠ مساءً.">Express orders arrive in 15–30 minutes. Normal delivery arrives within 2 hours, and the evening slot lands between 6:00 and 9:00 PM.</p>
+        </details>
+
+        <details class="bb-faq-item">
+          <summary data-en="When is delivery free?" data-ar="متى يكون التوصيل مجانياً؟">When is delivery free?</summary>
+          <p data-en="Delivery is free on every order above 100 KD. Below that a small fee applies, shown on the payment step before you pay."
+             data-ar="التوصيل مجاني لكل طلب فوق ١٠٠ د.ك، وأقل من ذلك تُضاف رسوم بسيطة تظهر في خطوة الدفع قبل السداد.">Delivery is free on every order above 100 KD. Below that a small fee applies, shown on the payment step before you pay.</p>
+        </details>
+
+        <details class="bb-faq-item">
+          <summary data-en="Which payment methods can I use?" data-ar="ما طرق الدفع المتاحة؟">Which payment methods can I use?</summary>
+          <p data-en="KNET, Visa, Mastercard, Apple Pay and cash on delivery. You can save a card to your account so checkout is one tap next time."
+             data-ar="كي نت وفيزا وماستركارد وأبل باي والدفع عند التسليم. يمكنك حفظ بطاقتك في حسابك ليصبح الدفع بلمسة واحدة في المرة القادمة.">KNET, Visa, Mastercard, Apple Pay and cash on delivery. You can save a card to your account so checkout is one tap next time.</p>
+        </details>
+
+        <details class="bb-faq-item">
+          <summary data-en="Can I change or cancel an order?" data-ar="هل يمكنني تعديل أو إلغاء الطلب؟">Can I change or cancel an order?</summary>
+          <p data-en="Yes, while the order still shows Order Accepted. Once it moves to Preparing, message us on WhatsApp and we will do what we can."
+             data-ar="نعم، طالما أن حالة الطلب «تم قبول الطلب». وبمجرد أن تتحول إلى «قيد التجهيز» راسلنا على واتساب وسنبذل ما بوسعنا.">Yes, while the order still shows Order Accepted. Once it moves to Preparing, message us on WhatsApp and we will do what we can.</p>
+        </details>
+
+        <details class="bb-faq-item">
+          <summary data-en="What if an item is missing or damaged?" data-ar="ماذا لو كان هناك منتج ناقص أو تالف؟">What if an item is missing or damaged?</summary>
+          <p data-en="Tell us within 24 hours and we refund that item to your original payment method, or replace it on your next delivery — whichever you prefer."
+             data-ar="أخبرنا خلال ٢٤ ساعة وسنعيد قيمة المنتج إلى وسيلة الدفع نفسها أو نستبدله في التوصيلة التالية، حسب رغبتك.">Tell us within 24 hours and we refund that item to your original payment method, or replace it on your next delivery — whichever you prefer.</p>
+        </details>
+
+        <details class="bb-faq-item">
+          <summary data-en="Do you deliver to my area?" data-ar="هل توصلون إلى منطقتي؟">Do you deliver to my area?</summary>
+          <p data-en="We cover Kuwait City, Hawalli, Farwaniya, Ahmadi and Jahra. Pick your area on the address step — if it is on the list, we deliver there."
+             data-ar="نغطي مدينة الكويت وحولي والفروانية والأحمدي والجهراء. اختر منطقتك في خطوة العنوان، فإن كانت في القائمة فنحن نوصل إليها.">We cover Kuwait City, Hawalli, Farwaniya, Ahmadi and Jahra. Pick your area on the address step — if it is on the list, we deliver there.</p>
+        </details>
+      </div>
+
+      <!-- MESSAGE FORM -->
+      <h2 class="text-base md:text-lg font-extrabold mt-10 mb-4"
+          data-en="Send us a message" data-ar="أرسل لنا رسالة">Send us a message</h2>
+
+      <form id="supportForm" class="bb-checkout-card space-y-3" novalidate>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="bb-label" for="spName" data-en="Your name" data-ar="اسمك">Your name</label>
+            <input id="spName" type="text" class="bb-field"
+                   data-placeholder-en="Your name" data-placeholder-ar="اسمك" placeholder="Your name" />
+          </div>
+          <div>
+            <label class="bb-label" for="spEmail" data-en="Email address" data-ar="البريد الإلكتروني">Email address</label>
+            <input id="spEmail" type="email" dir="ltr" class="bb-field" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="bb-label" for="spTopic" data-en="Topic" data-ar="الموضوع">Topic</label>
+            <select id="spTopic" class="bb-field bb-select">
+              <option value="order" data-en="A problem with an order" data-ar="مشكلة في طلب">A problem with an order</option>
+              <option value="delivery" data-en="Delivery &amp; timing" data-ar="التوصيل والمواعيد">Delivery &amp; timing</option>
+              <option value="payment" data-en="Payment or refund" data-ar="الدفع أو الاسترجاع">Payment or refund</option>
+              <option value="product" data-en="A product request" data-ar="طلب منتج">A product request</option>
+              <option value="other" data-en="Something else" data-ar="موضوع آخر">Something else</option>
+            </select>
+          </div>
+          <div>
+            <label class="bb-label" for="spOrder" data-en="Order number (optional)" data-ar="رقم الطلب (اختياري)">Order number (optional)</label>
+            <input id="spOrder" type="text" dir="ltr" class="bb-field" placeholder="BM-10024" />
+          </div>
+        </div>
+
+        <div>
+          <label class="bb-label" for="spMessage" data-en="Message" data-ar="الرسالة">Message</label>
+          <textarea id="spMessage" rows="4" class="bb-field resize-none"
+                    data-placeholder-en="Tell us what happened…" data-placeholder-ar="أخبرنا بما حدث…"
+                    placeholder="Tell us what happened…"></textarea>
+        </div>
+
+        <p id="spError" class="bb-field-error hidden"
+           data-en="Please add your email and a short message"
+           data-ar="يرجى إضافة بريدك الإلكتروني ورسالة قصيرة">Please add your email and a short message</p>
+        <p id="spSent" class="bb-promo-msg is-ok hidden"
+           data-en="Thanks — we have your message and will reply within a few hours."
+           data-ar="شكراً لك — وصلتنا رسالتك وسنرد خلال ساعات قليلة.">Thanks — we have your message and will reply within a few hours.</p>
+
+        <button type="submit" class="bb-btn bb-btn--primary mt-1"
+                data-en="Send message" data-ar="إرسال الرسالة">Send message</button>
+      </form>
+    </section>
     <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
@@ -313,7 +321,7 @@
       <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
       <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
     </a>
-    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
     </a>

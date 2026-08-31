@@ -456,3 +456,374 @@ html[dir="rtl"] .bb-select { background-position: left 14px center; }
   transition: background .15s, color .15s;
 }
 .bb-footer-social:hover { background: #3DA829; color: #fff; }
+
+/* ------------------------------------------------------------
+   AUTH PAGES — login, register, forgot password
+   These three sit outside the shopping shell: no tab bar, no
+   search. A single centred card on white, so the form is the
+   only thing on screen.
+------------------------------------------------------------ */
+.bb-auth-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.bb-auth-card {
+  width: 100%;
+  max-width: 26rem;                   /* 416px — comfortable one-column form */
+  margin: 0 auto;
+}
+/* The register form is wider: it holds two-column name and address rows */
+.bb-auth-card--wide { max-width: 40rem; }
+
+.bb-auth-title { font-size: 22px; font-weight: 800; color: #111827; line-height: 1.25; }
+.bb-auth-sub { font-size: 13px; font-weight: 700; color: #6b7280; margin-top: 6px; line-height: 1.5; }
+@media (min-width: 768px) {
+  .bb-auth-title { font-size: 26px; }
+}
+
+/* Primary / secondary auth buttons */
+.bb-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border-radius: 9999px;
+  padding: 13px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  transition: opacity .15s, background .15s, color .15s, transform .1s;
+}
+.bb-btn:active { transform: scale(.99); }
+.bb-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.bb-btn--primary { background: #3DA829; color: #fff; }
+.bb-btn--primary:hover:not(:disabled) { opacity: .92; }
+.bb-btn--accent { background: #F5A11A; color: #fff; }
+.bb-btn--accent:hover:not(:disabled) { opacity: .92; }
+.bb-btn--ghost { background: #fff; color: #374151; border: 1px solid #e5e7eb; }
+.bb-btn--ghost:hover:not(:disabled) { border-color: #3DA829; color: #3DA829; }
+/* Small inline variant — "Verify", "Resend", "Change email" */
+.bb-btn--sm { width: auto; padding: 9px 16px; font-size: 12px; }
+
+/* "or" divider between the form and the alternative action */
+.bb-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #9ca3af;
+}
+.bb-divider::before,
+.bb-divider::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+/* ------------------------------------------------------------
+   PASSWORD FIELD — show/hide eye sits inside the field
+------------------------------------------------------------ */
+.bb-pass-wrap { position: relative; }
+.bb-pass-wrap .bb-field { padding-inline-end: 44px; }
+/* The password input is always dir="ltr" (dots and Latin characters), so
+   the eye stays on the physical right in Arabic too — an inset-inline-end
+   here would flip it onto the left and sit on top of the text. */
+.bb-pass-toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .15s, background .15s;
+}
+.bb-pass-toggle:hover { color: #3DA829; background: #EAF6E6; }
+/* The eye swaps to the struck-through eye once the password is visible */
+.bb-pass-toggle .bb-eye-off { display: none; }
+.bb-pass-toggle.is-shown .bb-eye-on { display: none; }
+.bb-pass-toggle.is-shown .bb-eye-off { display: block; }
+
+/* Strength meter — three segments filled as the rules are met */
+.bb-strength { display: flex; gap: 4px; margin-top: 8px; }
+.bb-strength span {
+  flex: 1 1 0;
+  height: 4px;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  transition: background .2s;
+}
+.bb-strength.is-weak   span:nth-child(1) { background: #ef4444; }
+.bb-strength.is-medium span:nth-child(-n+2) { background: #F5A11A; }
+.bb-strength.is-strong span { background: #3DA829; }
+.bb-strength-label { font-size: 11px; font-weight: 800; margin-top: 6px; color: #9ca3af; }
+
+/* Per-field validation message (hidden until the field is wrong) */
+.bb-field-error { font-size: 11px; font-weight: 800; color: #ef4444; margin-top: 6px; }
+.bb-field.is-invalid { border-color: #ef4444; }
+
+/* ------------------------------------------------------------
+   PHONE FIELD — country code picker joined to the number
+   Kuwait (+965) is the default; the picker carries the other GCC
+   codes so an expat number still registers.
+------------------------------------------------------------ */
+.bb-phone { display: flex; gap: 8px; }
+.bb-phone .bb-phone-code {
+  width: 132px;
+  flex: none;
+  font-size: 13.5px;
+  font-weight: 800;
+}
+.bb-phone .bb-phone-number { flex: 1 1 auto; min-width: 0; }
+@media (max-width: 767px) {
+  .bb-phone .bb-phone-code { width: 118px; font-size: 15px; padding-inline-end: 34px; background-position: right 8px center; }
+  html[dir="rtl"] .bb-phone .bb-phone-code { background-position: left 8px center; }
+}
+
+/* ------------------------------------------------------------
+   OTP — six single-character boxes + resend countdown
+   Used by email verification on register and by password reset.
+------------------------------------------------------------ */
+.bb-otp {
+  display: flex;
+  gap: 8px;
+  direction: ltr;                     /* digits stay left-to-right in Arabic */
+  justify-content: flex-start;
+}
+.bb-otp input {
+  width: 44px;
+  height: 52px;
+  flex: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+.bb-otp input:focus { border-color: #3DA829; background: #EAF6E6; }
+.bb-otp.is-invalid input { border-color: #ef4444; }
+@media (max-width: 380px) {
+  .bb-otp { gap: 6px; }
+  .bb-otp input { width: 40px; height: 48px; font-size: 18px; }
+}
+
+/* Verified badge replacing the OTP panel once the code is accepted */
+.bb-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #3DA829;
+  background: #EAF6E6;
+  border-radius: 9999px;
+  padding: 4px 12px;
+}
+
+/* ------------------------------------------------------------
+   CHECKBOX — remember me, terms, notification opt-ins
+------------------------------------------------------------ */
+.bb-check { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; }
+.bb-check input { position: absolute; opacity: 0; width: 0; height: 0; }
+.bb-check-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 2px solid #d1d5db;
+  flex: none;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.bb-check input:checked + .bb-check-box {
+  background: #3DA829;
+  border-color: #3DA829;
+  color: #fff;
+}
+.bb-check input:focus-visible + .bb-check-box { box-shadow: 0 0 0 3px rgba(61, 168, 41, .25); }
+.bb-check-label { font-size: 12px; font-weight: 700; color: #4b5563; line-height: 1.5; }
+.bb-check-label a { color: #3DA829; font-weight: 800; }
+
+/* ------------------------------------------------------------
+   SWITCH — notification preferences
+------------------------------------------------------------ */
+.bb-switch { position: relative; flex: none; }
+.bb-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.bb-switch-track {
+  display: block;
+  width: 44px;
+  height: 26px;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  transition: background .18s;
+  cursor: pointer;
+}
+.bb-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, .25);
+  transition: transform .18s;
+}
+.bb-switch input:checked + .bb-switch-track { background: #3DA829; }
+.bb-switch input:checked + .bb-switch-track::after { transform: translateX(18px); }
+html[dir="rtl"] .bb-switch input:checked + .bb-switch-track::after { transform: translateX(-18px); }
+
+/* ------------------------------------------------------------
+   ACCOUNT SUB-PAGES — addresses, payment methods, notifications
+------------------------------------------------------------ */
+/* Saved address / saved card tile */
+.bb-saved-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 14px 16px;
+  transition: border-color .15s;
+}
+.bb-saved-card:hover { border-color: #3DA829; }
+.bb-saved-card.is-default { border-color: #3DA829; background: #EAF6E6; }
+.bb-saved-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 800;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  background: #3DA829;
+  color: #fff;
+}
+/* Text-only actions under a saved tile */
+.bb-link-btn { font-size: 11.5px; font-weight: 800; color: #6b7280; transition: color .15s; }
+.bb-link-btn:hover { color: #3DA829; }
+.bb-link-btn--danger:hover { color: #ef4444; }
+
+/* Dashed "add another" tile */
+.bb-add-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 18px;
+  padding: 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #6b7280;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.bb-add-tile:hover { border-color: #3DA829; color: #3DA829; background: #EAF6E6; }
+
+/* ------------------------------------------------------------
+   INFO PAGES — delivery info, returns, terms, help
+   One prose column, so legal and help copy stays readable on a
+   phone without fighting the utility classes on every paragraph.
+------------------------------------------------------------ */
+.bb-prose h2 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  margin-top: 28px;
+  margin-bottom: 8px;
+}
+.bb-prose h2:first-child { margin-top: 0; }
+.bb-prose h3 { font-size: 13.5px; font-weight: 800; color: #111827; margin-top: 18px; margin-bottom: 6px; }
+.bb-prose p { font-size: 13px; font-weight: 600; color: #4b5563; line-height: 1.75; margin-bottom: 10px; }
+.bb-prose ul { margin: 0 0 12px; padding-inline-start: 20px; list-style: disc; }
+.bb-prose li { font-size: 13px; font-weight: 600; color: #4b5563; line-height: 1.75; margin-bottom: 5px; }
+.bb-prose strong { font-weight: 800; color: #111827; }
+@media (min-width: 768px) {
+  .bb-prose h2 { font-size: 18px; }
+  .bb-prose p, .bb-prose li { font-size: 14px; }
+}
+
+/* Anchored jump list at the top of a long info page */
+.bb-toc { display: flex; flex-wrap: wrap; gap: 8px; }
+.bb-toc a {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  padding: 6px 13px;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.bb-toc a:hover { border-color: #3DA829; background: #EAF6E6; color: #3DA829; }
+/* Anchor targets clear the sticky header when jumped to */
+.bb-prose [id], .bb-faq [id] { scroll-margin-top: 96px; }
+
+/* FAQ accordion — native <details>, no JS needed */
+.bb-faq-item {
+  border: 1px solid #f3f4f6;
+  border-radius: 16px;
+  padding: 4px 16px;
+  transition: border-color .15s;
+}
+.bb-faq-item[open] { border-color: #3DA829; }
+.bb-faq-item summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: #111827;
+  cursor: pointer;
+  list-style: none;
+}
+.bb-faq-item summary::-webkit-details-marker { display: none; }
+.bb-faq-item summary::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  margin-inline-start: auto;
+  flex: none;
+  border-right: 2.5px solid #9ca3af;
+  border-bottom: 2.5px solid #9ca3af;
+  transform: rotate(45deg);
+  transition: transform .2s;
+}
+.bb-faq-item[open] summary::after { transform: rotate(-135deg); border-color: #3DA829; }
+.bb-faq-item p { font-size: 12.5px; font-weight: 600; color: #4b5563; line-height: 1.7; padding-bottom: 14px; margin: 0; }
+
+/* Contact tile — WhatsApp / phone / email on the help page */
+.bb-contact-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 14px 16px;
+  transition: border-color .15s, background .15s;
+}
+.bb-contact-tile:hover { border-color: #3DA829; background: #EAF6E6; }
+
+/* Served-area chip on the delivery information page — read-only, so it
+   is the .bb-toc pill without the link behaviour. */
+.bb-area-chip {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  padding: 6px 13px;
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — Categories</title>
+  <title>BoboMart — Account details</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -65,7 +65,7 @@
       <!-- Desktop nav links — right-aligned, cart + greeting sit after them -->
       <nav class="bb-nav hidden lg:flex items-center gap-6 text-sm font-bold text-gray-600 ms-auto">
         <a href="index.html" class="hover:text-brand-green" data-en="Home" data-ar="الرئيسية">Home</a>
-        <a href="categories.html" class="text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
+        <a href="categories.html" class="hover:text-brand-green" data-en="Categories" data-ar="الفئات">Categories</a>
         <a href="orders.html" class="hover:text-brand-green" data-en="Orders" data-ar="الطلبات">Orders</a>
       </nav>
 
@@ -84,88 +84,141 @@
       </div>
     </div>
   </header>
+  <main class="max-w-3xl mx-auto px-4">
 
-  <main class="max-w-7xl mx-auto px-4">
+
+    <!-- Back bar -->
+    <div class="pt-4 pb-1">
+      <a href="profile.html" class="bb-back-btn inline-flex items-center gap-1.5 text-sm font-extrabold text-gray-600 hover:text-brand-green transition">
+        <svg class="bb-chevron w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+        <span data-en="Back to profile" data-ar="رجوع إلى حسابي">Back to profile</span>
+      </a>
+    </div>
 
     <!-- ============================================================
-         ALL CATEGORIES — grid of category cards
-         REPEATABLE: .bb-category-card — Razor loop over categories
-         .NET: item counts come from products table
+         ACCOUNT DETAILS — edit the fields shown on the profile card
+         .NET later: an Account/Details view bound to @Model.User;
+         Save posts the edited fields back.
     ============================================================ -->
-    <section class="bb-all-categories mt-6">
-      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-1"
-          data-en="All categories" data-ar="جميع الفئات">All categories</h1>
-      <p class="text-xs md:text-sm text-gray-500 font-semibold mb-5"
-         data-en="Browse everything we deliver" data-ar="تصفح كل ما نوصله لك">Browse everything we deliver</p>
+    <section id="accountDetails" class="mb-2">
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mt-2 mb-5"
+          data-en="Account details" data-ar="بيانات الحساب">Account details</h1>
 
-      <div class="bb-category-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-        <!-- REPEATABLE: category card -->
-        <a href="category.html?cat=fruitsveg" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/fruitsveg.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Fruits & Veg" data-ar="فواكه وخضار">Fruits &amp; Veg</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="48 items" data-ar="٤٨ منتج">48 items</span>
-        </a>
+      <!-- Avatar -->
+      <section class="bb-checkout-card flex items-center gap-4">
+        <!-- .NET: src bound to @Model.User.AvatarUrl -->
+        <img src="images/profile.jpg" alt="Profile"
+             class="w-16 h-16 rounded-full object-cover border-2 border-brand-green shrink-0" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-extrabold" data-en="Profile picture" data-ar="صورة الحساب">Profile picture</p>
+          <p class="text-[11px] font-bold text-gray-400 mt-0.5"
+             data-en="JPG or PNG, up to 2 MB" data-ar="JPG أو PNG بحجم ٢ ميجابايت كحد أقصى">JPG or PNG, up to 2 MB</p>
+        </div>
+        <button type="button" class="bb-btn bb-btn--ghost bb-btn--sm shrink-0"
+                data-en="Change" data-ar="تغيير">Change</button>
+      </section>
 
-        <a href="category.html?cat=dairy" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/milk.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Dairy & Eggs" data-ar="ألبان وبيض">Dairy &amp; Eggs</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="32 items" data-ar="٣٢ منتج">32 items</span>
-        </a>
+      <form id="accountDetailsForm" class="bb-checkout-card mt-4" novalidate>
+        <h2 class="bb-checkout-card-title">
+          <span class="bb-checkout-card-num">1</span>
+          <span data-en="Personal information" data-ar="المعلومات الشخصية">Personal information</span>
+        </h2>
 
-        <a href="category.html?cat=bakery" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/bread.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Bakery" data-ar="مخبوزات">Bakery</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="21 items" data-ar="٢١ منتج">21 items</span>
-        </a>
+        <div class="space-y-3">
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label class="bb-label" for="acFirstName" data-en="First name" data-ar="الاسم الأول">First name</label>
+              <input id="acFirstName" type="text" autocomplete="given-name" class="bb-field" value="Customer" />
+            </div>
+            <div>
+              <label class="bb-label" for="acLastName" data-en="Last name" data-ar="اسم العائلة">Last name</label>
+              <input id="acLastName" type="text" autocomplete="family-name" class="bb-field" value="Name" />
+            </div>
+          </div>
 
-        <a href="category.html?cat=beverages" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/beverages.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Beverages" data-ar="مشروبات">Beverages</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="40 items" data-ar="٤٠ منتج">40 items</span>
-        </a>
+          <div>
+            <label class="bb-label" for="acEmail" data-en="Email address" data-ar="البريد الإلكتروني">Email address</label>
+            <input id="acEmail" type="email" autocomplete="email" dir="ltr" class="bb-field" value="customer@example.com" />
+            <p class="mt-2">
+              <span class="bb-verified">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg>
+                <span data-en="Verified" data-ar="موثّق">Verified</span>
+              </span>
+            </p>
+          </div>
 
-        <a href="category.html?cat=snacks" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/snacks.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Snacks" data-ar="وجبات خفيفة">Snacks</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="55 items" data-ar="٥٥ منتج">55 items</span>
-        </a>
+          <div>
+            <label class="bb-label" for="acPhone" data-en="Mobile number" data-ar="رقم الجوال">Mobile number</label>
+            <!-- Dummy hint: a Kuwaiti number never starts with 0, so this can never be real -->
+            <div class="bb-phone" dir="ltr">
+              <select id="acCountryCode" class="bb-field bb-select bb-phone-code" aria-label="Country code">
+                <option value="+965" selected>🇰🇼 +965</option>
+                <option value="+966">🇸🇦 +966</option>
+                <option value="+971">🇦🇪 +971</option>
+                <option value="+974">🇶🇦 +974</option>
+                <option value="+973">🇧🇭 +973</option>
+                <option value="+968">🇴🇲 +968</option>
+                <option value="+20">🇪🇬 +20</option>
+                <option value="+962">🇯🇴 +962</option>
+                <option value="+961">🇱🇧 +961</option>
+                <option value="+91">🇮🇳 +91</option>
+                <option value="+92">🇵🇰 +92</option>
+                <option value="+63">🇵🇭 +63</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+1">🇺🇸 +1</option>
+              </select>
+              <input id="acPhone" type="tel" inputmode="numeric" class="bb-field bb-phone-number" value="0000 0000" />
+            </div>
+          </div>
 
-        <a href="category.html?cat=rice" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/rice.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Rice & Grains" data-ar="أرز وحبوب">Rice &amp; Grains</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="18 items" data-ar="١٨ منتج">18 items</span>
-        </a>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label class="bb-label" for="acBirthday" data-en="Date of birth" data-ar="تاريخ الميلاد">Date of birth</label>
+              <input id="acBirthday" type="date" class="bb-field" dir="ltr" />
+            </div>
+            <div>
+              <label class="bb-label" for="acLanguage" data-en="Preferred language" data-ar="اللغة المفضلة">Preferred language</label>
+              <select id="acLanguage" class="bb-field bb-select">
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
-        <a href="category.html?cat=frozen" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/frozen.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Frozen" data-ar="مجمدات">Frozen</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="26 items" data-ar="٢٦ منتج">26 items</span>
-        </a>
+        <p id="acSaved" class="bb-promo-msg is-ok hidden"
+           data-en="Your details have been saved" data-ar="تم حفظ بياناتك">Your details have been saved</p>
 
-        <a href="category.html?cat=household" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/categories/household.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Household" data-ar="منزلية">Household</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="34 items" data-ar="٣٤ منتج">34 items</span>
-        </a>
+        <button type="submit" class="bb-btn bb-btn--primary mt-5"
+                data-en="Save changes" data-ar="حفظ التغييرات">Save changes</button>
+      </form>
 
-        <a href="category.html?cat=meat" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/chicken.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Meat & Poultry" data-ar="لحوم ودواجن">Meat &amp; Poultry</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="22 items" data-ar="٢٢ منتج">22 items</span>
-        </a>
+      <!-- Password -->
+      <section class="bb-checkout-card mt-4">
+        <h2 class="bb-checkout-card-title">
+          <span class="bb-checkout-card-num">2</span>
+          <span data-en="Password" data-ar="كلمة المرور">Password</span>
+        </h2>
+        <p class="text-[12px] font-bold text-gray-500"
+           data-en="Change your password from time to time to keep the account safe."
+           data-ar="غيّر كلمة المرور من حين لآخر للحفاظ على أمان حسابك.">Change your password from time to time to keep the account safe.</p>
+        <a href="forgot-password.html" class="bb-btn bb-btn--ghost mt-4"
+           data-en="Change password" data-ar="تغيير كلمة المرور">Change password</a>
+      </section>
 
-        <a href="category.html?cat=oils" class="bb-category-card group bg-gray-50 border border-gray-100 rounded-2xl p-4 flex flex-col items-center text-center gap-2 hover:border-brand-green hover:shadow-md transition">
-          <img src="images/products/oliveoil.jpg" alt="" class="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover group-hover:scale-105 transition" />
-          <span class="text-sm font-extrabold" data-en="Oils & Condiments" data-ar="زيوت وتوابل">Oils &amp; Condiments</span>
-          <span class="text-[11px] font-bold text-gray-400" data-en="29 items" data-ar="٢٩ منتج">29 items</span>
-        </a>
-      </div>
+      <!-- Danger zone -->
+      <section class="bb-checkout-card mt-4 border-red-100">
+        <h2 class="bb-checkout-card-title">
+          <span class="bb-checkout-card-num bg-red-50 text-red-500">!</span>
+          <span data-en="Delete account" data-ar="حذف الحساب">Delete account</span>
+        </h2>
+        <p class="text-[12px] font-bold text-gray-500"
+           data-en="Deleting removes your addresses and order history. This cannot be undone."
+           data-ar="الحذف يزيل عناوينك وسجل طلباتك، ولا يمكن التراجع عنه.">Deleting removes your addresses and order history. This cannot be undone.</p>
+        <button type="button" class="w-full mt-4 border border-red-200 text-red-500 font-extrabold text-sm rounded-full py-3 hover:bg-red-50 transition"
+                data-en="Delete my account" data-ar="حذف حسابي">Delete my account</button>
+      </section>
     </section>
-
-    <!-- ============================================================
-         FOOTER — sitewide links (mobile + desktop)
-         .NET: becomes a shared _Footer partial
-    ============================================================ -->
     <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
@@ -239,7 +292,7 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
     </a>
-    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
     </a>
@@ -252,7 +305,7 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
     </a>
-    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
     </a>

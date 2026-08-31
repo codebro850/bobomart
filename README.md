@@ -71,6 +71,27 @@ Rules:
 | Orders | 📦 Orders | Current & past orders with status |
 | Profile | 👤 Profile | Profile picture, details, addresses, language switch |
 
+### 3.1 Account Pages
+
+| Page | Description |
+|---|---|
+| `login.html` | Sign in with email + password, remember me, forgot-password link, guest checkout |
+| `register.html` | One page: first name, last name, **email verified by a 6-digit code** (60 s resend lock), password + confirm, terms |
+| `forgot-password.html` | Email → code → new password → done, reusing the same OTP component |
+| `account-details.html` | Edit name, email, mobile, birthday, language; change password; delete account |
+| `account-addresses.html` | Saved addresses (add / edit / delete / make default) — the same list checkout reads |
+| `account-payments.html` | Saved cards, add a card, preferred payment method |
+| `account-notifications.html` | Order-update and offer switches, stored per customer |
+
+### 3.2 Static Pages
+
+| Page | Description |
+|---|---|
+| `help.html` | Support channels, FAQ accordion, message form |
+| `delivery-info.html` | Delivery types and fees, served areas, order stages |
+| `returns.html` | Returns, refunds and cancellation policy |
+| `terms.html` | Terms of use and privacy policy, with a jump list |
+
 ---
 
 ## 4. Cart Rules
@@ -107,6 +128,14 @@ Static **HTML + CSS** design first, later integrated into a **.NET (ASP.NET / Ra
 bobomart/
 ├── README.md
 ├── index.html           # Home / Dashboard page (offer strip, header, deal of the day, packets grid, tab bar)
+├── login.html           # Sign in
+├── register.html        # Create account — name, email OTP, password
+├── forgot-password.html # Reset password — email → code → new password
+├── account-*.html       # details · addresses · payments · notifications
+├── help.html            # Help & support (contact, FAQ, message form)
+├── delivery-info.html   # Delivery types, fees, served areas
+├── returns.html         # Returns & refunds policy
+├── terms.html           # Terms of use & privacy
 ├── css/
 │   └── custom.css       # Small overrides on top of Tailwind (scrollbars, RTL tweaks)
 ├── js/
@@ -132,5 +161,8 @@ Later pages: `categories.html`, `cart.html`, `orders.html`, `profile.html` → e
 - [ ] Cart page with stepper logic and free-delivery progress
 - [ ] Profile page with picture
 - [ ] Orders page
+- [x] Login / register / forgot password (email OTP with 60 s resend)
+- [x] Account pages (details, addresses, payment methods, notifications)
+- [x] Static pages (help & FAQ, delivery information, returns, terms & privacy)
 - [ ] .NET integration (Razor views, dynamic data, real images)
 - [ ] Backend / payments (future)

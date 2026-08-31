@@ -1304,3 +1304,845 @@ function initCheckoutConfirmPage() {
 }
 
 initCheckoutConfirmPage();
+
+/* ============================================================
+   8. SHARED FORM PARTS — password eye, strength meter, OTP boxes,
+      resend countdown. Login, register, forgot-password and the
+      account pages all reuse these, so the behaviour is identical
+      wherever a password or a code is typed.
+   .NET later: the markup stays, the validation moves server-side
+   and these helpers only keep the on-screen behaviour.
+============================================================ */
+const DEMO_OTP = '123456';        // demo only — the server issues the real code
+const OTP_RESEND_SECONDS = 60;    // one minute before "Resend" unlocks
+
+const isArabic = () => document.documentElement.lang === 'ar';
+
+function setFieldError(inputId, errorId, show) {
+  const input = document.getElementById(inputId);
+  const error = document.getElementById(errorId);
+  if (input) input.classList.toggle('is-invalid', !!show);
+  if (error) error.classList.toggle('hidden', !show);
+}
+
+function isEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(value || '').trim());
+}
+
+/* ---------- password show / hide ---------- */
+// Delegated, so it covers every [data-pass-toggle] on every page.
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-pass-toggle]');
+  if (!btn) return;
+  const field = document.getElementById(btn.dataset.passToggle);
+  if (!field) return;
+  const show = field.type === 'password';
+  field.type = show ? 'text' : 'password';
+  btn.classList.toggle('is-shown', show);
+  btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+});
+
+/* ---------- password strength ----------
+   Three plain rules, because a customer should be able to see why
+   the bar moved: 8+ characters, a number, and a letter of each case
+   or a symbol. .NET later: mirror the same rules server-side. */
+function passwordScore(value) {
+  const v = String(value || '');
+  if (!v) return 0;
+  let score = 0;
+  if (v.length >= 8) score++;
+  if (/\d/.test(v)) score++;
+  if (/[a-z]/.test(v) && /[A-Z]/.test(v)) score++;
+  else if (/[^A-Za-z0-9]/.test(v)) score++;
+  return score;
+}
+
+function bindStrengthMeter(inputId, meterId, labelId) {
+  const input = document.getElementById(inputId);
+  const meter = document.getElementById(meterId);
+  const label = document.getElementById(labelId);
+  if (!input || !meter) return;
+
+  const LEVELS = [
+    { cls: '',          en: 'Use 8+ characters with a number', ar: 'استخدم ٨ أحرف أو أكثر مع رقم' },
+    { cls: 'is-weak',   en: 'Weak password',                   ar: 'كلمة مرور ضعيفة' },
+    { cls: 'is-medium', en: 'Good password',                   ar: 'كلمة مرور جيدة' },
+    { cls: 'is-strong', en: 'Strong password',                 ar: 'كلمة مرور قوية' },
+  ];
+
+  input.addEventListener('input', () => {
+    const level = LEVELS[passwordScore(input.value)];
+    meter.className = `bb-strength ${level.cls}`.trim();
+    if (label) {
+      label.dataset.en = level.en;
+      label.dataset.ar = level.ar;
+      label.textContent = isArabic() ? level.ar : level.en;
+    }
+  });
+}
+
+/* ---------- OTP boxes ----------
+   Six single-character inputs that behave like one field: typing
+   walks forward, backspace walks back, and a pasted code fills the
+   whole row. Returns a small handle the page uses to read/clear it. */
+function initOtpGroup(rootId, onComplete) {
+  const root = document.getElementById(rootId);
+  if (!root) return null;
+
+  const boxes = Array.from(root.querySelectorAll('input'));
+  const code = () => boxes.map((b) => b.value).join('');
+
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      box.value = box.value.replace(/\D/g, '').slice(0, 1);
+      root.classList.remove('is-invalid');
+      if (box.value && i < boxes.length - 1) boxes[i + 1].focus();
+      if (code().length === boxes.length && typeof onComplete === 'function') onComplete(code());
+    });
+
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        e.preventDefault();
+        boxes[i - 1].value = '';
+        boxes[i - 1].focus();
+      }
+      // The row is always LTR, so the arrows follow the boxes, not the page
+      if (e.key === 'ArrowLeft' && i > 0) boxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < boxes.length - 1) boxes[i + 1].focus();
+    });
+
+    box.addEventListener('paste', (e) => {
+      const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      if (!digits) return;
+      e.preventDefault();
+      boxes.forEach((b, j) => { b.value = digits[j] || ''; });
+      root.classList.remove('is-invalid');
+      boxes[Math.min(digits.length, boxes.length - 1)].focus();
+      if (code().length === boxes.length && typeof onComplete === 'function') onComplete(code());
+    });
+  });
+
+  return {
+    get value() { return code(); },
+    clear() { boxes.forEach((b) => { b.value = ''; }); root.classList.remove('is-invalid'); },
+    focus() { boxes[0].focus(); },
+    markInvalid() { root.classList.add('is-invalid'); },
+  };
+}
+
+/* ---------- resend countdown ----------
+   Locks the resend button for OTP_RESEND_SECONDS and ticks the
+   "Resend in 00:59" label down to zero. */
+function startResendCountdown(timerId, wrapId, buttonId, seconds = OTP_RESEND_SECONDS) {
+  const timer = document.getElementById(timerId);
+  const wrap = document.getElementById(wrapId);
+  const button = document.getElementById(buttonId);
+  if (!timer || !button) return;
+
+  // A second press restarts the clock rather than running two of them
+  if (button.dataset.tickId) clearInterval(Number(button.dataset.tickId));
+
+  let left = seconds;
+  button.disabled = true;
+  if (wrap) wrap.classList.remove('hidden');
+
+  const paint = () => {
+    const m = String(Math.floor(left / 60)).padStart(2, '0');
+    const s = String(left % 60).padStart(2, '0');
+    timer.textContent = `${m}:${s}`;
+  };
+  paint();
+
+  const tick = setInterval(() => {
+    left -= 1;
+    if (left <= 0) {
+      clearInterval(tick);
+      delete button.dataset.tickId;
+      button.disabled = false;
+      if (wrap) wrap.classList.add('hidden');
+      return;
+    }
+    paint();
+  }, 1000);
+
+  button.dataset.tickId = String(tick);
+}
+
+/* ============================================================
+   9. SIGNED-IN CUSTOMER
+   The demo keeps the customer in localStorage. Absent means "the
+   demo customer" so every page looks the way it always has; the
+   string "guest" means the customer signed out on purpose.
+   .NET later: replaced by the auth cookie and @User.Identity.
+============================================================ */
+const AUTH_KEY = 'bobomart-user';
+
+const DEMO_USER = {
+  firstName: 'Customer',
+  lastName: 'Name',
+  email: 'customer@example.com',
+  countryCode: '+965',
+  // Dummy number: a Kuwaiti number never starts with 0, so it cannot ring anyone
+  phone: '0000 0000',
+};
+
+function loadUser() {
+  const raw = localStorage.getItem(AUTH_KEY);
+  if (raw === 'guest') return null;              // signed out
+  if (!raw) return DEMO_USER;                    // first visit — demo customer
+  try { return JSON.parse(raw) || DEMO_USER; } catch { return DEMO_USER; }
+}
+
+function saveUser(user) {
+  localStorage.setItem(AUTH_KEY, JSON.stringify(user));
+}
+
+function signOut() {
+  localStorage.setItem(AUTH_KEY, 'guest');
+}
+
+function userFullName(user) {
+  return [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+}
+
+function userPhone(user) {
+  return `${user.countryCode || '+965'} ${user.phone || ''}`.trim();
+}
+
+// Header greeting on every page: the name when signed in, a "Sign in"
+// link when not. data-en / data-ar are set too, so the language toggle
+// keeps translating the greeting afterwards.
+function renderAuthState() {
+  const user = loadUser();
+
+  document.querySelectorAll('.bb-user-name').forEach((el) => {
+    const name = user ? userFullName(user) : '';
+    el.dataset.en = name;
+    el.dataset.ar = name;
+    el.textContent = name;
+  });
+
+  document.querySelectorAll('.bb-profile-btn').forEach((btn) => {
+    const greeting = btn.querySelector('[data-en="Hi"], [data-en="Sign in"]');
+    if (!greeting) return;
+    if (user) {
+      greeting.dataset.en = 'Hi';
+      greeting.dataset.ar = 'مرحباً';
+      btn.href = 'profile.html';
+    } else {
+      greeting.dataset.en = 'Sign in';
+      greeting.dataset.ar = 'تسجيل الدخول';
+      btn.href = 'login.html';
+    }
+    greeting.textContent = isArabic() ? greeting.dataset.ar : greeting.dataset.en;
+  });
+
+  document.querySelectorAll('.bb-user-phone').forEach((el) => {
+    el.textContent = user ? userPhone(user) : '';
+  });
+}
+
+renderAuthState();
+
+/* ============================================================
+   10. LOGIN PAGE
+   Only runs when #loginPage exists (login.html).
+   .NET later: the form POSTs to an Account/Login action and this
+   block goes away; the markup does not change.
+============================================================ */
+function initLoginPage() {
+  const form = document.getElementById('loginForm');
+  if (!form) return;
+
+  const email = document.getElementById('loginEmail');
+  const password = document.getElementById('loginPassword');
+  const failed = document.getElementById('loginError');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    failed.classList.add('hidden');
+
+    const badEmail = !isEmail(email.value);
+    const badPassword = password.value.trim().length < 1;
+    setFieldError('loginEmail', 'loginEmailError', badEmail);
+    setFieldError('loginPassword', 'loginPasswordError', badPassword);
+    if (badEmail || badPassword) return;
+
+    // Demo: any password of 6+ characters signs the customer in. The
+    // real check happens on the server.
+    if (password.value.length < 6) {
+      failed.classList.remove('hidden');
+      return;
+    }
+
+    // Keep the saved profile if it is the same customer coming back,
+    // so their name and number survive a sign-out / sign-in.
+    const saved = loadUser() || {};
+    const sameCustomer = saved.email === email.value.trim().toLowerCase();
+    saveUser({
+      ...DEMO_USER,
+      ...(sameCustomer ? saved : {}),
+      email: email.value.trim().toLowerCase(),
+    });
+
+    location.href = 'index.html';
+  });
+}
+
+initLoginPage();
+
+/* ============================================================
+   11. REGISTER PAGE — one page: name, email + 6-digit code, password
+   Only runs when #registerForm exists (register.html).
+   Nothing else is asked at sign-up; the mobile number and delivery
+   address are collected at the first checkout instead.
+   .NET later: "Send code" calls a SendEmailOtp action and the form
+   POSTs to Register.
+============================================================ */
+function initRegisterPage() {
+  const form = document.getElementById('registerForm');
+  if (!form) return;
+
+  let emailVerified = false;
+
+  const emailInput = document.getElementById('regEmail');
+  const otpPanel = document.getElementById('otpPanel');
+  const verifiedBadge = document.getElementById('emailVerified');
+  const sendBtn = document.getElementById('sendOtpBtn');
+
+  /* ---------- email verification ---------- */
+  const otp = initOtpGroup('otpInputs', () => document.getElementById('otpError').classList.add('hidden'));
+
+  sendBtn.addEventListener('click', () => {
+    const bad = !isEmail(emailInput.value);
+    setFieldError('regEmail', 'regEmailError', bad);
+    if (bad) return;
+
+    document.getElementById('otpTarget').textContent = emailInput.value.trim();
+    otpPanel.classList.remove('hidden');
+    document.getElementById('otpError').classList.add('hidden');
+    otp.clear();
+    otp.focus();
+    startResendCountdown('otpTimer', 'otpTimerWrap', 'resendOtpBtn');
+
+    sendBtn.dataset.en = 'Code sent';
+    sendBtn.dataset.ar = 'تم الإرسال';
+    sendBtn.textContent = isArabic() ? sendBtn.dataset.ar : sendBtn.dataset.en;
+  });
+
+  document.getElementById('resendOtpBtn').addEventListener('click', () => {
+    otp.clear();
+    otp.focus();
+    document.getElementById('otpError').classList.add('hidden');
+    startResendCountdown('otpTimer', 'otpTimerWrap', 'resendOtpBtn');
+  });
+
+  document.getElementById('verifyOtpBtn').addEventListener('click', () => {
+    if (otp.value !== DEMO_OTP) {
+      otp.markInvalid();
+      document.getElementById('otpError').classList.remove('hidden');
+      return;
+    }
+    emailVerified = true;
+    otpPanel.classList.add('hidden');
+    verifiedBadge.classList.remove('hidden');
+    emailInput.readOnly = true;
+    sendBtn.classList.add('hidden');
+    document.getElementById('registerError').classList.add('hidden');
+  });
+
+  document.getElementById('changeEmailBtn').addEventListener('click', () => {
+    emailVerified = false;
+    verifiedBadge.classList.add('hidden');
+    emailInput.readOnly = false;
+    sendBtn.classList.remove('hidden');
+    sendBtn.dataset.en = 'Send code';
+    sendBtn.dataset.ar = 'إرسال الرمز';
+    sendBtn.textContent = isArabic() ? sendBtn.dataset.ar : sendBtn.dataset.en;
+    emailInput.focus();
+  });
+
+  /* ---------- password strength ---------- */
+  bindStrengthMeter('regPassword', 'regStrength', 'regStrengthLabel');
+
+  /* ---------- create the account ---------- */
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const first = document.getElementById('regFirstName').value.trim();
+    const last = document.getElementById('regLastName').value.trim();
+    const pass = document.getElementById('regPassword').value;
+    const pass2 = document.getElementById('regPassword2').value;
+
+    // The mismatch message sits under the confirm field; everything
+    // else rolls up into the one message above the button.
+    const mismatch = pass !== pass2;
+    setFieldError('regPassword2', 'regPassword2Error', mismatch && pass2.length > 0);
+
+    const bad = !first || !last || !emailVerified
+      || pass.length < 8 || mismatch
+      || !document.getElementById('regTerms').checked;
+    document.getElementById('registerError').classList.toggle('hidden', !bad);
+    if (bad) return;
+
+    saveUser({
+      firstName: first,
+      lastName: last,
+      email: emailInput.value.trim().toLowerCase(),
+      countryCode: '+965',
+      phone: '',
+    });
+
+    location.href = 'index.html';
+  });
+}
+
+initRegisterPage();
+
+/* ============================================================
+   12. FORGOT PASSWORD — email → code → new password → done
+   Only runs when #forgotPage exists (forgot-password.html).
+   .NET later: three actions on the Account controller; the demo
+   code below is replaced by a signed reset token.
+============================================================ */
+function initForgotPasswordPage() {
+  const page = document.getElementById('forgotPage');
+  if (!page) return;
+
+  const panels = Array.from(page.querySelectorAll('.bb-fp-step'));
+  function showPanel(name) {
+    panels.forEach((p) => p.classList.toggle('hidden', p.dataset.fpStep !== name));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const emailInput = document.getElementById('fpEmail');
+  const otp = initOtpGroup('fpOtpInputs', () => document.getElementById('fpOtpError').classList.add('hidden'));
+
+  document.getElementById('fpSendBtn').addEventListener('click', () => {
+    const bad = !isEmail(emailInput.value);
+    setFieldError('fpEmail', 'fpEmailError', bad);
+    if (bad) return;
+
+    document.getElementById('fpTarget').textContent = emailInput.value.trim();
+    showPanel('otp');
+    otp.clear();
+    otp.focus();
+    startResendCountdown('fpTimer', 'fpTimerWrap', 'fpResendBtn');
+  });
+
+  document.getElementById('fpResendBtn').addEventListener('click', () => {
+    otp.clear();
+    otp.focus();
+    document.getElementById('fpOtpError').classList.add('hidden');
+    startResendCountdown('fpTimer', 'fpTimerWrap', 'fpResendBtn');
+  });
+
+  document.getElementById('fpVerifyBtn').addEventListener('click', () => {
+    if (otp.value !== DEMO_OTP) {
+      otp.markInvalid();
+      document.getElementById('fpOtpError').classList.remove('hidden');
+      return;
+    }
+    showPanel('password');
+  });
+
+  document.getElementById('fpBackToEmail').addEventListener('click', () => showPanel('email'));
+
+  bindStrengthMeter('fpPassword', 'fpStrength', 'fpStrengthLabel');
+
+  document.getElementById('fpResetBtn').addEventListener('click', () => {
+    const pass = document.getElementById('fpPassword').value;
+    const pass2 = document.getElementById('fpPassword2').value;
+    const bad = pass.length < 8 || pass !== pass2;
+    setFieldError('fpPassword2', 'fpPasswordError', bad);
+    if (bad) return;
+    showPanel('done');
+  });
+}
+
+initForgotPasswordPage();
+
+/* ============================================================
+   13. PROFILE PAGE — signed-in card, sign out
+   Only runs when #profileSignedIn exists (profile.html).
+============================================================ */
+function initProfilePage() {
+  const signedIn = document.getElementById('profileSignedIn');
+  if (!signedIn) return;
+
+  const signedOut = document.getElementById('profileSignedOut');
+  const user = loadUser();
+
+  signedIn.classList.toggle('hidden', !user);
+  if (signedOut) signedOut.classList.toggle('hidden', !!user);
+
+  const logout = document.getElementById('logoutBtn');
+  if (logout) logout.addEventListener('click', () => {
+    signOut();
+    location.href = 'login.html';
+  });
+}
+
+initProfilePage();
+
+/* ============================================================
+   14. ACCOUNT DETAILS — edit the fields shown on the profile card
+   Only runs when #accountDetailsForm exists (account-details.html).
+============================================================ */
+function initAccountDetailsPage() {
+  const form = document.getElementById('accountDetailsForm');
+  if (!form) return;
+
+  const user = loadUser() || DEMO_USER;
+  document.getElementById('acFirstName').value = user.firstName || '';
+  document.getElementById('acLastName').value = user.lastName || '';
+  document.getElementById('acEmail').value = user.email || '';
+  document.getElementById('acPhone').value = user.phone || '';
+  document.getElementById('acCountryCode').value = user.countryCode || '+965';
+  document.getElementById('acLanguage').value = document.documentElement.lang;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveUser({
+      ...user,
+      firstName: document.getElementById('acFirstName').value.trim(),
+      lastName: document.getElementById('acLastName').value.trim(),
+      email: document.getElementById('acEmail').value.trim().toLowerCase(),
+      countryCode: document.getElementById('acCountryCode').value,
+      phone: document.getElementById('acPhone').value.trim(),
+    });
+
+    // The chosen language applies straight away, like the profile switch
+    const lang = document.getElementById('acLanguage').value;
+    if (lang !== document.documentElement.lang) applyLanguage(lang);
+
+    renderAuthState();
+    document.getElementById('acSaved').classList.remove('hidden');
+  });
+}
+
+initAccountDetailsPage();
+
+/* ============================================================
+   15. DELIVERY ADDRESSES — the list checkout reads from
+   Only runs when #accountAddresses exists (account-addresses.html).
+   The first address in the list is the default one, so "make
+   default" simply moves it to the front.
+   .NET later: Account/Addresses with Add / Edit / Delete actions.
+============================================================ */
+function initAccountAddressesPage() {
+  const page = document.getElementById('accountAddresses');
+  if (!page) return;
+
+  const list = document.getElementById('addressList');
+  const formCard = document.getElementById('addressForm');
+  const areaSelect = document.getElementById('aaArea');
+  let editingId = null;
+
+  const FIELDS = {
+    aaLabel: 'label', aaType: 'type', aaArea: 'area', aaBlock: 'block',
+    aaStreet: 'street', aaAvenue: 'avenue', aaBuilding: 'building',
+    aaFloor: 'floor', aaFlat: 'flat', aaPhone: 'phone', aaDirections: 'directions',
+  };
+
+  function addresses() { return loadAddresses(); }
+  function persist(next) { localStorage.setItem(ADDRESS_KEY, JSON.stringify(next)); }
+
+  function renderAreas() {
+    const ar = isArabic();
+    areaSelect.innerHTML = AREAS
+      .map((a) => `<option value="${escapeHtml(a.en)}">${escapeHtml(ar ? a.ar : a.en)}</option>`)
+      .join('');
+  }
+
+  /* ---------- the saved list ---------- */
+  function renderList() {
+    const saved = addresses();
+
+    if (!saved.length) {
+      list.innerHTML = `
+        <div class="text-center py-10">
+          <div class="text-4xl mb-2">📍</div>
+          <p class="font-extrabold text-gray-700 text-sm"
+             data-en="No saved addresses yet" data-ar="لا توجد عناوين محفوظة">No saved addresses yet</p>
+          <p class="text-xs text-gray-400 font-semibold mt-1"
+             data-en="Add one and it appears at checkout" data-ar="أضف عنواناً وسيظهر عند الدفع">Add one and it appears at checkout</p>
+        </div>`;
+      applyLanguage(document.documentElement.lang);
+      return;
+    }
+
+    // REPEATABLE: one .bb-saved-card per saved address
+    list.innerHTML = saved.map((a, i) => `
+      <div class="bb-saved-card${i === 0 ? ' is-default' : ''}">
+        <div class="flex items-start gap-3">
+          <span class="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center shrink-0">
+            <svg class="w-4.5 h-4.5 text-brand-green" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          </span>
+          <div class="flex-1 min-w-0">
+            <p class="text-[13px] font-extrabold text-gray-900"
+               data-en="${escapeHtml(a.label)}" data-ar="${escapeHtml(addressName(a, true))}">${escapeHtml(addressName(a, isArabic()))}</p>
+            <p class="text-[11.5px] font-bold text-gray-500 mt-0.5 leading-relaxed"
+               data-en="${escapeHtml(addressLine(a, false))}" data-ar="${escapeHtml(addressLine(a, true))}">${escapeHtml(addressLine(a, isArabic()))}</p>
+            ${a.phone ? `<p class="text-[11px] font-bold text-gray-400 mt-1" dir="ltr">${escapeHtml(a.phone)}</p>` : ''}
+          </div>
+          ${i === 0 ? '<span class="bb-saved-tag shrink-0" data-en="Default" data-ar="افتراضي">Default</span>' : ''}
+        </div>
+        <div class="flex items-center gap-4 mt-3">
+          <button type="button" class="bb-link-btn" data-addr-edit="${escapeHtml(a.id)}"
+                  data-en="Edit" data-ar="تعديل">Edit</button>
+          ${i === 0 ? '' : `<button type="button" class="bb-link-btn" data-addr-default="${escapeHtml(a.id)}"
+                  data-en="Make default" data-ar="تعيين كافتراضي">Make default</button>`}
+          <button type="button" class="bb-link-btn bb-link-btn--danger" data-addr-delete="${escapeHtml(a.id)}"
+                  data-en="Delete" data-ar="حذف">Delete</button>
+        </div>
+      </div>`).join('');
+
+    applyLanguage(document.documentElement.lang);
+  }
+
+  /* ---------- the add / edit form ---------- */
+  function openForm(address) {
+    editingId = address ? address.id : null;
+    renderAreas();
+
+    Object.entries(FIELDS).forEach(([id, key]) => {
+      const el = document.getElementById(id);
+      el.value = address ? (address[key] || '') : '';
+    });
+    if (!address) document.getElementById('aaType').value = 'house';
+
+    const title = document.getElementById('addressFormTitle');
+    title.dataset.en = address ? 'Edit address' : 'New address';
+    title.dataset.ar = address ? 'تعديل العنوان' : 'عنوان جديد';
+    title.textContent = isArabic() ? title.dataset.ar : title.dataset.en;
+
+    document.getElementById('aaError').classList.add('hidden');
+    formCard.classList.remove('hidden');
+    formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function closeForm() {
+    editingId = null;
+    formCard.classList.add('hidden');
+  }
+
+  document.getElementById('addAddressBtn').addEventListener('click', () => openForm(null));
+  document.getElementById('aaCancel').addEventListener('click', closeForm);
+
+  document.getElementById('aaSave').addEventListener('click', () => {
+    const area = document.getElementById('aaArea').value;
+    const block = document.getElementById('aaBlock').value.trim();
+    const street = document.getElementById('aaStreet').value.trim();
+    if (!area || !block || !street) {
+      document.getElementById('aaError').classList.remove('hidden');
+      return;
+    }
+
+    const values = {};
+    Object.entries(FIELDS).forEach(([id, key]) => {
+      values[key] = document.getElementById(id).value.trim();
+    });
+    if (!values.label) values.label = 'Home';
+
+    const saved = addresses();
+    if (editingId) {
+      persist(saved.map((a) => (a.id === editingId ? { ...a, ...values } : a)));
+    } else {
+      persist([...saved, { id: `addr-${Date.now()}`, ...values }]);
+    }
+
+    closeForm();
+    renderList();
+  });
+
+  /* ---------- row actions ---------- */
+  list.addEventListener('click', (e) => {
+    const edit = e.target.closest('[data-addr-edit]');
+    if (edit) {
+      const found = addresses().find((a) => a.id === edit.dataset.addrEdit);
+      if (found) openForm(found);
+      return;
+    }
+
+    const makeDefault = e.target.closest('[data-addr-default]');
+    if (makeDefault) {
+      const id = makeDefault.dataset.addrDefault;
+      const saved = addresses();
+      const chosen = saved.find((a) => a.id === id);
+      if (chosen) persist([chosen, ...saved.filter((a) => a.id !== id)]);
+      renderList();
+      return;
+    }
+
+    const remove = e.target.closest('[data-addr-delete]');
+    if (remove) {
+      const id = remove.dataset.addrDelete;
+      persist(addresses().filter((a) => a.id !== id));
+      if (editingId === id) closeForm();
+      renderList();
+    }
+  });
+
+  renderAreas();
+  renderList();
+
+  // Redraw in the other language when the customer switches it
+  const langBtn = document.getElementById('langToggle');
+  if (langBtn) langBtn.addEventListener('click', () => {
+    const chosen = areaSelect.value;
+    renderAreas();
+    areaSelect.value = chosen;
+    renderList();
+  });
+}
+
+initAccountAddressesPage();
+
+/* ============================================================
+   16. PAYMENT METHODS — saved cards + the preferred method
+   Only runs when #accountPayments exists (account-payments.html).
+   The preferred method uses the same option rows as checkout, so
+   the two screens read identically.
+============================================================ */
+const PREFERRED_PAYMENT_KEY = 'bobomart-preferred-payment';
+
+function initAccountPaymentsPage() {
+  const page = document.getElementById('accountPayments');
+  if (!page) return;
+
+  const listEl = document.getElementById('defaultPayment');
+  let activeId = localStorage.getItem(PREFERRED_PAYMENT_KEY);
+  if (!PAYMENTS.some((p) => p.id === activeId)) activeId = PAYMENTS[0].id;
+
+  function renderPreferred() {
+    const ar = isArabic();
+    listEl.innerHTML = '';
+    // REPEATABLE: one .bb-opt per enabled gateway
+    PAYMENTS.forEach((pay) => {
+      const active = pay.id === activeId;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `bb-opt bb-opt--center${active ? ' is-active' : ''}`;
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      const marks = [pay.img, pay.img2].filter(Boolean)
+        .map((src) => `<img src="${src}" alt="" class="bb-pay-img" />`).join('');
+      btn.innerHTML = `
+        <span class="bb-radio"></span>
+        <span class="bb-pay-marks">${marks}</span>
+        <span class="flex-1 min-w-0">
+          <span class="bb-opt-title block" data-en="${pay.en}" data-ar="${pay.ar}">${ar ? pay.ar : pay.en}</span>
+          <span class="bb-opt-sub block" data-en="${pay.subEn}" data-ar="${pay.subAr}">${ar ? pay.subAr : pay.subEn}</span>
+        </span>
+      `;
+      btn.addEventListener('click', () => {
+        activeId = pay.id;
+        localStorage.setItem(PREFERRED_PAYMENT_KEY, activeId);
+        renderPreferred();
+      });
+      listEl.appendChild(btn);
+    });
+  }
+
+  renderPreferred();
+
+  /* ---------- add card form ---------- */
+  const cardForm = document.getElementById('cardForm');
+  document.getElementById('addCardBtn').addEventListener('click', () => {
+    cardForm.classList.toggle('hidden');
+  });
+  document.getElementById('cardCancel').addEventListener('click', () => {
+    cardForm.classList.add('hidden');
+  });
+  document.getElementById('cardSave').addEventListener('click', () => {
+    // Demo only — a real build hands these fields to the gateway and
+    // never sees the card number itself.
+    cardForm.classList.add('hidden');
+  });
+
+  const langBtn = document.getElementById('langToggle');
+  if (langBtn) langBtn.addEventListener('click', renderPreferred);
+}
+
+initAccountPaymentsPage();
+
+/* ============================================================
+   17. NOTIFICATIONS — one stored preference per switch
+   Only runs when #accountNotifications exists.
+   .NET later: Account/Notifications bound to a preferences table.
+============================================================ */
+const NOTIF_KEY = 'bobomart-notifications';
+
+function initAccountNotificationsPage() {
+  const page = document.getElementById('accountNotifications');
+  if (!page) return;
+
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(NOTIF_KEY)) || {}; } catch { saved = {}; }
+
+  const switches = Array.from(page.querySelectorAll('[data-notif]'));
+  switches.forEach((input) => {
+    const key = input.dataset.notif;
+    if (key in saved) input.checked = !!saved[key];
+
+    input.addEventListener('change', () => {
+      const next = {};
+      switches.forEach((s) => { next[s.dataset.notif] = s.checked; });
+      localStorage.setItem(NOTIF_KEY, JSON.stringify(next));
+
+      const note = document.getElementById('notifSaved');
+      note.classList.remove('hidden');
+      clearTimeout(note.dataset.hideId);
+      note.dataset.hideId = String(setTimeout(() => note.classList.add('hidden'), 2500));
+    });
+  });
+}
+
+initAccountNotificationsPage();
+
+/* ============================================================
+   18. DELIVERY INFO — the served areas as chips
+   Only runs when #areaChips exists (delivery-info.html).
+============================================================ */
+function initDeliveryInfoPage() {
+  const chips = document.getElementById('areaChips');
+  if (!chips) return;
+
+  function render() {
+    // REPEATABLE: one chip per served area (areas table)
+    chips.innerHTML = AREAS.map((a) => `
+      <span class="bb-area-chip" data-en="${escapeHtml(a.en)}" data-ar="${escapeHtml(a.ar)}">${escapeHtml(isArabic() ? a.ar : a.en)}</span>
+    `).join('');
+  }
+
+  render();
+  const langBtn = document.getElementById('langToggle');
+  if (langBtn) langBtn.addEventListener('click', render);
+}
+
+initDeliveryInfoPage();
+
+/* ============================================================
+   19. SUPPORT FORM — help page message box
+   Only runs when #supportForm exists (help.html).
+   .NET later: POSTs to a Support action that opens a ticket.
+============================================================ */
+function initSupportForm() {
+  const form = document.getElementById('supportForm');
+  if (!form) return;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = document.getElementById('spEmail').value;
+    const message = document.getElementById('spMessage').value.trim();
+    const bad = !isEmail(email) || message.length < 5;
+
+    document.getElementById('spError').classList.toggle('hidden', !bad);
+    document.getElementById('spSent').classList.toggle('hidden', bad);
+    if (bad) return;
+
+    form.reset();
+  });
+}
+
+initSupportForm();

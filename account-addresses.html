@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — Product</title>
+  <title>BoboMart — Delivery addresses</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="css/custom.css" />
 </head>
 
-<body class="bb-page font-en bg-white text-gray-800 pb-28 md:pb-0">
+<body class="bb-page font-en bg-white text-gray-800 pb-20 md:pb-0">
 
   <!-- OFFER STRIP -->
   <div class="bb-offer-strip bg-brand-green text-white text-center text-xs sm:text-sm font-bold py-2 px-4">
@@ -84,106 +84,125 @@
       </div>
     </div>
   </header>
+  <main class="max-w-3xl mx-auto px-4">
 
-  <!-- ============================================================
-       PRODUCT DETAIL — quick-commerce style single product view.
-       Big image, name, pack, price and a short description with an
-       "Add to cart" buy bar. Rendered by js/main.js from ?id=<id>.
-       .NET later: server renders /product/{id} from the DB.
-  ============================================================ -->
-  <main class="max-w-5xl mx-auto px-4">
 
     <!-- Back bar -->
     <div class="pt-4 pb-1">
-      <button onclick="history.length > 1 ? history.back() : location.assign('index.html')"
-              class="bb-back-btn inline-flex items-center gap-1.5 text-sm font-extrabold text-gray-600 hover:text-brand-green transition"
-              aria-label="Go back">
+      <a href="profile.html" class="bb-back-btn inline-flex items-center gap-1.5 text-sm font-extrabold text-gray-600 hover:text-brand-green transition">
         <svg class="bb-chevron w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
-        <span data-en="Back" data-ar="رجوع">Back</span>
-      </button>
-    </div>
-
-    <!-- Product found -->
-    <div id="productDetail" class="py-3 md:py-6 md:flex md:items-start md:gap-10">
-
-      <!-- Image -->
-      <div class="md:w-2/5 md:shrink-0 md:sticky md:top-24">
-        <div class="relative bg-gray-50 border border-gray-100 rounded-3xl p-5 md:p-8">
-          <span id="productDiscount" class="bb-discount-badge hidden absolute top-4 left-4 bg-brand-orange text-white text-xs font-extrabold rounded-full px-2.5 py-1">-0%</span>
-          <img id="productImg" src="" alt="" class="w-full aspect-square object-contain mx-auto" />
-        </div>
-      </div>
-
-      <!-- Info -->
-      <div class="mt-5 md:mt-0 md:flex-1 md:min-w-0">
-
-        <!-- Delivery time chip (quick-commerce signature) -->
-        <span class="inline-flex items-center gap-1 bg-brand-greenlight text-brand-green text-[11px] font-extrabold rounded-full px-2.5 py-1">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          <span data-en="Delivered in 20 min" data-ar="التوصيل خلال ٢٠ دقيقة">Delivered in 20 min</span>
-        </span>
-
-        <h1 id="productName" class="text-xl md:text-2xl font-extrabold mt-3 leading-snug">Product</h1>
-        <span id="productPack" class="inline-block text-xs font-extrabold text-brand-green bg-brand-greenlight rounded-full px-2.5 py-1 mt-2"></span>
-
-        <!-- Price — "KD" first, in the same font style as the amount -->
-        <div class="bb-price-row flex items-baseline gap-3 mt-4">
-          <span class="bb-price text-2xl md:text-3xl font-extrabold text-gray-900">
-            <span data-en="KD" data-ar="د.ك">KD</span> <span id="productPrice">0.000</span>
-          </span>
-          <span id="productOldPrice" class="bb-price-old hidden text-gray-400 text-lg line-through font-bold"></span>
-        </div>
-        <p class="text-[11px] font-bold text-gray-400 mt-1" data-en="Inclusive of all taxes" data-ar="شامل جميع الضرائب">Inclusive of all taxes</p>
-
-        <!-- Short description -->
-        <section class="mt-6">
-          <h2 class="text-sm font-extrabold text-gray-900 mb-1.5" data-en="About this product" data-ar="عن المنتج">About this product</h2>
-          <p id="productDesc" class="text-sm leading-relaxed text-gray-600"></p>
-        </section>
-
-        <!-- Quick highlights -->
-        <div class="grid grid-cols-3 gap-2 mt-6">
-          <div class="text-center bg-gray-50 border border-gray-100 rounded-2xl py-3 px-1">
-            <svg class="w-5 h-5 mx-auto text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
-            <p class="text-[10px] font-extrabold text-gray-600 mt-1.5 leading-tight" data-en="Fast delivery" data-ar="توصيل سريع">Fast delivery</p>
-          </div>
-          <div class="text-center bg-gray-50 border border-gray-100 rounded-2xl py-3 px-1">
-            <svg class="w-5 h-5 mx-auto text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
-            <p class="text-[10px] font-extrabold text-gray-600 mt-1.5 leading-tight" data-en="Freshness guaranteed" data-ar="طازج ومضمون">Freshness guaranteed</p>
-          </div>
-          <div class="text-center bg-gray-50 border border-gray-100 rounded-2xl py-3 px-1">
-            <svg class="w-5 h-5 mx-auto text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-            <p class="text-[10px] font-extrabold text-gray-600 mt-1.5 leading-tight" data-en="Easy returns" data-ar="إرجاع سهل">Easy returns</p>
-          </div>
-        </div>
-
-        <!-- BUY BAR — fixed at the bottom on mobile, inline on desktop -->
-        <div class="bb-buy-bar fixed inset-x-0 bottom-0 z-40 bg-white border-t border-gray-100 px-4 py-3
-                    md:static md:mt-8 md:border md:border-gray-100 md:rounded-2xl md:p-4">
-          <div class="max-w-5xl mx-auto flex items-center gap-4">
-            <div class="shrink-0">
-              <div class="flex items-baseline gap-2">
-                <span class="text-lg font-extrabold text-gray-900" id="productPriceBar"></span>
-              </div>
-              <span class="text-[11px] font-bold text-gray-400" data-en="Best price" data-ar="أفضل سعر">Best price</span>
-            </div>
-            <div id="productCartControl" class="bb-cart-control ml-auto w-40 md:w-52" data-variant="wide" data-product=""></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Product not found -->
-    <div id="productNotFound" class="hidden text-center py-20">
-      <p class="text-base font-extrabold text-gray-500" data-en="Product not found" data-ar="المنتج غير موجود">Product not found</p>
-      <a href="index.html" class="inline-block mt-4 bg-brand-green text-white text-sm font-extrabold rounded-full px-6 py-2.5"
-         data-en="Back to home" data-ar="العودة للرئيسية">Back to home</a>
+        <span data-en="Back to profile" data-ar="رجوع إلى حسابي">Back to profile</span>
+      </a>
     </div>
 
     <!-- ============================================================
-         FOOTER — sitewide links (mobile + desktop)
-         .NET: becomes a shared _Footer partial
+         DELIVERY ADDRESSES — the same saved addresses checkout uses
+         The list is rendered from the stored addresses, so anything
+         added here shows up in the checkout dropdown straight away.
+         .NET later: Account/Addresses view + Add/Edit/Delete actions.
     ============================================================ -->
+    <section id="accountAddresses" class="mb-2">
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mt-2"
+          data-en="Delivery addresses" data-ar="عناوين التوصيل">Delivery addresses</h1>
+      <p class="text-xs font-bold text-gray-400 mt-1 mb-5"
+         data-en="These are the addresses you can pick from at checkout."
+         data-ar="هذه هي العناوين التي يمكنك اختيارها عند إتمام الطلب.">These are the addresses you can pick from at checkout.</p>
+
+      <!-- REPEATABLE: one .bb-saved-card per saved address (JS / Razor loop) -->
+      <div id="addressList" class="space-y-3"></div>
+
+      <!-- Add / edit form — opens under the list, no separate page -->
+      <button type="button" id="addAddressBtn" class="bb-add-tile mt-4">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span data-en="Add a new address" data-ar="إضافة عنوان جديد">Add a new address</span>
+      </button>
+
+      <section id="addressForm" class="bb-checkout-card mt-4 hidden">
+        <h2 class="bb-checkout-card-title">
+          <span class="bb-checkout-card-num">+</span>
+          <span id="addressFormTitle" data-en="New address" data-ar="عنوان جديد">New address</span>
+        </h2>
+
+        <div class="space-y-3">
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label class="bb-label" for="aaLabel" data-en="Address profile" data-ar="اسم العنوان">Address profile</label>
+              <input id="aaLabel" type="text" class="bb-field"
+                     data-placeholder-en="Home, Work, Mum's place…" data-placeholder-ar="المنزل، العمل، بيت العائلة…"
+                     placeholder="Home, Work, Mum's place…" />
+            </div>
+            <div>
+              <label class="bb-label" for="aaType" data-en="Property type" data-ar="نوع العقار">Property type</label>
+              <select id="aaType" class="bb-field bb-select">
+                <option value="house" data-en="House" data-ar="منزل">House</option>
+                <option value="apartment" data-en="Apartment" data-ar="شقة">Apartment</option>
+                <option value="office" data-en="Office" data-ar="مكتب">Office</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="bb-label" for="aaArea" data-en="Area *" data-ar="المنطقة *">Area *</label>
+            <!-- REPEATABLE: <option> per served area (JS / Razor loop) -->
+            <select id="aaArea" class="bb-field bb-select"></select>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="bb-label" for="aaBlock" data-en="Block *" data-ar="القطعة *">Block *</label>
+              <input id="aaBlock" type="text" class="bb-field" placeholder="4" />
+            </div>
+            <div>
+              <label class="bb-label" for="aaStreet" data-en="Street *" data-ar="الشارع *">Street *</label>
+              <input id="aaStreet" type="text" class="bb-field" placeholder="12" />
+            </div>
+            <div>
+              <label class="bb-label" for="aaAvenue" data-en="Avenue" data-ar="الجادة">Avenue</label>
+              <input id="aaAvenue" type="text" class="bb-field" placeholder="3" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="bb-label" for="aaBuilding" data-en="Building / House" data-ar="المبنى / المنزل">Building / House</label>
+              <input id="aaBuilding" type="text" class="bb-field" placeholder="8" />
+            </div>
+            <div>
+              <label class="bb-label" for="aaFloor" data-en="Floor" data-ar="الطابق">Floor</label>
+              <input id="aaFloor" type="text" class="bb-field" placeholder="2" />
+            </div>
+            <div>
+              <label class="bb-label" for="aaFlat" data-en="Flat / Office" data-ar="الشقة / المكتب">Flat / Office</label>
+              <input id="aaFlat" type="text" class="bb-field" placeholder="3" />
+            </div>
+          </div>
+
+          <div>
+            <label class="bb-label" for="aaPhone" data-en="Contact number" data-ar="رقم الاتصال">Contact number</label>
+            <input id="aaPhone" type="tel" class="bb-field" dir="ltr" placeholder="+965 0000 0000" />
+          </div>
+
+          <div>
+            <label class="bb-label" for="aaDirections" data-en="Extra directions" data-ar="تعليمات إضافية">Extra directions</label>
+            <textarea id="aaDirections" rows="2" class="bb-field resize-none"
+                      data-placeholder-en="Near the pharmacy, white gate…"
+                      data-placeholder-ar="قرب الصيدلية، بوابة بيضاء…"
+                      placeholder="Near the pharmacy, white gate…"></textarea>
+          </div>
+
+          <p id="aaError" class="bb-field-error hidden"
+             data-en="Please fill in the area, block and street"
+             data-ar="يرجى إدخال المنطقة والقطعة والشارع">Please fill in the area, block and street</p>
+        </div>
+
+        <div class="flex gap-3 mt-5">
+          <button type="button" id="aaCancel" class="bb-btn bb-btn--ghost"
+                  data-en="Cancel" data-ar="إلغاء">Cancel</button>
+          <button type="button" id="aaSave" class="bb-btn bb-btn--primary"
+                  data-en="Save address" data-ar="حفظ العنوان">Save address</button>
+        </div>
+      </section>
+    </section>
     <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
@@ -250,6 +269,31 @@
       </div>
     </footer>
   </main>
+
+  <!-- BOTTOM TAB BAR — mobile only -->
+  <nav class="bb-tabbar md:hidden fixed bottom-0 inset-x-0 z-50 bg-white border-t border-gray-100 flex justify-around items-center py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <a href="index.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Home" data-ar="الرئيسية">Home</span>
+    </a>
+    <a href="categories.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Categories" data-ar="الفئات">Categories</span>
+    </a>
+    <a href="cart.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400 relative">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Cart" data-ar="السلة">Cart</span>
+      <span class="bb-cart-badge absolute -top-1.5 right-1 bg-brand-orange text-white text-[9px] font-bold rounded-full min-w-[16px] min-h-[16px] flex items-center justify-center">0</span>
+    </a>
+    <a href="orders.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
+    </a>
+    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
+    </a>
+  </nav>
 
   <script src="js/main.js"></script>
 </body>
