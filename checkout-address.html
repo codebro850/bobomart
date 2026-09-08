@@ -109,7 +109,7 @@
         data-en="Delivery address" data-ar="عنوان التوصيل">Delivery address</h1>
 
     <!-- Funnel trail: Address → Payment → Confirm -->
-    <div class="bb-steps mt-4 mb-6 max-w-md">
+    <div class="bb-steps mt-4 mb-6 max-w-lg">
       <div class="bb-step is-active">
         <span class="bb-step-num">1</span>
         <span class="bb-step-label" data-en="Address" data-ar="العنوان">Address</span>
@@ -117,11 +117,16 @@
       <span class="bb-step-sep"></span>
       <div class="bb-step">
         <span class="bb-step-num">2</span>
-        <span class="bb-step-label" data-en="Payment" data-ar="الدفع">Payment</span>
+        <span class="bb-step-label" data-en="Verify" data-ar="التحقق">Verify</span>
       </div>
       <span class="bb-step-sep"></span>
       <div class="bb-step">
         <span class="bb-step-num">3</span>
+        <span class="bb-step-label" data-en="Payment" data-ar="الدفع">Payment</span>
+      </div>
+      <span class="bb-step-sep"></span>
+      <div class="bb-step">
+        <span class="bb-step-num">4</span>
         <span class="bb-step-label" data-en="Confirm" data-ar="التأكيد">Confirm</span>
       </div>
     </div>
@@ -220,11 +225,22 @@
             </div>
           </div>
 
-          <!-- Contact number -->
+          <!-- Contact number — the driver calls this number, and it is
+               the one confirmed by SMS on the next step, so it is required.
+               If the number typed is one this customer already confirmed,
+               the tick appears and the next step is skipped. -->
           <div>
-            <label class="bb-label" for="addrPhone" data-en="Contact number" data-ar="رقم الاتصال">Contact number</label>
+            <label class="bb-label" for="addrPhone" data-en="Contact number *" data-ar="رقم الاتصال *">Contact number *</label>
             <!-- Dummy hint: a Kuwaiti number never starts with 0, so this can never be real -->
             <input id="addrPhone" type="tel" class="bb-field" dir="ltr" placeholder="+965 0000 0000" />
+            <div id="addrPhoneVerified" class="hidden mt-2">
+              <span class="bb-verified">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg>
+                <span data-en="Already verified" data-ar="تم التحقق مسبقاً">Already verified</span>
+              </span>
+              <span class="text-[11px] font-bold text-gray-400 ms-2"
+                    data-en="No code needed this time" data-ar="لا حاجة لرمز هذه المرة">No code needed this time</span>
+            </div>
           </div>
 
           <!-- Extra directions -->
@@ -237,14 +253,14 @@
           </div>
 
           <p id="addrError" class="hidden bb-promo-msg is-bad"
-             data-en="Please fill in the area, block and street"
-             data-ar="يرجى إدخال المنطقة والقطعة والشارع">Please fill in the area, block and street</p>
+             data-en="Please fill in the area, block, street and contact number"
+             data-ar="يرجى إدخال المنطقة والقطعة والشارع ورقم الاتصال">Please fill in the area, block, street and contact number</p>
         </div>
 
         <!-- Desktop continue (mobile uses the fixed bar below) -->
         <button id="addressContinue"
                 class="hidden md:block w-full mt-5 bg-brand-orange text-white font-extrabold text-sm rounded-full py-3 hover:opacity-90 transition"
-                data-en="Continue to payment" data-ar="المتابعة إلى الدفع">Continue to payment</button>
+                data-en="Continue" data-ar="متابعة">Continue</button>
       </section>
     </div>
 
@@ -302,6 +318,7 @@
         <div>
           <h3 class="bb-footer-title" data-en="Help" data-ar="المساعدة">Help</h3>
           <ul class="bb-footer-links">
+            <li><a href="about.html" data-en="About us" data-ar="من نحن">About us</a></li>
             <li><a href="help.html#contact" data-en="Contact us" data-ar="اتصل بنا">Contact us</a></li>
             <li><a href="delivery-info.html" data-en="Delivery information" data-ar="معلومات التوصيل">Delivery information</a></li>
             <li><a href="returns.html" data-en="Returns & refunds" data-ar="الإرجاع والاستبدال">Returns &amp; refunds</a></li>
@@ -323,7 +340,7 @@
   <div id="addressBar" class="bb-place-bar md:hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-100 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
     <button id="addressContinueMobile"
             class="w-full bg-brand-orange text-white font-extrabold text-sm rounded-full py-3.5 hover:opacity-90 transition"
-            data-en="Continue to payment" data-ar="المتابعة إلى الدفع">Continue to payment</button>
+            data-en="Continue" data-ar="متابعة">Continue</button>
   </div>
 
   <script src="js/main.js"></script>

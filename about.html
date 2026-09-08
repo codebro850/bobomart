@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — My Profile</title>
+  <title>BoboMart — About us</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -84,110 +84,133 @@
       </div>
     </div>
   </header>
-
   <main class="max-w-3xl mx-auto px-4">
 
+
     <!-- ============================================================
-         PROFILE — user card + settings menu
-         .NET: user info bound to logged-in user (@Model.User)
+         ABOUT US — who BoboMart is, how the service works, and the
+         promises behind it. Placeholder copy for the design review;
+         the client replaces the story and the numbers before launch.
+         .NET later: a CMS page or a static Razor view.
     ============================================================ -->
-    <section class="bb-profile-page mt-6">
-      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mb-5"
-          data-en="My profile" data-ar="حسابي">My profile</h1>
+    <section id="aboutPage" class="mt-6 mb-2">
 
-      <!-- SIGNED OUT — shown when the customer has logged out.
-           .NET: rendered when User.Identity.IsAuthenticated is false -->
-      <div id="profileSignedOut" class="hidden text-center py-10">
-        <div class="text-5xl mb-3">👋</div>
-        <p class="font-extrabold text-gray-700" data-en="You are not signed in" data-ar="لم تسجل الدخول">You are not signed in</p>
-        <p class="text-sm text-gray-400 font-semibold mt-1"
-           data-en="Sign in to see your addresses, orders and saved cart"
-           data-ar="سجّل دخولك لعرض عناوينك وطلباتك وسلتك المحفوظة">Sign in to see your addresses, orders and saved cart</p>
-        <div class="flex flex-col sm:flex-row gap-3 justify-center mt-6 max-w-sm mx-auto">
-          <a href="login.html" class="bb-btn bb-btn--primary" data-en="Sign in" data-ar="تسجيل الدخول">Sign in</a>
-          <a href="register.html" class="bb-btn bb-btn--ghost" data-en="Create an account" data-ar="أنشئ حساباً">Create an account</a>
+      <!-- Intro -->
+      <h1 class="bb-section-title text-xl md:text-2xl font-extrabold"
+          data-en="About BoboMart" data-ar="عن بوبومارت">About BoboMart</h1>
+      <p class="text-xs font-bold text-gray-400 mt-1"
+         data-en="A neighbourhood grocery run, delivered in minutes."
+         data-ar="تسوق البقالة من حيّك، ويصلك في دقائق.">A neighbourhood grocery run, delivered in minutes.</p>
+
+      <!-- Hero -->
+      <div class="bb-about-hero mt-6 bg-brand-greenlight/60 border border-brand-green/20 rounded-2xl overflow-hidden md:flex md:items-center">
+        <div class="p-5 md:p-7 md:flex-1">
+          <p class="text-[11px] font-extrabold text-brand-orange tracking-wide"
+             data-en="QUICK DELIVERY IN KUWAIT" data-ar="توصيل سريع في الكويت">QUICK DELIVERY IN KUWAIT</p>
+          <h2 class="text-lg md:text-2xl font-extrabold leading-snug mt-2"
+              data-en="Fresh food should not need a car park"
+              data-ar="الطعام الطازج لا يحتاج إلى موقف سيارات">Fresh food should not need a car park</h2>
+          <p class="text-[13px] font-semibold text-gray-600 leading-relaxed mt-3"
+             data-en="BoboMart started with one small shop in Salmiya and a simple promise: the same groceries you would pick yourself, brought to your door before the ice cream melts."
+             data-ar="بدأت بوبومارت من متجر صغير في السالمية بوعد بسيط: نفس المنتجات التي كنت ستختارها بنفسك، تصل إلى بابك قبل أن يذوب الآيس كريم.">BoboMart started with one small shop in Salmiya and a simple promise: the same groceries you would pick yourself, brought to your door before the ice cream melts.</p>
+        </div>
+        <img src="images/hero.jpg" alt=""
+             class="w-full md:w-72 h-44 md:h-56 object-cover md:rounded-2xl md:m-4 md:ms-0" />
+      </div>
+
+      <!-- Numbers
+           REPEATABLE: one tile per headline figure -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+        <div class="bb-about-stat">
+          <p class="bb-about-stat-num" dir="ltr">15</p>
+          <p class="bb-about-stat-label" data-en="Minutes, average delivery" data-ar="دقيقة، متوسط زمن التوصيل">Minutes, average delivery</p>
+        </div>
+        <div class="bb-about-stat">
+          <p class="bb-about-stat-num" dir="ltr">16</p>
+          <p class="bb-about-stat-label" data-en="Areas across Kuwait" data-ar="منطقة في الكويت">Areas across Kuwait</p>
+        </div>
+        <div class="bb-about-stat">
+          <p class="bb-about-stat-num" dir="ltr">2,400+</p>
+          <p class="bb-about-stat-label" data-en="Products on the shelves" data-ar="منتج على الرفوف">Products on the shelves</p>
+        </div>
+        <div class="bb-about-stat">
+          <p class="bb-about-stat-num" dir="ltr">7</p>
+          <p class="bb-about-stat-label" data-en="Days a week, 8 AM – 11 PM" data-ar="أيام أسبوعياً، ٨ ص – ١١ م">Days a week, 8 AM – 11 PM</p>
         </div>
       </div>
 
-      <!-- SIGNED IN — the whole profile, hidden while logged out -->
-      <div id="profileSignedIn">
+      <!-- What we stand for
+           REPEATABLE: one card per promise -->
+      <h2 class="text-base md:text-lg font-extrabold mt-10 mb-4"
+          data-en="What we stand for" data-ar="ما نلتزم به">What we stand for</h2>
 
-      <!-- User card -->
-      <div class="bb-user-card flex items-center gap-4 bg-brand-greenlight/60 border border-brand-green/20 rounded-2xl p-4 md:p-5">
-        <!-- .NET: src bound to @Model.User.AvatarUrl -->
-        <img src="images/profile.jpg" alt="Profile"
-             class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-brand-green shrink-0" />
-        <div class="flex-1 min-w-0">
-          <!-- .NET: @Model.User.FullName / phone -->
-          <p class="bb-user-name font-extrabold text-base md:text-lg truncate">Customer Name</p>
-          <p class="bb-user-phone text-xs text-gray-500 font-bold" dir="ltr">+965 0000 0000</p>
-          <p class="text-[11px] text-brand-green font-extrabold mt-0.5" data-en="⭐ Loyal customer · 24 orders" data-ar="⭐ عميل مميز · ٢٤ طلب">⭐ Loyal customer · 24 orders</p>
+      <div class="grid sm:grid-cols-3 gap-3">
+        <div class="bb-saved-card">
+          <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center">
+            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </span>
+          <p class="text-[13px] font-extrabold text-gray-900 mt-3"
+             data-en="Picked, not scooped" data-ar="نختار بعناية">Picked, not scooped</p>
+          <p class="text-[11.5px] font-bold text-gray-500 mt-1 leading-relaxed"
+             data-en="Our pickers choose your produce the way they would choose their own — and call you before swapping anything."
+             data-ar="يختار فريقنا منتجاتك كما يختارونها لأنفسهم، ويتصلون بك قبل استبدال أي شيء.">Our pickers choose your produce the way they would choose their own — and call you before swapping anything.</p>
         </div>
-        <a href="account-details.html" class="shrink-0 text-xs font-extrabold text-brand-green border border-brand-green/40 rounded-full px-4 py-1.5 hover:bg-brand-green hover:text-white transition"
-           data-en="Edit" data-ar="تعديل">Edit</a>
+
+        <div class="bb-saved-card">
+          <span class="w-9 h-9 rounded-full bg-brand-orangelight flex items-center justify-center">
+            <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </span>
+          <p class="text-[13px] font-extrabold text-gray-900 mt-3"
+             data-en="Honest timing" data-ar="مواعيد صادقة">Honest timing</p>
+          <p class="text-[11.5px] font-bold text-gray-500 mt-1 leading-relaxed"
+             data-en="The window we show is the window we keep. If we are running late, you hear it from us first."
+             data-ar="الوقت الذي نعرضه هو الوقت الذي نلتزم به، وإن تأخرنا فستعرف ذلك منّا أولاً.">The window we show is the window we keep. If we are running late, you hear it from us first.</p>
+        </div>
+
+        <div class="bb-saved-card">
+          <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center">
+            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l8.8 8.8 8.8-8.8a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+          </span>
+          <p class="text-[13px] font-extrabold text-gray-900 mt-3"
+             data-en="Fair to everyone" data-ar="عدالة للجميع">Fair to everyone</p>
+          <p class="text-[11.5px] font-bold text-gray-500 mt-1 leading-relaxed"
+             data-en="Shelf prices, no surge on a rainy evening, and drivers paid for every trip they make."
+             data-ar="أسعار الرفوف نفسها، بلا زيادة في أمسية ممطرة، ومندوبون يتقاضون أجرهم عن كل رحلة.">Shelf prices, no surge on a rainy evening, and drivers paid for every trip they make.</p>
+        </div>
       </div>
 
-      <!-- Settings menu -->
-      <div class="bb-profile-menu mt-5 divide-y divide-gray-100 border border-gray-100 rounded-2xl overflow-hidden">
+      <!-- The longer story -->
+      <div class="bb-prose mt-10">
+        <h2 data-en="How the service works" data-ar="كيف تعمل الخدمة">How the service works</h2>
+        <p data-en="Every order is picked from a real store, not a warehouse on the edge of town. That is why the delivery window is short and the produce still looks like produce when it arrives."
+           data-ar="كل طلب يُجهَّز من متجر حقيقي، لا من مستودع على أطراف المدينة. لذلك تكون مدة التوصيل قصيرة وتصل المنتجات الطازجة كما هي.">Every order is picked from a real store, not a warehouse on the edge of town. That is why the delivery window is short and the produce still looks like produce when it arrives.</p>
+        <ul>
+          <li data-en="You order — packets are sold in fixed sizes, so 1 kg is always 1 kg."
+              data-ar="تطلب — تُباع المنتجات بأحجام محددة، فالكيلوغرام دائماً كيلوغرام.">You order — packets are sold in fixed sizes, so 1 kg is always 1 kg.</li>
+          <li data-en="We pick — chilled and frozen items are packed last, in insulated bags."
+              data-ar="نجهّز — تُعبأ المنتجات المبردة والمجمدة أخيراً في أكياس عازلة.">We pick — chilled and frozen items are packed last, in insulated bags.</li>
+          <li data-en="We drive — you get the driver's number by SMS when he sets off."
+              data-ar="نوصل — يصلك رقم المندوب برسالة نصية عند انطلاقه.">We drive — you get the driver&#39;s number by SMS when he sets off.</li>
+        </ul>
 
-        <!-- Addresses -->
-        <a href="account-addresses.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
-          <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          </span>
-          <span class="flex-1 text-sm font-bold" data-en="Delivery addresses" data-ar="عناوين التوصيل">Delivery addresses</span>
-          <svg class="bb-chevron w-4 h-4 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-        </a>
+        <h2 data-en="Where we source from" data-ar="من أين نشتري">Where we source from</h2>
+        <p data-en="Fruit and vegetables come from the Sulaibiya market most mornings, dairy and bakery from local producers, and the rest from the same distributors that supply Kuwait's supermarkets. Nothing sits on our shelves longer than it would on theirs."
+           data-ar="تأتي الفواكه والخضار من سوق الصليبية في معظم الصباحات، والألبان والمخبوزات من منتجين محليين، وبقية المنتجات من الموزعين الذين يوردون لأسواق الكويت. ولا يبقى أي منتج على رفوفنا أطول مما يبقى على رفوفهم.">Fruit and vegetables come from the Sulaibiya market most mornings, dairy and bakery from local producers, and the rest from the same distributors that supply Kuwait&#39;s supermarkets. Nothing sits on our shelves longer than it would on theirs.</p>
 
-        <!-- Payment methods -->
-        <a href="account-payments.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
-          <span class="w-9 h-9 rounded-full bg-brand-orangelight flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          </span>
-          <span class="flex-1 text-sm font-bold" data-en="Payment methods" data-ar="طرق الدفع">Payment methods</span>
-          <svg class="bb-chevron w-4 h-4 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-        </a>
+        <h2 data-en="Less waste, lighter bags" data-ar="هدر أقل وأكياس أخف">Less waste, lighter bags</h2>
+        <p data-en="Orders are packed in reusable bags the driver takes back on his next visit, and produce close to its date goes to a daily discount shelf rather than a bin."
+           data-ar="تُعبأ الطلبات في أكياس قابلة لإعادة الاستخدام يستعيدها المندوب في زيارته التالية، وتُعرض المنتجات قريبة انتهاء الصلاحية على رف خصومات يومي بدلاً من التخلص منها.">Orders are packed in reusable bags the driver takes back on his next visit, and produce close to its date goes to a daily discount shelf rather than a bin.</p>
 
-        <!-- Language (EN ⇄ AR inside profile, as required) -->
-        <button id="langToggleProfile" class="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition text-start">
-          <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          </span>
-          <span class="flex-1 text-sm font-bold" data-en="Language" data-ar="اللغة">Language</span>
-          <span class="text-xs font-extrabold text-brand-green border border-brand-green/40 rounded-full px-3 py-1"
-                data-en="عربي" data-ar="EN">عربي</span>
-        </button>
-
-        <!-- Notifications -->
-        <a href="account-notifications.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
-          <span class="w-9 h-9 rounded-full bg-brand-orangelight flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          </span>
-          <span class="flex-1 text-sm font-bold" data-en="Notifications" data-ar="الإشعارات">Notifications</span>
-          <svg class="bb-chevron w-4 h-4 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-        </a>
-
-        <!-- Help & support -->
-        <a href="help.html" class="flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 transition">
-          <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          </span>
-          <span class="flex-1 text-sm font-bold" data-en="Help & support" data-ar="المساعدة والدعم">Help &amp; support</span>
-          <svg class="bb-chevron w-4 h-4 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
-        </a>
+        <h2 data-en="Talk to us" data-ar="تواصل معنا">Talk to us</h2>
+        <p data-en="BoboMart is small enough that a message reaches a person, not a queue. Tell us what to stock, what went wrong, or what we should do better."
+           data-ar="بوبومارت صغيرة بما يكفي لتصل رسالتك إلى شخص حقيقي لا إلى قائمة انتظار. أخبرنا بما نضيفه، أو بما حدث من خطأ، أو بما يمكننا تحسينه.">BoboMart is small enough that a message reaches a person, not a queue. Tell us what to stock, what went wrong, or what we should do better.</p>
       </div>
 
-      <!-- Logout -->
-      <!-- .NET: posts to logout action -->
-      <button id="logoutBtn" class="w-full mt-5 border border-red-200 text-red-500 font-extrabold text-sm rounded-full py-3 hover:bg-red-50 transition"
-              data-en="Log out" data-ar="تسجيل الخروج">Log out</button>
-      </div><!-- /#profileSignedIn -->
+      <div class="flex flex-col sm:flex-row gap-3 mt-8">
+        <a href="index.html" class="bb-btn bb-btn--primary" data-en="Start shopping" data-ar="ابدأ التسوق">Start shopping</a>
+        <a href="help.html#contact" class="bb-btn bb-btn--ghost" data-en="Contact us" data-ar="اتصل بنا">Contact us</a>
+      </div>
     </section>
-
-    <!-- ============================================================
-         FOOTER — sitewide links (mobile + desktop)
-         .NET: becomes a shared _Footer partial
-    ============================================================ -->
     <footer class="bb-footer mt-12 md:mt-16 border-t border-gray-100 pt-8">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
 
@@ -275,7 +298,7 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Orders" data-ar="الطلبات">Orders</span>
     </a>
-    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-brand-green">
+    <a href="profile.html" class="bb-tab flex flex-col items-center gap-1 text-gray-400">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="text-[10px] font-extrabold" data-en="Profile" data-ar="حسابي">Profile</span>
     </a>

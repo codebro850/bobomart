@@ -68,6 +68,7 @@ Rules:
 | Home | 🏠 Home | Offer strip, hero/banner, Deal of the Day + countdown, category shortcuts, grocery packets grid |
 | Categories | 🗂 Categories | Fruits & Vegetables, Dairy & Eggs, Bakery, Beverages, Snacks, Rice & Grains, Frozen, Household |
 | Cart | 🛒 Cart | Line items with steppers, subtotal in KD, free-delivery progress bar (100 KD), checkout |
+| Checkout | — | Four steps: address → **mobile verification (SMS code)** → payment → confirmation |
 | Orders | 📦 Orders | Current & past orders with status |
 | Profile | 👤 Profile | Profile picture, details, addresses, language switch |
 
@@ -87,6 +88,7 @@ Rules:
 
 | Page | Description |
 |---|---|
+| `about.html` | Who BoboMart is, headline figures, promises, sourcing |
 | `help.html` | Support channels, FAQ accordion, message form |
 | `delivery-info.html` | Delivery types and fees, served areas, order stages |
 | `returns.html` | Returns, refunds and cancellation policy |
@@ -132,6 +134,8 @@ bobomart/
 ├── register.html        # Create account — name, email OTP, password
 ├── forgot-password.html # Reset password — email → code → new password
 ├── account-*.html       # details · addresses · payments · notifications
+├── checkout-*.html      # address · verify · payment · confirm
+├── about.html           # About us
 ├── help.html            # Help & support (contact, FAQ, message form)
 ├── delivery-info.html   # Delivery types, fees, served areas
 ├── returns.html         # Returns & refunds policy
@@ -163,6 +167,7 @@ Later pages: `categories.html`, `cart.html`, `orders.html`, `profile.html` → e
 - [ ] Orders page
 - [x] Login / register / forgot password (email OTP with 60 s resend)
 - [x] Account pages (details, addresses, payment methods, notifications)
-- [x] Static pages (help & FAQ, delivery information, returns, terms & privacy)
+- [x] Static pages (about us, help & FAQ, delivery information, returns, terms & privacy)
+- [x] Checkout mobile verification (SMS code after the address step; skipped for an already-verified number)
 - [ ] .NET integration (Razor views, dynamic data, real images)
 - [ ] Backend / payments (future)

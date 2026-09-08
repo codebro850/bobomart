@@ -180,6 +180,14 @@
           <div>
             <label class="bb-label" for="aaPhone" data-en="Contact number" data-ar="رقم الاتصال">Contact number</label>
             <input id="aaPhone" type="tel" class="bb-field" dir="ltr" placeholder="+965 0000 0000" />
+            <!-- A number confirmed by SMS on an earlier order needs no
+                 second code, so it reads as verified here too -->
+            <div id="aaPhoneVerified" class="hidden mt-2">
+              <span class="bb-verified">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg>
+                <span data-en="Already verified" data-ar="تم التحقق مسبقاً">Already verified</span>
+              </span>
+            </div>
           </div>
 
           <div>
@@ -253,6 +261,7 @@
         <div>
           <h3 class="bb-footer-title" data-en="Help" data-ar="المساعدة">Help</h3>
           <ul class="bb-footer-links">
+            <li><a href="about.html" data-en="About us" data-ar="من نحن">About us</a></li>
             <li><a href="help.html#contact" data-en="Contact us" data-ar="اتصل بنا">Contact us</a></li>
             <li><a href="delivery-info.html" data-en="Delivery information" data-ar="معلومات التوصيل">Delivery information</a></li>
             <li><a href="returns.html" data-en="Returns & refunds" data-ar="الإرجاع والاستبدال">Returns &amp; refunds</a></li>

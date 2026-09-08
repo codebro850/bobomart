@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BoboMart — Payment</title>
+  <title>BoboMart — Verify mobile number</title>
 
   <!-- Tailwind CSS (CDN — no build step, plays well with .NET Razor) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +35,8 @@
   <link rel="stylesheet" href="css/custom.css" />
 </head>
 
-<!-- No bottom tab bar: the fixed "Place order" bar takes that space on mobile -->
+<!-- No bottom tab bar: checkout is a focused funnel and the fixed
+     "Continue" bar takes that space on mobile (same as product.html) -->
 <body class="bb-page font-en bg-white text-gray-800 pb-28 md:pb-0">
 
   <!-- OFFER STRIP -->
@@ -87,16 +88,12 @@
   </header>
 
   <!-- ============================================================
-       CHECKOUT · STEP 2 of 3 — PAYMENT
-       Five sections, in order:
-         1. the chosen delivery address (+ link back to change it)
-         2. delivery type
-         3. cart details (items + delivery instructions)
-         4. voucher — then the price details it feeds into
-         5. payment (+ place order)
-       Rendered by js/main.js from the checkout draft saved on step 1.
-       .NET later: a Checkout/Payment view; "Place order" POSTs to the
-       order controller and redirects to the confirmation page.
+       CHECKOUT · STEP 1 of 3 — DELIVERY ADDRESS
+       Delivery-address fields only. Saved addresses are picked from a
+       dropdown (no "add new address" click needed — the fields are on
+       the page from the start and fill in from the selection).
+       .NET later: a Checkout/Address view; the dropdown binds to the
+       user's addresses and Continue POSTs the chosen/edited address.
   ============================================================ -->
   <main class="max-w-3xl mx-auto px-4">
 
@@ -109,21 +106,21 @@
     </div>
 
     <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mt-2"
-        data-en="Payment" data-ar="الدفع">Payment</h1>
+        data-en="Verify your mobile number" data-ar="تأكيد رقم جوالك">Verify your mobile number</h1>
 
-    <!-- Funnel trail: Address → Payment → Confirm -->
+    <!-- Funnel trail: Address → Verify → Payment → Confirm -->
     <div class="bb-steps mt-4 mb-6 max-w-lg">
       <div class="bb-step is-done">
         <span class="bb-step-num">1</span>
         <span class="bb-step-label" data-en="Address" data-ar="العنوان">Address</span>
       </div>
       <span class="bb-step-sep is-done"></span>
-      <div class="bb-step is-done">
+      <div class="bb-step is-active">
         <span class="bb-step-num">2</span>
         <span class="bb-step-label" data-en="Verify" data-ar="التحقق">Verify</span>
       </div>
-      <span class="bb-step-sep is-done"></span>
-      <div class="bb-step is-active">
+      <span class="bb-step-sep"></span>
+      <div class="bb-step">
         <span class="bb-step-num">3</span>
         <span class="bb-step-label" data-en="Payment" data-ar="الدفع">Payment</span>
       </div>
@@ -134,7 +131,7 @@
       </div>
     </div>
 
-    <!-- Empty cart — nothing to pay for -->
+    <!-- Empty cart — nothing to check out -->
     <div id="checkoutEmpty" class="hidden text-center py-16">
       <div class="text-5xl mb-3">🛒</div>
       <p class="font-extrabold text-gray-700" data-en="Your cart is empty" data-ar="سلتك فارغة">Your cart is empty</p>
@@ -144,170 +141,106 @@
          data-en="Start shopping" data-ar="ابدأ التسوق">Start shopping</a>
     </div>
 
-    <div id="checkoutPayment" class="space-y-4">
+    <!-- ============================================================
+         CHECKOUT · STEP 2 of 4 — MOBILE VERIFICATION
+         The driver calls the number on the delivery address, so it is
+         confirmed by SMS before payment. A number this customer has
+         already confirmed skips straight through — the panel below
+         says so instead of asking for another code.
+         .NET later: a Checkout/VerifyPhone view; the code is issued and
+         checked server-side and the confirmed number is stored on the
+         customer record.
+    ============================================================ -->
+    <div id="checkoutVerify">
 
-      <!-- 1 · DELIVERY ADDRESS — the important fields of the chosen address -->
+      <!-- THE NUMBER — with a way back to change it -->
       <section class="bb-checkout-card">
-        <div class="flex items-start justify-between gap-3">
-          <h2 class="bb-checkout-card-title mb-0">
-            <span class="bb-checkout-card-num">1</span>
-            <span data-en="Delivery address" data-ar="عنوان التوصيل">Delivery address</span>
-          </h2>
-          <!-- Straight back to step 1 to pick a different address -->
-          <a href="checkout-address.html" class="shrink-0 text-xs font-extrabold text-brand-green hover:opacity-80 transition"
+        <h2 class="bb-checkout-card-title">
+          <span class="bb-checkout-card-num">1</span>
+          <span data-en="Delivery contact number" data-ar="رقم الاتصال للتوصيل">Delivery contact number</span>
+        </h2>
+
+        <div class="flex items-center gap-3">
+          <span class="w-10 h-10 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </span>
+          <div class="flex-1 min-w-0">
+            <p id="verifyTarget" class="text-[15px] font-extrabold text-gray-900" dir="ltr">+965 0000 0000</p>
+            <p id="verifyAddrLine" class="text-[11.5px] font-bold text-gray-500 mt-0.5 leading-relaxed">—</p>
+          </div>
+          <a href="checkout-address.html" class="bb-link-btn shrink-0"
              data-en="Change" data-ar="تغيير">Change</a>
         </div>
-
-        <div class="mt-3 flex items-start gap-3">
-          <span class="w-9 h-9 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
-            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-          </span>
-          <div class="min-w-0">
-            <!-- address profile + area -->
-            <p class="bb-opt-title">
-              <span id="payAddrLabel"></span>
-              <span class="text-gray-300 font-bold mx-1">·</span>
-              <span id="payAddrArea" class="text-brand-green"></span>
-            </p>
-            <p id="payAddrLine" class="bb-opt-sub"></p>
-            <p id="payAddrPhone" class="bb-opt-sub" dir="ltr"></p>
-          </div>
-        </div>
       </section>
 
-      <!-- 2 · DELIVERY TYPE -->
-      <section class="bb-checkout-card">
+      <!-- ALREADY VERIFIED — the same number was confirmed before, so
+           there is nothing to type. Shown instead of the code panel. -->
+      <section id="verifyAlready" class="bb-checkout-card mt-4 hidden">
+        <div class="flex items-start gap-3">
+          <span class="w-10 h-10 rounded-full bg-brand-greenlight flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-brand-green" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg>
+          </span>
+          <div class="flex-1 min-w-0">
+            <p class="text-[13px] font-extrabold text-gray-900"
+               data-en="This number is already verified" data-ar="هذا الرقم تم التحقق منه مسبقاً">This number is already verified</p>
+            <p class="text-[11.5px] font-bold text-gray-500 mt-1 leading-relaxed"
+               data-en="You confirmed it on an earlier order, so there is no code to enter this time."
+               data-ar="لقد أكدته في طلب سابق، لذا لا يوجد رمز لإدخاله هذه المرة.">You confirmed it on an earlier order, so there is no code to enter this time.</p>
+          </div>
+        </div>
+
+        <a href="checkout-payment.html" class="bb-btn bb-btn--accent mt-5 hidden md:flex"
+           data-en="Continue to payment" data-ar="المتابعة إلى الدفع">Continue to payment</a>
+      </section>
+
+      <!-- CODE PANEL — six boxes, one minute before Resend unlocks -->
+      <section id="verifyCode" class="bb-checkout-card mt-4">
         <h2 class="bb-checkout-card-title">
           <span class="bb-checkout-card-num">2</span>
-          <span data-en="Delivery type" data-ar="نوع التوصيل">Delivery type</span>
+          <span data-en="Enter the code" data-ar="أدخل الرمز">Enter the code</span>
         </h2>
 
-        <!-- REPEATABLE: .bb-opt — one per available slot -->
-        <div id="slotList" class="grid sm:grid-cols-3 gap-2.5"></div>
-      </section>
+        <p class="text-[12px] font-bold text-gray-500 leading-relaxed"
+           data-en="We sent a 6-digit code by SMS to the number above."
+           data-ar="أرسلنا رمزاً من ٦ أرقام برسالة نصية إلى الرقم أعلاه.">We sent a 6-digit code by SMS to the number above.</p>
 
-      <!-- 3 · CART DETAILS — the items being paid for, plus the delivery
-           instructions that travel with them -->
-      <section class="bb-checkout-card">
-        <div class="flex items-start justify-between gap-3">
-          <h2 class="bb-checkout-card-title mb-0">
-            <span class="bb-checkout-card-num">3</span>
-            <span data-en="Cart details" data-ar="تفاصيل السلة">Cart details</span>
-          </h2>
-          <a href="cart.html" class="shrink-0 text-xs font-extrabold text-brand-green hover:opacity-80 transition"
-             data-en="Edit cart" data-ar="تعديل السلة">Edit cart</a>
+        <!-- REPEATABLE: one <input> per code digit -->
+        <div id="verifyOtpInputs" class="bb-otp mt-4">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
         </div>
 
-        <!-- REPEATABLE: .bb-checkout-line — one per cart line (filled by JS) -->
-        <div id="checkoutItems" class="space-y-2.5 mt-3"></div>
+        <!-- Demo only: a real build never shows the code on screen -->
+        <p class="text-[11px] font-bold text-gray-400 mt-3">
+          <span data-en="Demo code:" data-ar="رمز التجربة:">Demo code:</span>
+          <span class="text-brand-green font-extrabold" dir="ltr">123456</span>
+        </p>
 
-        <!-- Delivery instructions stay with the cart details -->
-        <div class="mt-4 border-t border-gray-100 pt-4">
-          <label class="bb-label" for="orderNote" data-en="Delivery instructions" data-ar="تعليمات التوصيل">Delivery instructions</label>
-          <textarea id="orderNote" rows="2" class="bb-field resize-none"
-                    data-placeholder-en="Ring the bell twice, leave at the door…"
-                    data-placeholder-ar="اقرع الجرس مرتين، اتركه عند الباب…"
-                    placeholder="Ring the bell twice, leave at the door…"></textarea>
+        <p id="verifyOtpError" class="bb-field-error hidden"
+           data-en="That code is not correct. Check it and try again."
+           data-ar="الرمز غير صحيح. تحقق منه وحاول مرة أخرى.">That code is not correct. Check it and try again.</p>
 
-          <label class="flex items-start gap-2.5 mt-3 cursor-pointer">
-            <input id="contactlessOpt" type="checkbox" class="mt-0.5 w-4 h-4 accent-brand-green shrink-0" />
-            <span class="text-xs font-bold text-gray-600"
-                  data-en="Contactless delivery — leave my order at the door"
-                  data-ar="توصيل بدون تلامس — اترك طلبي عند الباب">Contactless delivery — leave my order at the door</span>
-          </label>
-        </div>
-      </section>
-
-      <!-- 4 · VOUCHER — under the cart items and above the price details,
-           so the discount is applied before the totals are read -->
-      <section class="bb-checkout-card">
-        <h2 class="bb-checkout-card-title">
-          <span class="bb-checkout-card-num">4</span>
-          <span data-en="Voucher" data-ar="قسيمة الخصم">Voucher</span>
-        </h2>
-
-        <label class="bb-label" for="promoInput" data-en="Have a voucher code?" data-ar="لديك كود قسيمة؟">Have a voucher code?</label>
-        <div class="flex items-center gap-2">
-          <input id="promoInput" type="text" class="bb-field flex-1 uppercase"
-                 data-placeholder-en="e.g. BOBO10" data-placeholder-ar="مثال BOBO10" placeholder="e.g. BOBO10" />
-          <button id="promoApplyBtn"
-                  class="shrink-0 bg-brand-green text-white text-xs font-extrabold rounded-full px-5 py-2.5 hover:opacity-90 transition"
-                  data-en="Apply" data-ar="تطبيق">Apply</button>
-        </div>
-        <p id="promoMsg" class="hidden bb-promo-msg"></p>
-      </section>
-
-      <!-- PRICE DETAILS — subtotal, delivery charges, voucher discount and
-           total; recomputed by JS whenever anything above changes -->
-      <section class="bb-checkout-card">
-        <h2 class="bb-checkout-card-title" data-en="Price details" data-ar="تفاصيل السعر">Price details</h2>
-
-        <div class="space-y-2 text-sm font-semibold text-gray-600">
-          <div class="flex items-center justify-between">
-            <span data-en="Subtotal" data-ar="المجموع الفرعي">Subtotal</span>
-            <span id="checkoutSubtotal" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
-          </div>
-          <div class="flex items-center justify-between">
-            <span data-en="Delivery charges" data-ar="رسوم التوصيل">Delivery charges</span>
-            <span id="checkoutDelivery" class="bb-price font-extrabold text-gray-900">KD 0.000</span>
-          </div>
-          <div id="checkoutDiscountRow" class="hidden items-center justify-between">
-            <span data-en="Voucher discount" data-ar="خصم القسيمة">Voucher discount</span>
-            <span id="checkoutDiscount" class="bb-price font-extrabold text-brand-green">− KD 0.000</span>
-          </div>
-          <div class="border-t border-gray-200 pt-2 flex items-center justify-between text-base">
-            <span class="font-extrabold text-gray-900" data-en="Total" data-ar="الإجمالي">Total</span>
-            <span id="checkoutTotal" class="bb-price font-extrabold text-brand-green">KD 0.000</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- 5 · PAYMENT (with brand images) — last section, followed by the
-           place-order action -->
-      <section class="bb-checkout-card">
-        <h2 class="bb-checkout-card-title">
-          <span class="bb-checkout-card-num">5</span>
-          <span data-en="Payment" data-ar="الدفع">Payment</span>
-        </h2>
-
-        <!-- REPEATABLE: .bb-opt — one per enabled payment method -->
-        <div id="paymentList" class="space-y-2.5"></div>
-
-        <!-- Card fields — shown only when the card method is selected.
-             .NET later: replaced by the gateway's hosted fields / iframe,
-             so raw card data never touches the app. -->
-        <div id="cardFields" class="hidden mt-4 border-t border-gray-100 pt-4 space-y-3">
-          <div>
-            <label class="bb-label" data-en="Card number" data-ar="رقم البطاقة">Card number</label>
-            <input type="text" inputmode="numeric" autocomplete="cc-number" class="bb-field" dir="ltr"
-                   placeholder="4242 4242 4242 4242" />
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="bb-label" data-en="Expiry" data-ar="تاريخ الانتهاء">Expiry</label>
-              <input type="text" inputmode="numeric" autocomplete="cc-exp" class="bb-field" dir="ltr" placeholder="MM/YY" />
-            </div>
-            <div>
-              <label class="bb-label" data-en="CVV" data-ar="رمز التحقق">CVV</label>
-              <input type="text" inputmode="numeric" autocomplete="cc-csc" class="bb-field" dir="ltr" placeholder="123" />
-            </div>
-          </div>
-          <p class="text-[11px] font-bold text-gray-400"
-             data-en="🔒 Payments are processed securely. Card details are never stored."
-             data-ar="🔒 تتم معالجة المدفوعات بشكل آمن. لا يتم تخزين بيانات البطاقة.">🔒 Payments are processed securely. Card details are never stored.</p>
+        <div class="flex items-center justify-between gap-3 mt-4 flex-wrap">
+          <p class="text-[11.5px] font-bold text-gray-500">
+            <span data-en="Did not get it?" data-ar="لم يصلك الرمز؟">Did not get it?</span>
+            <span id="verifyTimerWrap" class="ms-1">
+              <span data-en="Resend in" data-ar="إعادة الإرسال بعد">Resend in</span>
+              <span id="verifyTimer" class="text-brand-green font-extrabold" dir="ltr">01:00</span>
+            </span>
+          </p>
+          <button type="button" id="verifyResendBtn" class="bb-btn bb-btn--ghost bb-btn--sm" disabled
+                  data-en="Resend code" data-ar="إعادة إرسال الرمز">Resend code</button>
         </div>
 
-        <!-- Desktop place-order button (mobile uses the fixed bar below) -->
-        <button id="placeOrderBtn"
-                class="hidden md:block w-full mt-5 bg-brand-orange text-white font-extrabold text-sm rounded-full py-3 hover:opacity-90 transition"
-                data-en="Place order" data-ar="تأكيد الطلب">Place order</button>
-
-        <p class="text-[11px] text-gray-400 font-semibold text-center mt-2.5 leading-relaxed"
-           data-en="By placing this order you agree to our terms & delivery policy."
-           data-ar="بتأكيد الطلب فإنك توافق على الشروط وسياسة التوصيل.">By placing this order you agree to our terms &amp; delivery policy.</p>
+        <!-- Desktop continue (mobile uses the fixed bar below) -->
+        <button type="button" id="verifyConfirmBtn" class="hidden md:flex bb-btn bb-btn--accent mt-5"
+                data-en="Verify &amp; continue" data-ar="تأكيد ومتابعة">Verify &amp; continue</button>
       </section>
     </div>
-
     <!-- ============================================================
          FOOTER — sitewide links (mobile + desktop)
          .NET: becomes a shared _Footer partial
@@ -380,17 +313,11 @@
     </footer>
   </main>
 
-  <!-- PLACE ORDER BAR — fixed at the bottom on mobile only -->
-  <div id="placeOrderBar" class="bb-place-bar md:hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-100 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-    <div class="flex items-center gap-4">
-      <div class="shrink-0">
-        <span class="block text-[11px] font-bold text-gray-400" data-en="Total" data-ar="الإجمالي">Total</span>
-        <span id="checkoutTotalBar" class="bb-price text-lg font-extrabold text-gray-900">KD 0.000</span>
-      </div>
-      <button id="placeOrderBtnMobile"
-              class="flex-1 bg-brand-orange text-white font-extrabold text-sm rounded-full py-3.5 hover:opacity-90 transition"
-              data-en="Place order" data-ar="تأكيد الطلب">Place order</button>
-    </div>
+  <!-- VERIFY BAR — fixed at the bottom on mobile only -->
+  <div id="verifyBar" class="bb-place-bar md:hidden fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-100 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <button type="button" id="verifyConfirmMobile"
+            class="w-full bg-brand-orange text-white font-extrabold text-sm rounded-full py-3.5 hover:opacity-90 transition"
+            data-en="Verify &amp; continue" data-ar="تأكيد ومتابعة">Verify &amp; continue</button>
   </div>
 
   <script src="js/main.js"></script>
