@@ -78,7 +78,30 @@
          data-en="Sign in to see your addresses, orders and saved cart."
          data-ar="سجّل دخولك لعرض عناوينك وطلباتك وسلتك المحفوظة.">Sign in to see your addresses, orders and saved cart.</p>
 
-      <form id="loginForm" class="mt-7 space-y-4" novalidate>
+      <!-- ============================================================
+           GENERAL MESSAGES — one place for every screen-level outcome
+           (signed in, account created, wrong password, email already
+           registered). Field-level errors stay next to their field.
+           .NET later: bound to the ModelState summary / TempData.
+      ============================================================ -->
+      <div id="authAlerts" class="mt-5 space-y-2.5" role="status" aria-live="polite">
+        <div id="authSuccess" class="bb-alert bb-alert--success hidden">
+          <svg class="bb-alert-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5"/></svg>
+          <div class="min-w-0">
+            <p id="authSuccessTitle" class="bb-alert-title"></p>
+            <p id="authSuccessText" class="bb-alert-text"></p>
+          </div>
+        </div>
+        <div id="authError" class="bb-alert bb-alert--error hidden">
+          <svg class="bb-alert-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="min-w-0">
+            <p id="authErrorTitle" class="bb-alert-title"></p>
+            <p id="authErrorText" class="bb-alert-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <form id="loginForm" class="mt-6 space-y-4" novalidate>
 
         <!-- Email -->
         <div>
@@ -118,11 +141,6 @@
           <a href="forgot-password.html" class="text-xs font-extrabold text-brand-green hover:underline shrink-0"
              data-en="Forgot password?" data-ar="نسيت كلمة المرور؟">Forgot password?</a>
         </div>
-
-        <!-- Wrong-credentials message from the server -->
-        <p id="loginError" class="bb-promo-msg is-bad hidden"
-           data-en="That email and password do not match. Please try again."
-           data-ar="البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.">That email and password do not match. Please try again.</p>
 
         <button type="submit" class="bb-btn bb-btn--primary mt-2"
                 data-en="Sign in" data-ar="تسجيل الدخول">Sign in</button>

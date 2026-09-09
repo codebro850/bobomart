@@ -76,8 +76,8 @@ Rules:
 
 | Page | Description |
 |---|---|
-| `login.html` | Sign in with email + password, remember me, forgot-password link, guest checkout |
-| `register.html` | One page: first name, last name, **email verified by a 6-digit code** (60 s resend lock), password + confirm, terms |
+| `login.html` | Sign in with email + password, remember me, forgot-password link, guest checkout, general success/error block |
+| `register.html` | One page: first name, last name, **email verified by a 6-digit code** (60 s resend lock), password + confirm, terms, general success/error block |
 | `forgot-password.html` | Email → code → new password → done, reusing the same OTP component |
 | `account-details.html` | Edit name, email, mobile, birthday, language; change password; delete account |
 | `account-addresses.html` | Saved addresses (add / edit / delete / make default) — the same list checkout reads |
@@ -165,7 +165,7 @@ Later pages: `categories.html`, `cart.html`, `orders.html`, `profile.html` → e
 - [ ] Cart page with stepper logic and free-delivery progress
 - [ ] Profile page with picture
 - [ ] Orders page
-- [x] Login / register / forgot password (email OTP with 60 s resend)
+- [x] Login / register / forgot password (email OTP with 60 s resend, general success/error messages)
 - [x] Account pages (details, addresses, payment methods, notifications)
 - [x] Static pages (about us, help & FAQ, delivery information, returns, terms & privacy)
 - [x] Checkout mobile verification (SMS code after the address step; skipped for an already-verified number)

@@ -81,7 +81,30 @@
          data-en="One account for your addresses, orders and faster checkout."
          data-ar="حساب واحد لعناوينك وطلباتك وإتمام أسرع للطلب.">One account for your addresses, orders and faster checkout.</p>
 
-      <form id="registerForm" class="mt-7 space-y-4" novalidate>
+      <!-- ============================================================
+           GENERAL MESSAGES — one place for every screen-level outcome
+           (signed in, account created, wrong password, email already
+           registered). Field-level errors stay next to their field.
+           .NET later: bound to the ModelState summary / TempData.
+      ============================================================ -->
+      <div id="authAlerts" class="mt-5 space-y-2.5" role="status" aria-live="polite">
+        <div id="authSuccess" class="bb-alert bb-alert--success hidden">
+          <svg class="bb-alert-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m8.5 12.5 2.5 2.5 5-5"/></svg>
+          <div class="min-w-0">
+            <p id="authSuccessTitle" class="bb-alert-title"></p>
+            <p id="authSuccessText" class="bb-alert-text"></p>
+          </div>
+        </div>
+        <div id="authError" class="bb-alert bb-alert--error hidden">
+          <svg class="bb-alert-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div class="min-w-0">
+            <p id="authErrorTitle" class="bb-alert-title"></p>
+            <p id="authErrorText" class="bb-alert-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <form id="registerForm" class="mt-6 space-y-4" novalidate>
 
         <!-- First / last name -->
         <div class="grid sm:grid-cols-2 gap-3">
@@ -209,10 +232,6 @@
             <a href="terms.html" target="_blank" data-en="Terms &amp; privacy policy" data-ar="الشروط وسياسة الخصوصية">Terms &amp; privacy policy</a>
           </span>
         </label>
-
-        <p id="registerError" class="bb-field-error hidden"
-           data-en="Fill in your name, verify your email, choose a password of 8+ characters and accept the terms"
-           data-ar="أدخل اسمك ووثّق بريدك واختر كلمة مرور من ٨ أحرف أو أكثر ووافق على الشروط">Fill in your name, verify your email, choose a password of 8+ characters and accept the terms</p>
 
         <button type="submit" class="bb-btn bb-btn--primary mt-2"
                 data-en="Create account" data-ar="إنشاء الحساب">Create account</button>

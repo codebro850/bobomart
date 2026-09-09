@@ -1641,6 +1641,118 @@ function renderAuthState() {
 
 renderAuthState();
 
+/* ---------- general success / error messages ----------
+   Login and register each carry one #authAlerts block. Everything the
+   screen has to say at form level goes through here, so the customer
+   always looks in the same place for it — field-level errors stay
+   beside their field.
+   .NET later: these strings come from .resx and the block is bound to
+   the ModelState summary / TempData message. */
+const AUTH_MESSAGES = {
+  // login
+  signedIn: {
+    kind: 'success',
+    titleEn: 'Signed in', titleAr: 'تم تسجيل الدخول',
+    textEn: 'Taking you to the shop…', textAr: 'جارٍ تحويلك إلى المتجر…',
+  },
+  loginRejected: {
+    kind: 'error',
+    titleEn: 'We could not sign you in', titleAr: 'لم نتمكن من تسجيل دخولك',
+    textEn: 'That email and password do not match. Check them and try again, or reset your password.',
+    textAr: 'البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقق منهما وحاول مرة أخرى، أو أعد تعيين كلمة المرور.',
+  },
+  loginIncomplete: {
+    kind: 'error',
+    titleEn: 'Some details are missing', titleAr: 'بعض البيانات ناقصة',
+    textEn: 'Please correct the fields marked below.',
+    textAr: 'يرجى تصحيح الحقول المشار إليها أدناه.',
+  },
+
+  // register
+  codeSent: {
+    kind: 'success',
+    titleEn: 'Code sent', titleAr: 'تم إرسال الرمز',
+    textEn: 'Check your inbox and enter the 6-digit code below.',
+    textAr: 'تحقق من بريدك وأدخل الرمز المكوّن من ٦ أرقام أدناه.',
+  },
+  emailVerified: {
+    kind: 'success',
+    titleEn: 'Email verified', titleAr: 'تم توثيق البريد',
+    textEn: 'Choose a password to finish creating your account.',
+    textAr: 'اختر كلمة مرور لإكمال إنشاء حسابك.',
+  },
+  accountCreated: {
+    kind: 'success',
+    titleEn: 'Account created', titleAr: 'تم إنشاء الحساب',
+    textEn: 'Welcome to BoboMart — taking you to the shop…',
+    textAr: 'مرحباً بك في بوبومارت — جارٍ تحويلك إلى المتجر…',
+  },
+  emailTaken: {
+    kind: 'error',
+    titleEn: 'That email already has an account', titleAr: 'هذا البريد له حساب بالفعل',
+    textEn: 'Sign in instead, or use a different email address.',
+    textAr: 'سجّل الدخول بدلاً من ذلك، أو استخدم بريداً إلكترونياً آخر.',
+  },
+  emailNotVerified: {
+    kind: 'error',
+    titleEn: 'Verify your email first', titleAr: 'وثّق بريدك الإلكتروني أولاً',
+    textEn: 'Tap “Send code”, then enter the 6-digit code we email you.',
+    textAr: 'اضغط «إرسال الرمز» ثم أدخل الرمز المكوّن من ٦ أرقام الذي نرسله إليك.',
+  },
+  registerIncomplete: {
+    kind: 'error',
+    titleEn: 'We cannot create the account yet', titleAr: 'لا يمكننا إنشاء الحساب بعد',
+    textEn: 'Fill in your name, choose a password of 8+ characters and accept the terms.',
+    textAr: 'أدخل اسمك واختر كلمة مرور من ٨ أحرف أو أكثر ووافق على الشروط.',
+  },
+};
+
+// Paints one message into the block and hides the other kind, so the
+// screen never shows a success and an error at the same time.
+function showAuthMessage(key) {
+  const msg = AUTH_MESSAGES[key];
+  const box = document.getElementById(msg && msg.kind === 'success' ? 'authSuccess' : 'authError');
+  const other = document.getElementById(msg && msg.kind === 'success' ? 'authError' : 'authSuccess');
+  if (!msg || !box) return;
+
+  const prefix = msg.kind === 'success' ? 'authSuccess' : 'authError';
+  const title = document.getElementById(`${prefix}Title`);
+  const text = document.getElementById(`${prefix}Text`);
+
+  title.dataset.en = msg.titleEn;
+  title.dataset.ar = msg.titleAr;
+  title.textContent = isArabic() ? msg.titleAr : msg.titleEn;
+
+  text.dataset.en = msg.textEn || '';
+  text.dataset.ar = msg.textAr || '';
+  text.textContent = isArabic() ? text.dataset.ar : text.dataset.en;
+  text.classList.toggle('hidden', !msg.textEn);
+
+  if (other) other.classList.add('hidden');
+  box.classList.remove('hidden');
+  box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+function clearAuthMessages() {
+  ['authSuccess', 'authError'].forEach((id) => {
+    const box = document.getElementById(id);
+    if (box) box.classList.add('hidden');
+  });
+}
+
+// Demo stand-in for "is this email already registered?". The stored
+// account and the demo customer both count, so the error path can be
+// seen on the review build.
+// .NET later: a lookup against the customers table.
+function isEmailTaken(value) {
+  const email = String(value || '').trim().toLowerCase();
+  if (!email) return false;
+  const taken = new Set([DEMO_USER.email]);
+  const stored = loadUser();
+  if (stored && stored.email) taken.add(String(stored.email).toLowerCase());
+  return taken.has(email);
+}
+
 /* ============================================================
    10. LOGIN PAGE
    Only runs when #loginPage exists (login.html).
@@ -1653,22 +1765,24 @@ function initLoginPage() {
 
   const email = document.getElementById('loginEmail');
   const password = document.getElementById('loginPassword');
-  const failed = document.getElementById('loginError');
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    failed.classList.add('hidden');
+    clearAuthMessages();
 
     const badEmail = !isEmail(email.value);
     const badPassword = password.value.trim().length < 1;
     setFieldError('loginEmail', 'loginEmailError', badEmail);
     setFieldError('loginPassword', 'loginPasswordError', badPassword);
-    if (badEmail || badPassword) return;
+    if (badEmail || badPassword) {
+      showAuthMessage('loginIncomplete');
+      return;
+    }
 
     // Demo: any password of 6+ characters signs the customer in. The
     // real check happens on the server.
     if (password.value.length < 6) {
-      failed.classList.remove('hidden');
+      showAuthMessage('loginRejected');
       return;
     }
 
@@ -1682,7 +1796,11 @@ function initLoginPage() {
       email: email.value.trim().toLowerCase(),
     });
 
-    location.href = 'index.html';
+    // Confirm it on screen before leaving, or the message flashes past
+    showAuthMessage('signedIn');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    setTimeout(() => { location.href = 'index.html'; }, 900);
   });
 }
 
@@ -1711,9 +1829,17 @@ function initRegisterPage() {
   const otp = initOtpGroup('otpInputs', () => document.getElementById('otpError').classList.add('hidden'));
 
   sendBtn.addEventListener('click', () => {
+    clearAuthMessages();
+
     const bad = !isEmail(emailInput.value);
     setFieldError('regEmail', 'regEmailError', bad);
     if (bad) return;
+
+    // The server checks this before spending an SMS/email on a code
+    if (isEmailTaken(emailInput.value)) {
+      showAuthMessage('emailTaken');
+      return;
+    }
 
     document.getElementById('otpTarget').textContent = emailInput.value.trim();
     otpPanel.classList.remove('hidden');
@@ -1725,6 +1851,8 @@ function initRegisterPage() {
     sendBtn.dataset.en = 'Code sent';
     sendBtn.dataset.ar = 'تم الإرسال';
     sendBtn.textContent = isArabic() ? sendBtn.dataset.ar : sendBtn.dataset.en;
+
+    showAuthMessage('codeSent');
   });
 
   document.getElementById('resendOtpBtn').addEventListener('click', () => {
@@ -1745,7 +1873,7 @@ function initRegisterPage() {
     verifiedBadge.classList.remove('hidden');
     emailInput.readOnly = true;
     sendBtn.classList.add('hidden');
-    document.getElementById('registerError').classList.add('hidden');
+    showAuthMessage('emailVerified');
   });
 
   document.getElementById('changeEmailBtn').addEventListener('click', () => {
@@ -1765,6 +1893,7 @@ function initRegisterPage() {
   /* ---------- create the account ---------- */
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    clearAuthMessages();
 
     const first = document.getElementById('regFirstName').value.trim();
     const last = document.getElementById('regLastName').value.trim();
@@ -1776,11 +1905,20 @@ function initRegisterPage() {
     const mismatch = pass !== pass2;
     setFieldError('regPassword2', 'regPassword2Error', mismatch && pass2.length > 0);
 
-    const bad = !first || !last || !emailVerified
-      || pass.length < 8 || mismatch
-      || !document.getElementById('regTerms').checked;
-    document.getElementById('registerError').classList.toggle('hidden', !bad);
-    if (bad) return;
+    // One message at a time, most specific first
+    if (isEmailTaken(emailInput.value)) {
+      showAuthMessage('emailTaken');
+      return;
+    }
+    if (!emailVerified) {
+      showAuthMessage('emailNotVerified');
+      return;
+    }
+    if (!first || !last || pass.length < 8 || mismatch
+        || !document.getElementById('regTerms').checked) {
+      showAuthMessage('registerIncomplete');
+      return;
+    }
 
     saveUser({
       firstName: first,
@@ -1790,7 +1928,11 @@ function initRegisterPage() {
       phone: '',
     });
 
-    location.href = 'index.html';
+    // Confirm it on screen before leaving, or the message flashes past
+    showAuthMessage('accountCreated');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    setTimeout(() => { location.href = 'index.html'; }, 900);
   });
 }
 
