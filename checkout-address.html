@@ -89,9 +89,12 @@
 
   <!-- ============================================================
        CHECKOUT · STEP 1 of 3 — DELIVERY ADDRESS
-       Delivery-address fields only. Saved addresses are picked from a
-       dropdown (no "add new address" click needed — the fields are on
-       the page from the start and fill in from the selection).
+       Delivery address *and* the contact-number check, on one page.
+       Saved addresses are picked from a dropdown (no "add new address"
+       click needed — the fields are on the page from the start and fill
+       in from the selection). A number confirmed on an earlier order
+       shows a green tick; any other number is confirmed by code right
+       here, so there is no separate verification page.
        .NET later: a Checkout/Address view; the dropdown binds to the
        user's addresses and Continue POSTs the chosen/edited address.
   ============================================================ -->
@@ -108,7 +111,9 @@
     <h1 class="bb-section-title text-xl md:text-2xl font-extrabold mt-2"
         data-en="Delivery address" data-ar="عنوان التوصيل">Delivery address</h1>
 
-    <!-- Funnel trail: Address → Payment → Confirm -->
+    <!-- Funnel trail: Address → Payment → Confirm.
+         Number confirmation is no longer a step of its own — it happens
+         on this page, beside the contact number. -->
     <div class="bb-steps mt-4 mb-6 max-w-lg">
       <div class="bb-step is-active">
         <span class="bb-step-num">1</span>
@@ -117,16 +122,11 @@
       <span class="bb-step-sep"></span>
       <div class="bb-step">
         <span class="bb-step-num">2</span>
-        <span class="bb-step-label" data-en="Verify" data-ar="التحقق">Verify</span>
-      </div>
-      <span class="bb-step-sep"></span>
-      <div class="bb-step">
-        <span class="bb-step-num">3</span>
         <span class="bb-step-label" data-en="Payment" data-ar="الدفع">Payment</span>
       </div>
       <span class="bb-step-sep"></span>
       <div class="bb-step">
-        <span class="bb-step-num">4</span>
+        <span class="bb-step-num">3</span>
         <span class="bb-step-label" data-en="Confirm" data-ar="التأكيد">Confirm</span>
       </div>
     </div>
@@ -225,22 +225,88 @@
             </div>
           </div>
 
-          <!-- Contact number — the driver calls this number, and it is
-               the one confirmed by SMS on the next step, so it is required.
-               If the number typed is one this customer already confirmed,
-               the tick appears and the next step is skipped. -->
+          <!-- Contact number — the driver calls this number, so it is
+               required and confirmed here, on this page. A number this
+               customer already confirmed shows the green tick and asks
+               for nothing else; any other number opens the code panel
+               right below the field, without leaving the page.
+               .NET later: the code is issued and checked server-side and
+               the confirmed number is stored on the customer record. -->
           <div>
             <label class="bb-label" for="addrPhone" data-en="Contact number *" data-ar="رقم الاتصال *">Contact number *</label>
             <!-- Dummy hint: a Kuwaiti number never starts with 0, so this can never be real -->
             <input id="addrPhone" type="tel" class="bb-field" dir="ltr" placeholder="+965 0000 0000" />
+
+            <!-- VERIFIED — this number is confirmed, nothing to type -->
             <div id="addrPhoneVerified" class="hidden mt-2">
               <span class="bb-verified">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m20 6-11 11-5-5"/></svg>
-                <span data-en="Already verified" data-ar="تم التحقق مسبقاً">Already verified</span>
+                <span data-en="Verified" data-ar="تم التحقق">Verified</span>
               </span>
               <span class="text-[11px] font-bold text-gray-400 ms-2"
                     data-en="No code needed this time" data-ar="لا حاجة لرمز هذه المرة">No code needed this time</span>
             </div>
+
+            <!-- NOT CONFIRMED YET — one tap sends the code to this number -->
+            <div id="addrPhoneUnverified" class="hidden mt-2 flex items-center gap-3 flex-wrap">
+              <button type="button" id="addrSendCodeBtn" class="bb-btn bb-btn--ghost bb-btn--sm"
+                      data-en="Send code" data-ar="إرسال الرمز">Send code</button>
+              <span class="text-[11px] font-bold text-gray-400"
+                    data-en="This number needs a quick SMS check"
+                    data-ar="هذا الرقم يحتاج إلى تحقق سريع برسالة نصية">This number needs a quick SMS check</span>
+            </div>
+
+            <!-- CODE PANEL — opens in place, under the field. Six boxes,
+                 one minute before Resend unlocks. -->
+            <div id="addrOtpPanel" class="hidden mt-3 rounded-2xl border border-gray-100 bg-gray-50 p-4">
+              <p class="text-[12px] font-bold text-gray-500 leading-relaxed">
+                <span data-en="We sent a 6-digit code by SMS to"
+                      data-ar="أرسلنا رمزاً من ٦ أرقام برسالة نصية إلى">We sent a 6-digit code by SMS to</span>
+                <span id="addrOtpTarget" class="text-gray-900 font-extrabold" dir="ltr"></span>
+              </p>
+
+              <!-- REPEATABLE: one <input> per code digit -->
+              <div id="addrOtpInputs" class="bb-otp bb-otp--fit mt-3">
+                <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
+                <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+                <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+                <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+                <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+                <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+              </div>
+
+              <!-- Demo only: a real build never shows the code on screen -->
+              <p class="text-[11px] font-bold text-gray-400 mt-3">
+                <span data-en="Demo code:" data-ar="رمز التجربة:">Demo code:</span>
+                <span class="text-brand-green font-extrabold" dir="ltr">123456</span>
+              </p>
+
+              <p id="addrOtpError" class="bb-field-error hidden"
+                 data-en="That code is not correct. Check it and try again."
+                 data-ar="الرمز غير صحيح. تحقق منه وحاول مرة أخرى.">That code is not correct. Check it and try again.</p>
+
+              <div class="flex items-center justify-between gap-3 mt-3 flex-wrap">
+                <p class="text-[11.5px] font-bold text-gray-500">
+                  <span data-en="Did not get it?" data-ar="لم يصلك الرمز؟">Did not get it?</span>
+                  <span id="addrOtpTimerWrap" class="ms-1">
+                    <span data-en="Resend in" data-ar="إعادة الإرسال بعد">Resend in</span>
+                    <span id="addrOtpTimer" class="text-brand-green font-extrabold" dir="ltr">01:00</span>
+                  </span>
+                </p>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="addrOtpResendBtn" class="bb-btn bb-btn--ghost bb-btn--sm" disabled
+                          data-en="Resend code" data-ar="إعادة إرسال الرمز">Resend code</button>
+                  <button type="button" id="addrOtpVerifyBtn" class="bb-btn bb-btn--accent bb-btn--sm"
+                          data-en="Verify" data-ar="تحقق">Verify</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shown when Continue is pressed on a number that has not
+                 been confirmed yet — the code panel above opens with it -->
+            <p id="addrVerifyError" class="hidden bb-promo-msg is-bad"
+               data-en="Please confirm the contact number with the code sent to it"
+               data-ar="يرجى تأكيد رقم الاتصال بالرمز المرسل إليه">Please confirm the contact number with the code sent to it</p>
           </div>
 
           <!-- Extra directions -->
@@ -255,6 +321,7 @@
           <p id="addrError" class="hidden bb-promo-msg is-bad"
              data-en="Please fill in the area, block, street and contact number"
              data-ar="يرجى إدخال المنطقة والقطعة والشارع ورقم الاتصال">Please fill in the area, block, street and contact number</p>
+
         </div>
 
         <!-- Desktop continue (mobile uses the fixed bar below) -->

@@ -714,14 +714,15 @@ function initProductPage() {
 initProductPage();
 
 /* ============================================================
-   7. CHECKOUT — four pages, one shared draft.
-        step 1  checkout-address.html  → delivery address
-        step 2  checkout-verify.html   → contact number confirmed by SMS
-                                         (skipped for a number already
-                                         verified on an earlier order)
-        step 3  checkout-payment.html  → delivery type, cart details,
+   7. CHECKOUT — three pages, one shared draft.
+        step 1  checkout-address.html  → delivery address, and the
+                                         contact number confirmed by SMS
+                                         on the same page (a number
+                                         verified on an earlier order
+                                         just shows a green tick)
+        step 2  checkout-payment.html  → delivery type, cart details,
                                          voucher, payment
-        step 4  checkout-confirm.html  → order confirmed
+        step 3  checkout-confirm.html  → order confirmed
    The draft lives in localStorage so each page picks up where the
    previous one left off.
    .NET later: the draft becomes TempData / a server-side checkout
@@ -810,9 +811,10 @@ const PROMOS = {
 /* ------------------------------------------------------------
    VERIFIED MOBILE NUMBERS
    The driver calls the number on the delivery address, so checkout
-   confirms it by SMS (step 2). Numbers already confirmed are
-   remembered, so entering a *new* address with a number this customer
-   has confirmed before shows a tick and skips the code screen.
+   confirms it by SMS — on the address page itself, not a step of its
+   own. Numbers already confirmed are remembered, so entering a *new*
+   address with a number this customer has confirmed before shows a
+   tick and asks for no code at all.
    .NET later: a VerifiedPhones table on the customer; this list and
    the demo code both move server-side.
 ------------------------------------------------------------ */
@@ -945,12 +947,16 @@ function blockEmptyCheckout(rootId, barId) {
 }
 
 /* ============================================================
-   7a. STEP 1 — DELIVERY ADDRESS
+   7a. STEP 1 — DELIVERY ADDRESS (+ contact-number check)
    A dropdown of every saved address sits above the address fields,
    which are always on the page (no "add new address" tap). Picking a
    saved address fills the fields; "New address" clears them.
-   Continue goes to step 2 (mobile verification), or straight to
-   payment when the contact number was already confirmed.
+
+   The number is confirmed here rather than on a page of its own:
+     · a number confirmed on an earlier order → green tick, no code
+     · any other number → the code panel opens under the field and
+       the customer stays on this page to type it
+   Continue then goes straight to payment.
    Only runs when #checkoutAddress exists (checkout-address.html).
 ============================================================ */
 function initCheckoutAddressPage() {
@@ -1004,12 +1010,30 @@ function initCheckoutAddressPage() {
   renderSelect(saved ? startId : 'new');
   fillFields(draft.address && draft.address.id === startId ? draft.address : (saved || addresses[0]));
 
-  // The Continue button says where it goes: a number this customer has
-  // already confirmed skips the verification step, so the tick beside
-  // the field and the button label are painted together.
+  /* ---------- contact number, confirmed in place ----------
+     Three states share the space under the field: the green tick for a
+     number already confirmed, a "Send code" row for one that is not,
+     and the code panel once a code is on its way. Nothing here leaves
+     the page.
+     .NET later: Send code / Verify become two small POSTs; the code
+     itself is issued and checked server-side. */
+  const phoneInput = field('phone');
+  const unverifiedRow = document.getElementById('addrPhoneUnverified');
+  const otpPanel = document.getElementById('addrOtpPanel');
+  const otpTarget = document.getElementById('addrOtpTarget');
+  const otpError = document.getElementById('addrOtpError');
+  const verifyError = document.getElementById('addrVerifyError');
+
+  let otpOpen = false;     // is the code panel showing?
+  let otpSentTo = '';      // digits the current code was sent to
+
+  const otp = initOtpGroup('addrOtpInputs', () => otpError.classList.add('hidden'));
+
+  // The Continue button says what pressing it will do: an unconfirmed
+  // number is checked first, right here, before payment opens.
   function paintContinueLabel(verified) {
-    const en = verified ? 'Continue to payment' : 'Verify mobile number';
-    const ar = verified ? 'المتابعة إلى الدفع' : 'تأكيد رقم الجوال';
+    const en = verified ? 'Continue to payment' : 'Verify number & continue';
+    const ar = verified ? 'المتابعة إلى الدفع' : 'تأكيد الرقم ومتابعة';
     ['addressContinue', 'addressContinueMobile'].forEach((btnId) => {
       const btn = document.getElementById(btnId);
       if (!btn) return;
@@ -1019,11 +1043,70 @@ function initCheckoutAddressPage() {
     });
   }
 
+  function closeOtpPanel() {
+    otpOpen = false;
+    otpSentTo = '';
+    otpPanel.classList.add('hidden');
+    otpError.classList.add('hidden');
+    verifyError.classList.add('hidden');
+    if (otp) otp.clear();
+  }
+
+  // Paints everything that hangs off the number: the tick is handled by
+  // bindPhoneVerifiedBadge, this fills in the rest.
+  function paintPhoneRow(verified) {
+    // Typing a different number invalidates the code already sent
+    if (otpOpen && normalizePhone(phoneInput.value) !== otpSentTo) closeOtpPanel();
+
+    const longEnough = normalizePhone(phoneInput.value).length >= 7;
+    unverifiedRow.classList.toggle('hidden', verified || otpOpen || !longEnough);
+    paintContinueLabel(verified);
+  }
+
   const paintPhoneBadge =
-    bindPhoneVerifiedBadge('addrPhone', 'addrPhoneVerified', paintContinueLabel);
+    bindPhoneVerifiedBadge('addrPhone', 'addrPhoneVerified', paintPhoneRow);
+
+  // Sends the code and opens the panel under the field
+  function openOtpPanel() {
+    const digits = normalizePhone(phoneInput.value);
+    if (digits.length < 7) {
+      errorEl.classList.remove('hidden');
+      phoneInput.focus();
+      return false;
+    }
+    otpOpen = true;
+    otpSentTo = digits;
+    otpTarget.textContent = phoneInput.value.trim();
+    otpPanel.classList.remove('hidden');
+    unverifiedRow.classList.add('hidden');
+    otpError.classList.add('hidden');
+    otp.clear();
+    otp.focus();
+    startResendCountdown('addrOtpTimer', 'addrOtpTimerWrap', 'addrOtpResendBtn');
+    return true;
+  }
+
+  // Checks the typed code. On success the panel closes and the tick
+  // takes its place — the number is remembered for later orders too.
+  function confirmCode() {
+    if (otp.value !== DEMO_OTP) {
+      otp.markInvalid();
+      otpError.classList.remove('hidden');
+      return false;
+    }
+    markPhoneVerified(phoneInput.value);
+    closeOtpPanel();
+    paintPhoneBadge();
+    return true;
+  }
+
+  document.getElementById('addrSendCodeBtn').addEventListener('click', () => openOtpPanel());
+  document.getElementById('addrOtpResendBtn').addEventListener('click', () => openOtpPanel());
+  document.getElementById('addrOtpVerifyBtn').addEventListener('click', confirmCode);
 
   select.addEventListener('change', () => {
     errorEl.classList.add('hidden');
+    verifyError.classList.add('hidden');
     if (select.value === 'new') {
       fillFields({ area: AREAS[0].en, type: 'house' });
       field('label').focus();
@@ -1038,7 +1121,7 @@ function initCheckoutAddressPage() {
     const addr = {};
     Object.keys(FIELDS).forEach((key) => { addr[key] = field(key).value.trim(); });
 
-    // The contact number is required now: step 2 confirms it by SMS and
+    // The contact number is required: it is confirmed by SMS below and
     // the driver calls it on the day.
     if (!addr.area || !addr.block || !addr.street || normalizePhone(addr.phone).length < 7) {
       errorEl.classList.remove('hidden');
@@ -1046,6 +1129,22 @@ function initCheckoutAddressPage() {
       return;
     }
     errorEl.classList.add('hidden');
+
+    // Not confirmed yet — send the code and stay on this page. A second
+    // press, with the code typed, confirms it and carries on to payment.
+    if (!isPhoneVerified(addr.phone)) {
+      if (!otpOpen) {
+        if (!openOtpPanel()) return;
+        verifyError.classList.remove('hidden');
+        otpPanel.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        return;
+      }
+      if (!confirmCode()) {
+        otpPanel.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        return;
+      }
+    }
+    verifyError.classList.add('hidden');
 
     const editingSaved = select.value !== 'new';
     addr.id = editingSaved ? select.value : `addr-${addresses.length + 1}`;
@@ -1060,10 +1159,8 @@ function initCheckoutAddressPage() {
 
     saveDraft({ ...loadDraft(), address: addr });
 
-    // Already-confirmed numbers go straight to payment
-    location.href = isPhoneVerified(addr.phone)
-      ? 'checkout-payment.html'
-      : 'checkout-verify.html';
+    // The number is confirmed by this point, so payment is next
+    location.href = 'checkout-payment.html';
   }
 
   ['addressContinue', 'addressContinueMobile'].forEach((btnId) => {
@@ -1095,9 +1192,10 @@ function initCheckoutPaymentPage() {
     return;
   }
 
-  // Address in hand but the number is not confirmed — step 2 first
+  // Address in hand but the number is not confirmed — back to step 1,
+  // where the code panel sits under the contact field
   if (!isPhoneVerified(draft.address.phone)) {
-    location.replace('checkout-verify.html');
+    location.replace('checkout-address.html');
     return;
   }
 
@@ -2394,90 +2492,3 @@ function initSupportForm() {
 }
 
 initSupportForm();
-
-/* ============================================================
-   20. CHECKOUT STEP 2 — MOBILE VERIFICATION
-   The code is on its way the moment this page opens, because step 1
-   just submitted the number. A number this customer already
-   confirmed shows the "already verified" panel instead and walks
-   straight on to payment.
-   Only runs when #checkoutVerify exists (checkout-verify.html).
-   .NET later: a Checkout/VerifyPhone view; the code is issued and
-   checked server-side, and the confirmed number is stored on the
-   customer record rather than in localStorage.
-============================================================ */
-function initCheckoutVerifyPage() {
-  const root = document.getElementById('checkoutVerify');
-  if (!root) return;
-  if (blockEmptyCheckout('checkoutVerify', 'verifyBar')) return;
-
-  const isAr = () => document.documentElement.lang === 'ar';
-  const draft = loadDraft();
-
-  // No address yet — step 1 has to happen first
-  if (!draft.address) {
-    location.replace('checkout-address.html');
-    return;
-  }
-
-  const phone = draft.address.phone || '';
-  document.getElementById('verifyTarget').textContent = phone;
-
-  // The address under the number, so it is clear which one is being confirmed
-  const lineEl = document.getElementById('verifyAddrLine');
-  lineEl.dataset.en = `${draft.address.label} · ${addressLine(draft.address, false)}`;
-  lineEl.dataset.ar = `${addressName(draft.address, true)} · ${addressLine(draft.address, true)}`;
-  lineEl.textContent = isAr() ? lineEl.dataset.ar : lineEl.dataset.en;
-
-  const alreadyPanel = document.getElementById('verifyAlready');
-  const codePanel = document.getElementById('verifyCode');
-  const mobileBtn = document.getElementById('verifyConfirmMobile');
-
-  /* ---------- already confirmed: nothing to type ---------- */
-  if (isPhoneVerified(phone)) {
-    alreadyPanel.classList.remove('hidden');
-    codePanel.classList.add('hidden');
-
-    if (mobileBtn) {
-      mobileBtn.dataset.en = 'Continue to payment';
-      mobileBtn.dataset.ar = 'المتابعة إلى الدفع';
-      mobileBtn.textContent = isAr() ? mobileBtn.dataset.ar : mobileBtn.dataset.en;
-      mobileBtn.addEventListener('click', () => { location.href = 'checkout-payment.html'; });
-    }
-    return;
-  }
-
-  /* ---------- confirm by code ---------- */
-  const errorEl = document.getElementById('verifyOtpError');
-  const otp = initOtpGroup('verifyOtpInputs', () => errorEl.classList.add('hidden'));
-
-  function sendCode() {
-    errorEl.classList.add('hidden');
-    otp.clear();
-    otp.focus();
-    startResendCountdown('verifyTimer', 'verifyTimerWrap', 'verifyResendBtn');
-  }
-
-  // Step 1 submitted the number, so the first code is already on its way
-  sendCode();
-
-  document.getElementById('verifyResendBtn').addEventListener('click', sendCode);
-
-  function confirmCode() {
-    if (otp.value !== DEMO_OTP) {
-      otp.markInvalid();
-      errorEl.classList.remove('hidden');
-      return;
-    }
-    // Remembered, so a later address carrying this number needs no code
-    markPhoneVerified(phone);
-    location.href = 'checkout-payment.html';
-  }
-
-  ['verifyConfirmBtn', 'verifyConfirmMobile'].forEach((btnId) => {
-    const btn = document.getElementById(btnId);
-    if (btn) btn.addEventListener('click', confirmCode);
-  });
-}
-
-initCheckoutVerifyPage();

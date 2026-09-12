@@ -618,6 +618,9 @@ html[dir="rtl"] .bb-select { background-position: left 14px center; }
   .bb-otp { gap: 6px; }
   .bb-otp input { width: 40px; height: 48px; font-size: 18px; }
 }
+/* Inside a checkout card the row has less room than on a full-page OTP
+   screen, so the boxes share what there is instead of spilling over */
+.bb-otp--fit input { flex: 1 1 0; width: auto; min-width: 0; max-width: 44px; }
 
 /* Verified badge replacing the OTP panel once the code is accepted */
 .bb-verified {
